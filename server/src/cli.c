@@ -5,6 +5,6 @@
 #include "../headers/cli.h"
 
 CliArguments ParseCli(int argc, char ** argv){
-    CliArguments args = {"5279"};
+    CliArguments args = {"1080"};
     return args;
 }
