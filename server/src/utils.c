@@ -6,6 +6,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include "../headers/utils.h"
 #include "../headers/tcp.h"
 
@@ -44,3 +45,5 @@ int printSocketAddress(int fd, char *addrBuffer) {
     }
     return 1;
 }
+
+

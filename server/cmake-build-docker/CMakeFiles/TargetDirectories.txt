@@ -1,3 +1,0 @@
-/tmp/server/cmake-build-docker/CMakeFiles/rebuild_cache.dir
-/tmp/server/cmake-build-docker/CMakeFiles/edit_cache.dir
-/tmp/server/cmake-build-docker/CMakeFiles/Server.dir
