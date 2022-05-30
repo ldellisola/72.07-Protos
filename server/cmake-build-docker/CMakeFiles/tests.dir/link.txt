@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/tests.dir/tests/superTest.c.o  -o tests  -lgtest_main -lgtest 

@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/ExtraTests.dir/superTest.c.o  -o ExtraTests  ../lib/libgtest_maind.a ../libServerLib.a ../lib/libgtestd.a -lpthread 

@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/tmp/server/headers/cli.h
+
+/tmp/server/src/main.c
+stdio.h
+-
+netdb.h
+-
+memory.h
+-
+stdlib.h
+-
+unistd.h
+-
+signal.h
+-
+fcntl.h
+-
+stdbool.h
+-
+errno.h
+-
+../headers/cli.h
+/tmp/server/headers/cli.h
+

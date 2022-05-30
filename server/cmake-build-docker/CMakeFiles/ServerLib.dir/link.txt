@@ -1,0 +1,2 @@
+/usr/bin/ar qc libServerLib.a  CMakeFiles/ServerLib.dir/src/main.c.o CMakeFiles/ServerLib.dir/src/cli.c.o
+/usr/bin/ranlib libServerLib.a
