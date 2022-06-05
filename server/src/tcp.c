@@ -48,6 +48,7 @@ TcpSocket * InitTcpServer(const char * port ){
         return null;
     }
 
+
     LogInfo("Bound TCP server socket to file descriptor");
 
     if (listen(servSock, 10) < 0) {

@@ -5,6 +5,7 @@
 #define SERVER_UTILS_H
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #define null NULL
 #define OK 0

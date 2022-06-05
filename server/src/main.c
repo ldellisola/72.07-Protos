@@ -24,8 +24,21 @@ int main(int argc, char ** argv) {
 
     CliArguments arguments = ParseCli(argc,argv);
 
+    if (arguments.PrintVersion) {
+        printf("Version: 0.0.1");
+        return 0;
+    }
 
-    TcpSocket * server = InitSocks5Server(arguments.Port);
+    if (arguments.PrintHelp){
+        PrintHelp();
+        return 0;
+    }
+
+
+
+
+
+    TcpSocket * server = InitSocks5Server(arguments.SocksPort);
 
     Socks5Connection * connection = WaitForNewSocks5Connections(server);
 
@@ -42,29 +55,5 @@ int main(int argc, char ** argv) {
 
     DisposeTcpSocket(server);
     DisposeSocks5Connection(connection);
-
-
-
-
-
-//
-//    Sock * tcpServer = InitTcpServer(arguments.Port);
-//
-//    TcpSocket * tcpSocket = WaitForNewConnections(tcpServer);
-//
-//    do{
-//        char buffer[10];
-//        int a = ReadFromTcpSocket(&tcpSocket,buffer,10);
-//
-//        if ( a == 0)
-//            break;
-//
-//        WriteToTcpSocket(&tcpSocket,buffer,10);
-//
-//
-//        printf("%s", buffer);
-//    } while (true);
-//
-//    return DisposeTcpServer(tcpServer);
 }
 
