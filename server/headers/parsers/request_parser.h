@@ -1,7 +1,7 @@
 
 
-#ifndef SERVER_REQ_PARSER_H
-#define SERVER_REQ_PARSER_H
+#ifndef SERVER_REQUEST_PARSER_H
+#define SERVER_REQUEST_PARSER_H
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -109,4 +109,4 @@ bool RequestParserFeed(RequestParser* p, byte c);
 bool RequestParserConsume(RequestParser* p, byte* c, int length);
 bool RequestParserFinished(RequestParser* p, bool* hasError);
 
-#endif //SERVER_REQ_PARSER_H
+#endif //SERVER_REQUEST_PARSER_H

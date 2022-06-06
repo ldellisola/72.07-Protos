@@ -9,7 +9,7 @@
 #include <errno.h>
 #include "../headers/cli.h"
 #include "../headers/tcp.h"
-#include "../headers/socks.h"
+#include "../headers/socks/socks_server.h"
 #include "../headers/logger.h"
 
 
@@ -34,10 +34,6 @@ int main(int argc, char ** argv) {
         return 0;
     }
 
-
-
-
-
     TcpSocket * server = InitSocks5Server(arguments.SocksPort);
 
     Socks5Connection * connection = WaitForNewSocks5Connections(server);
@@ -48,12 +44,12 @@ int main(int argc, char ** argv) {
         if (bytes <= 0)
             break;
 
-        if (HandleSocks5Request(connection,buffer,bytes) == ERROR)
+        if (RunSocks5(connection,buffer,bytes))
             break;
 
     } while (true);
 
     DisposeTcpSocket(server);
-    DisposeSocks5Connection(connection);
+    Socks5ConnectionDestroy(connection);
 }
 

@@ -4,7 +4,7 @@
 #include "../../headers/logger.h"
 #include "../../headers/utils.h"
 
-HelloParser * helloParserInit()
+HelloParser * HelloParserInit()
 {
     LogInfo("Creating HelloParser...");
     HelloParser * p = calloc(1,sizeof(HelloParser));

@@ -40,7 +40,7 @@ typedef struct
     uint8_t * Methods;
 }HelloParser;
 
-HelloParser * helloParserInit();
+HelloParser * HelloParserInit();
 
 void HelloParserDestroy(HelloParser* p);
 
