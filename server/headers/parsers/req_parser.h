@@ -5,7 +5,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "buffer.h"
+#include "../buffer.h"
+#include "../utils.h"
 #include <netinet/in.h>
 
 //Once the method-dependent subnegotiation has completed, the client
@@ -68,44 +69,44 @@ static const uint8_t ATYP_IPV6 = 0x04;
 #define MAX_LENGTH 253
 
 
-enum req_state
+typedef enum
 {
-    req_version,
-    req_cmd,
-    req_rsv,
-    req_atyp,
-    req_dest_addr,
-    req_dest_port,
-    req_error_unsupported_version,
-    req_invalid_state,
-    req_done,
-};
-typedef union Address {
+    RequestVersion,
+    RequestCMD,
+    RequestRSV,
+    RequestAType,
+    RequestDestAddrIPV4,
+    RequestDestAddrIPV6,
+    RequestDestAddrFQDN,
+    RequestDestPortFirstByte,
+    RequestDestPortSecondByte,
+    RequestErrorUnsupportedVersion,
+    RequestInvalidState,
+    RequestDone,
+} RequestParserStates;
 
-    uint8_t domainName[MAX_LENGTH];
-    struct in_addr ipv4;
-    struct in6_addr ipv6;
-} Address;
+typedef union {
+    uint8_t First;
+    uint8_t Second;
+    in_port_t Complete
+} Port;
 
-struct req_parser
+typedef struct
 {
-    enum req_state state;
-    /* tipo de command que se pide */
-    uint8_t cmd;
-    /* tipo de command que se pide */
-    uint8_t atyp;
-    /* destination address */
-    union Address dest_addr;
-    /*destination port */
-    in_port_t dest_port;
-};
+    RequestParserStates State;
+    uint8_t CMD;
+    uint8_t AType;
+    uint8_t * DestAddress;
+    uint8_t AddressLength;
+    uint8_t AddressPosition;
+    Port DestPort;
+}RequestParser;
 
 
-
-/** inicializa el parser **/
-void req_parser_init(struct req_parser *p);
-
-/** entrega un byte al parser. Retorna true si se llego al final **/
-enum req_state req_parser_feed(struct req_parser *p, uint8_t b);
+RequestParser * RequestParserInit();
+void RequestParserDestroy(RequestParser * p);
+bool RequestParserFeed(RequestParser* p, byte c);
+bool RequestParserConsume(RequestParser* p, byte* c, int length);
+bool RequestParserFinished(RequestParser* p, bool* hasError);
 
 #endif //SERVER_REQ_PARSER_H

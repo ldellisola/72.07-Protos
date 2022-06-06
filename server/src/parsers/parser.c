@@ -28,9 +28,7 @@ parser_destroy(struct parser *p) {
     }
 }
 
-struct parser *
-parser_init(const unsigned *classes,
-            const struct parser_definition *def) {
+struct parser * parser_init(const unsigned *classes, const struct parser_definition *def) {
     struct parser *ret = malloc(sizeof(*ret));
     if(ret != NULL) {
         memset(ret, 0, sizeof(*ret));
@@ -41,13 +39,11 @@ parser_init(const unsigned *classes,
     return ret;
 }
 
-void
-parser_reset(struct parser *p) {
+void parser_reset(struct parser *p) {
     p->state   = p->def->start_state;
 }
 
-const struct parser_event *
-parser_feed(struct parser *p, const uint8_t c) {
+const struct parser_event * parser_feed(struct parser *p, const uint8_t c) {
     const unsigned type = p->classes[c];
 
     p->e1.next = p->e2.next = 0;
@@ -84,8 +80,7 @@ parser_feed(struct parser *p, const uint8_t c) {
 
 static const unsigned classes[0xFF] = {0x00};
 
-const unsigned *
-parser_no_classes(void) {
+const unsigned * parser_no_classes(void) {
     return classes;
 }
 

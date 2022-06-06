@@ -18,9 +18,9 @@ void LogInfo(const char *message, ...) {
     va_list arg;
     va_start (arg, message);
 
-            fprintf(stdout,"INFO: ");
-            vfprintf (stdout, message, arg);
-            fprintf(stdout,"\n");
+    fprintf(stdout,"INFO: ");
+    vfprintf (stdout, message, arg);
+    fprintf(stdout,"\n");
 
     va_end (arg);
 }
