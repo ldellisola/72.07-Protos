@@ -101,11 +101,40 @@ typedef struct
     Port DestPort;
 }RequestParser;
 
-
+/**
+ * It initializes a new RequestParser instance
+ * @return a RequestParser instance
+ */
 RequestParser * RequestParserInit();
+
+/**
+ * It safely disposes a RequestParser instance
+ * @param p The parser instance
+ */
 void RequestParserDestroy(RequestParser * p);
+
+/**
+ * It iterates the parser one step for a given input
+ * @param p Pointer to an AuthParser
+ * @param c Byte to feed the AuthParser
+ * @return True if the parser reached a final state.
+ */
 bool RequestParserFeed(RequestParser* p, byte c);
+
+/**
+ * It iterates through the parser for a given number of steps
+ * @param p Pointer to the parser instance
+ * @param c Array of bytes to feed the parser
+ * @param length Total amount of bytes to feed the parser
+ * @return True if the parser reached a final state
+ */
 bool RequestParserConsume(RequestParser* p, byte* c, int length);
+
+/**
+ * It checks if the parser reached a failed state
+ * @param p Pointer to the parser instance
+ * @return True if the parser is in a failed state
+ */
 bool RequestParserFailed(RequestParser* p);
 
 #endif //SERVER_REQUEST_PARSER_H

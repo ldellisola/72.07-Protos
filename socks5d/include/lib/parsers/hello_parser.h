@@ -40,14 +40,40 @@ typedef struct
     uint8_t * Methods;
 }HelloParser;
 
+/**
+ * It initializes a HelloParser instance
+ * @return A new HelloParser instance
+ */
 HelloParser * HelloParserInit();
 
+/**
+ * It safely disposes a parser instance
+ * @param p Parser instance to be disposed
+ */
 void HelloParserDestroy(HelloParser* p);
 
-bool HelloParserFeed(HelloParser *p, uint8_t b);
+/**
+ * It iterates the parser one step for a given input
+ * @param p Pointer to an AuthParser
+ * @param c Byte to feed the AuthParser
+ * @return True if the parser reached a final state.
+ */
+bool HelloParserFeed(HelloParser *p, byte c);
 
+/**
+ * It iterates through the parser for a given number of steps
+ * @param p Pointer to the parser instance
+ * @param c Array of bytes to feed the parser
+ * @param length Total amount of bytes to feed the parser
+ * @return True if the parser reached a final state
+ */
 bool HelloParserConsume(HelloParser * p, byte * c, int length);
 
+/**
+ * It checks if the parser reached a failed state
+ * @param p Pointer to the parser instance
+ * @return True if the parser is in a failed state
+ */
 bool HelloParserFailed(HelloParser * p);
 
 

@@ -2,6 +2,6 @@
 // Created by Lucas Dell'Isola on 07/06/2022.
 //
 
-void main(int argc, char** argv){
+int main(int argc, char** argv){
 
 }

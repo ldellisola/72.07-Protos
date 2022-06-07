@@ -161,7 +161,7 @@ size_t ReadFromTcpSocket(TcpSocket * socket, byte * buffer, int bufferLength){
     }
 
     LogInfo("Reading from TCP socket on file descriptor %d...",socket->FileDescriptor);
-    size_t bytes =  recv(socket->FileDescriptor,buffer,bufferLength,0);
+    long bytes =  recv(socket->FileDescriptor,buffer,bufferLength,0);
 
     if (bytes < 0){
         LogError(true,"Could not read from TCP socket on file descriptor %d",socket->FileDescriptor);
@@ -186,7 +186,7 @@ size_t WriteToTcpSocket(TcpSocket * socket, byte * content, int contentLength){
 
     LogInfo("Writing %d bytes to TCP socket on file descriptor %d...",contentLength, socket->FileDescriptor);
 
-    size_t bytes = send(socket->FileDescriptor,content,contentLength,0);
+    long bytes = send(socket->FileDescriptor,content,contentLength,0);
 
     if(bytes < 0){
         LogError(true,"Could not write to TCP socket on file descriptor %d",socket->FileDescriptor);

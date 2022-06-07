@@ -42,14 +42,40 @@ typedef struct {
 }AuthParser;
 
 
+/**
+ * It creates a new instance of the AuthParser
+ * @return a new instance of the AuthParser
+ */
 AuthParser * AuthParserInit();
 
+/**
+ * It safely disposes an instance of the AuthParser
+ * @param p Pointer to the AuthParser to dispose
+ */
 void AuthParserDestroy(AuthParser *p);
 
+/**
+ * It iterates the AuthParser one step for a given input
+ * @param p Pointer to an AuthParser
+ * @param c Byte to feed the AuthParser
+ * @return True if the parser reached a final state.
+ */
 bool AuthParserFeed(AuthParser *p, byte c);
 
+/**
+ * It iterates through the AuthParser for a given number of steps
+ * @param p Pointer to the parser instance
+ * @param c Array of bytes to feed the parser
+ * @param length Total amount of bytes to feed the parser
+ * @return True if the parser reached a final state
+ */
 bool AuthParserConsume(AuthParser* p, byte * c, int length);
 
+/**
+ * It checks if the parser reached a failed state
+ * @param p Pointer to the parser instance
+ * @return True if the parser is in a failed state
+ */
 bool AuthParserFailed(AuthParser *p);
 
 

@@ -17,9 +17,9 @@ HelloParser * HelloParserInit()
     return p;
 }
 
-bool HelloParserFeed(HelloParser *p, uint8_t b)
+bool HelloParserFeed(HelloParser *p, byte c)
 {
-    LogInfo("Feeding %d to HelloParser",b);
+    LogInfo("Feeding %d to HelloParser", c);
 
     if (null == p)
     {
@@ -30,12 +30,12 @@ bool HelloParserFeed(HelloParser *p, uint8_t b)
     switch (p->State)
     {
         case HelloVersion:
-            p->State = 0x05 == b ? HelloNMethods : HelloErrorUnsupportedVersion;
-            LogInfo("HelloParser socks5 protocol version: %d",b);
+            p->State = 0x05 == c ? HelloNMethods : HelloErrorUnsupportedVersion;
+            LogInfo("HelloParser socks5 protocol version: %d", c);
             break;
         case HelloNMethods:
-            LogInfo("HelloParser nmethods: %d",b);
-            p->NMethods = b;
+            LogInfo("HelloParser nmethods: %d", c);
+            p->NMethods = c;
             p->State = HelloMethods;
 
             if (p->NMethods <= 0)
@@ -45,8 +45,8 @@ bool HelloParserFeed(HelloParser *p, uint8_t b)
 
             break;
         case HelloMethods:
-            p->Methods[p->RemainingMethods++] = b;
-            LogInfo("HelloParser detected authentication method %d",b);
+            p->Methods[p->RemainingMethods++] = c;
+            LogInfo("HelloParser detected authentication method %d", c);
             if (p->RemainingMethods == p->NMethods) {
                 LogInfo("HelloParser no more authentication methods");
                 p->State = HelloDone;

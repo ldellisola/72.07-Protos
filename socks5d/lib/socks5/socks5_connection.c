@@ -15,6 +15,11 @@ typedef enum {
     SOCKS5_AUTH_INVALID = 0xFF
 }SOCKS5_AUTH;
 
+bool HandleConnectionStatusInit(Socks5Connection * connection, byte* data, int length);
+
+
+bool HandleConnectionAuthentication(Socks5Connection *connection, byte *data, int length);
+
 #define SOCKS5_DEFAULT_USER "admin"
 #define SOCKS5_DEFAULT_PASSWORD "admin"
 
@@ -52,6 +57,8 @@ void Socks5ConnectionDestroy(Socks5Connection *connection) {
     LogInfo("Socks5Connection disposed!");
 }
 
+
+
 bool RunSocks5(Socks5Connection *connection, byte *data, int length) {
     LogInfo("Running Socks5Connection FSM");
 
@@ -62,83 +69,105 @@ bool RunSocks5(Socks5Connection *connection, byte *data, int length) {
     }
 
     switch (connection->Status) {
-        case SOCKS5_CS_INIT: {
-            HelloParser * parser = connection->Parser;
-            bool hasFinishedHello = HelloParserConsume(parser, data, length);
-            if (!hasFinishedHello)
-                break;
-
-            bool hasFailed = HelloParserFailed(parser);
-            // TODO: Handle Error
-            if (hasFailed)
-                break;
-
-            SOCKS5_AUTH selectedAuthMethod = SOCKS5_AUTH_INVALID;
-
-            for(int i = 0; i < parser->NMethods; i++)
-            {
-                if ( SOCKS5_AUTH_USER_PASS == parser->Methods[i] || SOCKS5_AUTH_NO_AUTH == parser->Methods[i])
-                {
-                    selectedAuthMethod = parser->Methods[i];
-                    break;
-                }
-            }
-
-            byte message[2] = {0x05,selectedAuthMethod};
-            // TODO: Make non blocking
-            WriteToTcpSocket(connection->Socket,message,2);
-
-            // TODO: Get IP if FQDN
-
-            HelloParserDestroy(parser);
-
-            switch (selectedAuthMethod) {
-                case SOCKS5_AUTH_NO_AUTH:
-                    connection->Parser = RequestParserInit();
-                    connection->ParserType = RequestParserType;
-                    connection->Status = SOCKS5_CS_READY;
-                    break;
-                case SOCKS5_AUTH_USER_PASS:
-                    connection->Parser = AuthParserInit();
-                    connection->ParserType = AuthParserType;
-                    connection->Status = SOCKS5_CS_AUTH;
-                    break;
-                case SOCKS5_AUTH_INVALID:
-                    connection->Status = SOCKS5_CS_FINISHED;
-                    return true;
-            }
-            break;
-        }
-        case SOCKS5_CS_AUTH: {
-            AuthParser *parser = connection->Parser;
-            bool hasFinishedAuth = AuthParserConsume(parser, data, length);
-            if (!hasFinishedAuth)
-                break;
-
-            // TODO Implement real user system
-            bool isLoggedIn =   strncmp(parser->UName,SOCKS5_DEFAULT_USER, strlen(SOCKS5_DEFAULT_USER)) == 0 &&
-                                strncmp(parser->Passwd,SOCKS5_DEFAULT_PASSWORD,strlen(SOCKS5_DEFAULT_PASSWORD)) == 0;
-
-
-            // TODO: Make non blocking
-            byte message[2] = {0x05, isLoggedIn ? 0 : 0xFF};
-            WriteToTcpSocket(connection->Socket, message, 2);
-
-            if (isLoggedIn)
-                connection->Status = SOCKS5_CS_READY;
-            else
-            {
-                connection->Status = SOCKS5_CS_FINISHED;
-                return true;
-            }
-        }
-            break;
+        case SOCKS5_CS_INIT: return HandleConnectionStatusInit(connection,data,length);
+        case SOCKS5_CS_AUTH: return HandleConnectionAuthentication(connection,data,length);
         case SOCKS5_CS_READY:
             break;
         case SOCKS5_CS_FINISHED:
             return true;
+        case SOCKS5_CS_FAILED:
+            break;
     }
 
     return false;
 
+}
+
+bool Socks5ConnectionFailed(Socks5Connection *connection) {
+    if (null == connection)
+    {
+        LogError(false,"Socks5Connection cannot be NULL to check if it failed");
+        return true;
+    }
+
+    if (SOCKS5_CS_FAILED == connection->Status)
+        return true;
+
+    return false;
+}
+
+
+bool HandleConnectionStatusInit(Socks5Connection * connection, byte* data, int length) {
+    HelloParser * parser = connection->Parser;
+    bool hasFinishedHello = HelloParserConsume(parser, data, length);
+    if (!hasFinishedHello)
+        return false;
+
+    bool hasFailed = HelloParserFailed(parser);
+    // TODO: Handle Error
+    if (hasFailed) {
+        connection->Status = SOCKS5_CS_FAILED;
+        return false;
+    }
+
+    SOCKS5_AUTH selectedAuthMethod = SOCKS5_AUTH_INVALID;
+
+    for(int i = 0; i < parser->NMethods; i++)
+    {
+        if ( SOCKS5_AUTH_USER_PASS == parser->Methods[i] || SOCKS5_AUTH_NO_AUTH == parser->Methods[i])
+        {
+            selectedAuthMethod = parser->Methods[i];
+            break;
+        }
+    }
+
+    byte message[2] = {0x05,selectedAuthMethod};
+    // TODO: Make non blocking
+    WriteToTcpSocket(connection->Socket,message,2);
+
+    // TODO: Get IP if FQDN
+    HelloParserDestroy(parser);
+
+    switch (selectedAuthMethod) {
+        case SOCKS5_AUTH_NO_AUTH:
+            connection->Parser = RequestParserInit();
+            connection->ParserType = RequestParserType;
+            connection->Status = SOCKS5_CS_READY;
+            break;
+        case SOCKS5_AUTH_USER_PASS:
+            connection->Parser = AuthParserInit();
+            connection->ParserType = AuthParserType;
+            connection->Status = SOCKS5_CS_AUTH;
+            break;
+        case SOCKS5_AUTH_INVALID:
+            connection->Status = SOCKS5_CS_FAILED;
+            return true;
+    }
+
+    return false;
+}
+
+bool HandleConnectionAuthentication(Socks5Connection *connection, byte *data, int length) {
+    AuthParser *parser = connection->Parser;
+    bool hasFinishedAuth = AuthParserConsume(parser, data, length);
+    if (!hasFinishedAuth)
+        return false;
+
+    if (AuthParserFailed(parser)){
+        connection->Status = SOCKS5_CS_FAILED;
+        return true;
+    }
+
+    // TODO Implement real user system
+    bool isLoggedIn =   strncmp(parser->UName,SOCKS5_DEFAULT_USER, strlen(SOCKS5_DEFAULT_USER)) == 0 &&
+                        strncmp(parser->Passwd,SOCKS5_DEFAULT_PASSWORD,strlen(SOCKS5_DEFAULT_PASSWORD)) == 0;
+
+
+    // TODO: Make non blocking
+    byte message[2] = {0x05, isLoggedIn ? 0 : 0xFF};
+    WriteToTcpSocket(connection->Socket, message, 2);
+
+    connection->Status = isLoggedIn ? SOCKS5_CS_READY : SOCKS5_CS_FINISHED;
+
+    return !isLoggedIn;
 }

@@ -8,5 +8,6 @@ set(
 )
 
 add_executable(lulu_client ${SOURCES})
+add_library(lulu_client_lib ${SOURCES})
 
 target_link_libraries(lulu_client PUBLIC parsers tcp utils)

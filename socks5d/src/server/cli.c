@@ -4,6 +4,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <strings.h>
 #include "server/cli.h"
 #include "utils/utils.h"
 #include "utils/logger.h"

@@ -1,24 +1,16 @@
 #include <stdio.h>
-#include <netdb.h>
 #include <memory.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <signal.h>
-#include <fcntl.h>
 #include <stdbool.h>
-#include <errno.h>
+#include <unistd.h>
 #include "server/cli.h"
 #include "tcp/tcp.h"
 #include "socks5/socks5_server.h"
 #include "utils/logger.h"
 
 
-#define null NULL
-int servSock;
-
-void SIGIOHandler(int signalType); // Handle SIGIO
 
 int main(int argc, char ** argv) {
+    close(0);
     setvbuf(stdout, NULL, _IONBF, 0);
     SetLogLevel(LOG_INFO);
 
