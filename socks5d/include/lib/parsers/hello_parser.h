@@ -48,7 +48,7 @@ bool HelloParserFeed(HelloParser *p, uint8_t b);
 
 bool HelloParserConsume(HelloParser * p, byte * c, int length);
 
-bool HelloParserFinished(HelloParser * p, bool *hasError);
+bool HelloParserFailed(HelloParser * p);
 
 
 #endif //SERVER_HELLO_PARSER_H

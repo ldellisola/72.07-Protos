@@ -129,29 +129,18 @@ bool RequestParserConsume(RequestParser *p, byte *c, int length) {
     return false;
 }
 
-bool RequestParserFinished(RequestParser *p, bool* hasError){
-    if (null == hasError){
-        LogError(false,"HasError reference cannot be NULL");
-        return false;
-    }
-
+bool RequestParserFailed(RequestParser *p){
     if (null == p)
     {
         LogError(false,"Cannot feed AuthParser if is NULL");
-        *hasError = true;
         return true;
     }
 
     switch (p->State) {
-        case RequestDone:
-            *hasError = false;
-            return true;
         case RequestErrorUnsupportedVersion:
         case RequestInvalidState:
-            *hasError = true;
             return true;
         default:
-            *hasError = false;
             return false;
     }
 }

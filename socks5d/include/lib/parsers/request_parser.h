@@ -106,6 +106,6 @@ RequestParser * RequestParserInit();
 void RequestParserDestroy(RequestParser * p);
 bool RequestParserFeed(RequestParser* p, byte c);
 bool RequestParserConsume(RequestParser* p, byte* c, int length);
-bool RequestParserFinished(RequestParser* p, bool* hasError);
+bool RequestParserFailed(RequestParser* p);
 
 #endif //SERVER_REQUEST_PARSER_H

@@ -63,34 +63,21 @@ bool HelloParserFeed(HelloParser *p, uint8_t b)
     return false;
 }
 
-bool HelloParserFinished(HelloParser * p, bool *hasError)
+bool HelloParserFailed(HelloParser * p)
 {
-    if (null == hasError){
-        LogError(false,"HasError reference cannot be NULL");
-        return false;
-    }
-
     if (null == p)
     {
         LogError(false,"Cannot feed AuthParser if is NULL");
-        *hasError = true;
         return true;
     }
-    bool ret = false;
+
     switch (p->State)
     {
         case HelloErrorUnsupportedVersion:
-            *hasError = true;
-            ret = true;
-            break;
-        case HelloDone:
-            ret = true;
-            break;
+            return true;
         default:
-            ret = false;
-            break;
+            return false;
     }
-    return ret;
 }
 
 bool HelloParserConsume(HelloParser * p, byte * c, int length){

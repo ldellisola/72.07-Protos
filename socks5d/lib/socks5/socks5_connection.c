@@ -68,6 +68,11 @@ bool RunSocks5(Socks5Connection *connection, byte *data, int length) {
             if (!hasFinishedHello)
                 break;
 
+            bool hasFailed = HelloParserFailed(parser);
+            // TODO: Handle Error
+            if (hasFailed)
+                break;
+
             SOCKS5_AUTH selectedAuthMethod = SOCKS5_AUTH_INVALID;
 
             for(int i = 0; i < parser->NMethods; i++)

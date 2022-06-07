@@ -89,29 +89,18 @@ bool AuthParserFeed(AuthParser *p, byte c) {
     return false;
 }
 
-bool AuthParserFinished(AuthParser *p,bool*hasError){
-
-    if (null == hasError){
-        LogError(false,"HasError reference cannot be NULL");
-        return false;
-    }
+bool AuthParserFailed(AuthParser *p){
 
     if (null == p)
     {
         LogError(false,"Cannot feed AuthParser if is NULL");
-        *hasError = true;
         return true;
     }
 
     switch (p->State) {
-        case AuthFinished:
-            *hasError = false;
-            return true;
         case AuthInvalidProtocol:
-            *hasError = true;
             return true;
         default:
-            *hasError = false;
             return false;
     }
 }

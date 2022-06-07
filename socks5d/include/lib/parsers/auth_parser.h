@@ -50,7 +50,7 @@ bool AuthParserFeed(AuthParser *p, byte c);
 
 bool AuthParserConsume(AuthParser* p, byte * c, int length);
 
-bool AuthParserFinished(AuthParser *p, bool* hasError);
+bool AuthParserFailed(AuthParser *p);
 
 
 #endif //SERVER_AUTH_PARSER_H
