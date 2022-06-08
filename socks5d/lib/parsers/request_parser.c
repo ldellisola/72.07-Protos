@@ -14,14 +14,15 @@ RequestParser *RequestParserInit() {
 
     ptr->State = RequestVersion;
     LogInfo("RequestParser created!");
-    return ptr;}
+    return ptr;
+}
 
-bool RequestParserFeed(RequestParser *p, byte c) {
+RequestParserState RequestParserFeed(RequestParser *p, byte c) {
     LogInfo("Feeding %d to RequestParser",c);
     if (null == p)
     {
         LogError(false,"Cannot feed RequestParser if is NULL");
-        return true;
+        return RequestInvalidState;
     }
 
     switch (p->State)
@@ -33,33 +34,38 @@ bool RequestParserFeed(RequestParser *p, byte c) {
         case RequestCMD:
             LogInfo("RequestParser detected command %d",c);
             p->CMD = c;
-            p->CMD = RequestRSV;
+            p->State = RequestRSV;
             break;
         case RequestRSV:
             LogInfo("RequestParser reserved byte %d",c);
-            p->State = RequestAType;
+            p->State = 0 == c ? RequestAType : RequestInvalidState;
             break;
         case RequestAType:
             LogInfo("RequestParser address type %d",c);
             p->AType = c;
 
-            if (ATYP_IPV4 == p->AType) {
-                p->State = RequestDestAddrIPV4;
-                p->AddressLength = 4;
+            switch (p->AType) {
+                case ATYP_IPV4:
+                    p->State = RequestDestAddrIPV4;
+                    p->AddressLength = 4;
+                    break;
+                case ATYP_IPV6:
+                    p->State = RequestDestAddrIPV6;
+                    p->AddressLength = 16;
+                    break;
+                case ATYP_DOMAINNAME:
+                    p->State = RequestDestAddrFQDN;
+                    break;
+                default:
+                    p->State = RequestInvalidState;
+                    break;
             }
-
-            if (ATYP_IPV6 == p->AType) {
-                p->State = RequestDestAddrIPV6;
-                p->AddressLength = 16;
-            }
-
-            if (ATYP_DOMAINNAME == p->AType)
-                p->State = RequestDestAddrFQDN;
-
             break;
         case RequestDestAddrFQDN:
             if (null == p->DestAddress && 0 == p->AddressLength){
                 p->AddressLength = c;
+                if (p->AddressLength <= 0)
+                    p->State = RequestInvalidState;
                 break;
             }
         case RequestDestAddrIPV4:
@@ -76,23 +82,26 @@ bool RequestParserFeed(RequestParser *p, byte c) {
             break;
         case RequestDestPortFirstByte:
             LogInfo("RequestParser port first byte %x",c);
-            p->DestPort.First = c;
+            p->DestPort = c;
             p->State = RequestDestPortSecondByte;
             break;
         case RequestDestPortSecondByte:
             LogInfo("RequestParser port second byte %x",c);
-            p->DestPort.Second = c;
+            // TODO: Check if its this way
+            p->DestPort |= (c << 8);
+            LogInfo("RequestParser complete port %d",p->DestPort);
             p->State = RequestDone;
             break;
         case RequestDone:
         case RequestErrorUnsupportedVersion:
-            return true;
+        case RequestInvalidState:
+            break;
         default:
             LogError(false, "request invalid state");
             p->State = RequestInvalidState;
             break;
     }
-    return false;
+    return p->State;
 }
 
 void RequestParserDestroy(RequestParser *p) {
@@ -109,36 +118,42 @@ void RequestParserDestroy(RequestParser *p) {
     LogInfo("AuthParser disposed!");
 }
 
-bool RequestParserConsume(RequestParser *p, byte *c, int length) {
+int RequestParserConsume(RequestParser *p, byte *c, int length) {
     LogInfo("RequestParser consuming %d bytes",length);
     if (null == p)
     {
         LogError(false,"Cannot consume if RequestParser is NULL");
-        return true;
+        return 0;
     }
 
     if (null == c){
         LogError(false,"RequestParser cannot consume NULL array");
-        return true;
+        return 0;
     }
 
     for (int i = 0; i < length; ++i) {
-        if (RequestParserFeed(p,c[i]))
-            return true;
+        RequestParserState state = RequestParserFeed(p, c[i]);
+        if (RequestParserHasFinished(state))
+            return i+1;
     }
-    return false;
+    return length;
 }
 
-bool RequestParserFailed(RequestParser *p){
-    if (null == p)
-    {
-        LogError(false,"Cannot feed AuthParser if is NULL");
-        return true;
-    }
-
-    switch (p->State) {
+bool RequestParserFailed(RequestParserState state){
+    switch (state) {
         case RequestErrorUnsupportedVersion:
         case RequestInvalidState:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool RequestParserHasFinished(RequestParserState state) {
+    switch (state) {
+        case RequestErrorUnsupportedVersion:
+        case RequestInvalidState:
+        case RequestDone:
             return true;
         default:
             return false;

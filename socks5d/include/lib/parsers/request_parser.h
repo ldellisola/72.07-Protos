@@ -60,12 +60,11 @@
 //
 //   the address is a version-6 IP address, with a length of 16 octets.
 
-static const uint8_t CMD_CONNECT = 0x01;
-static const uint8_t CMD_BIND = 0x02;
-static const uint8_t ATYP_IPV4 = 0x01;
-static const uint8_t ATYP_DOMAINNAME = 0x03;
-static const uint8_t ATYP_IPV6 = 0x04;
-#define MAX_LENGTH 253
+#define CMD_CONNECT  0x01
+#define CMD_BIND  0x02
+#define ATYP_IPV4  0x01
+#define ATYP_DOMAINNAME  0x03
+#define ATYP_IPV6  0x04
 
 
 typedef enum
@@ -82,23 +81,18 @@ typedef enum
     RequestErrorUnsupportedVersion,
     RequestInvalidState,
     RequestDone,
-} RequestParserStates;
+} RequestParserState;
 
-typedef union {
-    uint8_t First;
-    uint8_t Second;
-    in_port_t Complete;
-} Port;
 
 typedef struct
 {
-    RequestParserStates State;
+    RequestParserState State;
     uint8_t CMD;
     uint8_t AType;
     uint8_t * DestAddress;
     uint8_t AddressLength;
     uint8_t AddressPosition;
-    Port DestPort;
+    in_port_t DestPort;
 }RequestParser;
 
 /**
@@ -117,24 +111,31 @@ void RequestParserDestroy(RequestParser * p);
  * It iterates the parser one step for a given input
  * @param p Pointer to an AuthParser
  * @param c Byte to feed the AuthParser
- * @return True if the parser reached a final state.
+ * @return The current state
  */
-bool RequestParserFeed(RequestParser* p, byte c);
+RequestParserState RequestParserFeed(RequestParser* p, byte c);
 
 /**
  * It iterates through the parser for a given number of steps
  * @param p Pointer to the parser instance
  * @param c Array of bytes to feed the parser
  * @param length Total amount of bytes to feed the parser
- * @return True if the parser reached a final state
+ * @return number of bytes consumed
  */
-bool RequestParserConsume(RequestParser* p, byte* c, int length);
+int RequestParserConsume(RequestParser* p, byte* c, int length);
 
 /**
  * It checks if the parser reached a failed state
- * @param p Pointer to the parser instance
+ * @param state Current state
  * @return True if the parser is in a failed state
  */
-bool RequestParserFailed(RequestParser* p);
+bool RequestParserFailed(RequestParserState state);
+
+/**
+ * It checks if the parser has reached a final state
+ * @param state Current state
+ * @return True if the parser is in a final state
+ */
+bool RequestParserHasFinished(RequestParserState state);
 
 #endif //SERVER_REQUEST_PARSER_H

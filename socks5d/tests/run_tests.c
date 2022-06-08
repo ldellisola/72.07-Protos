@@ -6,13 +6,16 @@
 #include <stdlib.h>
 #include "parsers/hello_parser_test.h"
 #include "parsers/auth_parser_test.h"
+#include "parsers/request_parser_test.h"
 #include "server/cli_test.h"
+
 
 int main(void) {
 
     Suite *suites [] = {
             RegisterHelloParserTestSuit(),
             RegisterAuthParserTestSuit(),
+            RegisterRequestParserTestSuit(),
             RegisterCliTestSuit(),
             NULL
     };
