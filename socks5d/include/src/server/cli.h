@@ -24,6 +24,8 @@ typedef struct {
     int UsersCount;
 } CliArguments;
 
+// TODO:Test
+
 CliArguments ParseCli(int argc, char** argv);
 void PrintHelp();
 void PrintCLI(CliArguments arguments);

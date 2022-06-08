@@ -9,6 +9,8 @@
 #include "parsers/auth_parser.h"
 #include "parsers/request_parser.h"
 
+// TODO: Test
+
 typedef enum {
     SOCKS5_AUTH_NO_AUTH = 0,
     SOCKS5_AUTH_USER_PASS = 0x02,
