@@ -36,12 +36,12 @@ void AuthParserDestroy(AuthParser *p) {
     LogInfo("AuthParser disposed!");
 }
 
-bool AuthParserFeed(AuthParser *p, byte c) {
+AuthParserState AuthParserFeed(AuthParser *p, byte c) {
     LogInfo("Feeding %d to AuthParser",c);
     if (null == p)
     {
         LogError(false,"Cannot feed AuthParser if is NULL");
-        return true;
+        return AuthInvalidState;
     }
 
     switch (p->State) {
@@ -52,7 +52,7 @@ bool AuthParserFeed(AuthParser *p, byte c) {
         case AuthULen:
             LogInfo("AuthParser username length: %d",c);
             p->ULen = c;
-            p->State = AuthUName;
+            p->State = 0 == p->ULen ? AuthInvalidState : AuthUName;
             break;
         case AuthUName:
             if (null == p->UName)
@@ -68,7 +68,7 @@ bool AuthParserFeed(AuthParser *p, byte c) {
         case AuthPLen:
             LogInfo("AuthParser password length: %d",c);
             p->PLen = c;
-            p->State = AuthPasswd;
+            p->State =  0 == p->PLen ? AuthInvalidState : AuthPasswd;
             break;
         case AuthPasswd:
             if (null == p->Passwd)
@@ -83,21 +83,17 @@ bool AuthParserFeed(AuthParser *p, byte c) {
             break;
         case AuthInvalidProtocol:
         case AuthFinished:
-            return true;
+        case AuthInvalidState:
+            break;
     }
 
-    return false;
+    return p->State;
 }
 
-bool AuthParserFailed(AuthParser *p){
+bool AuthParserHasFailed(AuthParserState state){
 
-    if (null == p)
-    {
-        LogError(false,"Cannot feed AuthParser if is NULL");
-        return true;
-    }
-
-    switch (p->State) {
+    switch (state) {
+        case AuthInvalidState:
         case AuthInvalidProtocol:
             return true;
         default:
@@ -105,24 +101,41 @@ bool AuthParserFailed(AuthParser *p){
     }
 }
 
-bool AuthParserConsume(AuthParser *p, byte *c, int length) {
+int AuthParserConsume(AuthParser *p, byte *c, int length) {
     LogInfo("AuthParser consuming %d bytes",length);
     if (null == p)
     {
         LogError(false,"Cannot consume if AuthParser is NULL");
-        return true;
+        return 0;
     }
 
     if (null == c){
         LogError(false,"AuthParser cannot consume NULL array");
-        return true;
+        return 0;
     }
 
     for (int i = 0; i < length; ++i) {
-        if (AuthParserFeed(p,c[i]))
+        AuthParserState state = AuthParserFeed(p,c[i]);
+        if (AuthParserHasFinished(state))
+            return i+1;
+    }
+    return length;
+}
+
+bool AuthParserHasFinished(AuthParserState state) {
+    switch (state) {
+        default:
+        case AuthVersion:
+        case AuthULen:
+        case AuthUName:
+        case AuthPLen:
+        case AuthPasswd:
+            return false;
+        case AuthInvalidProtocol:
+        case AuthInvalidState:
+        case AuthFinished:
             return true;
     }
-    return false;
 }
 
 

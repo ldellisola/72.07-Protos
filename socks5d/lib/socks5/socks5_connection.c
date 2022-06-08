@@ -103,7 +103,7 @@ bool HandleConnectionStatusInit(Socks5Connection * connection, byte* data, int l
     if (!hasFinishedHello)
         return false;
 
-    bool hasFailed = HelloParserFailed(parser);
+    bool hasFailed = HelloParserHasFailed(parser->State);
     // TODO: Handle Error
     if (hasFailed) {
         connection->Status = SOCKS5_CS_FAILED;
@@ -149,11 +149,12 @@ bool HandleConnectionStatusInit(Socks5Connection * connection, byte* data, int l
 
 bool HandleConnectionAuthentication(Socks5Connection *connection, byte *data, int length) {
     AuthParser *parser = connection->Parser;
-    bool hasFinishedAuth = AuthParserConsume(parser, data, length);
-    if (!hasFinishedAuth)
+    AuthParserConsume(parser, data, length);
+
+    if (!AuthParserHasFinished(parser->State))
         return false;
 
-    if (AuthParserFailed(parser)){
+    if (AuthParserHasFailed(parser->State)){
         connection->Status = SOCKS5_CS_FAILED;
         return true;
     }

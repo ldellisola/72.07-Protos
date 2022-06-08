@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 11)
 set(
         SOURCES
         hello_parser_test.c
+        auth_parser_test.c
 )
 
 add_library(parsers_test STATIC ${SOURCES})

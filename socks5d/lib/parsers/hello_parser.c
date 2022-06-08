@@ -17,21 +17,21 @@ HelloParser * HelloParserInit()
     return p;
 }
 
-bool HelloParserFeed(HelloParser *p, byte c)
+HelloParserState HelloParserFeed(HelloParser *p, byte c)
 {
     LogInfo("Feeding %d to HelloParser", c);
 
     if (null == p)
     {
         LogError(false,"Cannot feed HelloParser if is NULL");
-        return true;
+        return HelloInvalidState;
     }
 
     switch (p->State)
     {
         case HelloVersion:
-            p->State = 0x05 == c ? HelloNMethods : HelloErrorUnsupportedVersion;
             LogInfo("HelloParser socks5 protocol version: %d", c);
+            p->State = 0x05 == c ? HelloNMethods : HelloErrorUnsupportedVersion;
             break;
         case HelloNMethods:
             LogInfo("HelloParser nmethods: %d", c);
@@ -39,40 +39,35 @@ bool HelloParserFeed(HelloParser *p, byte c)
             p->State = HelloMethods;
 
             if (p->NMethods <= 0)
-                p->State = HelloDone;
+                p->State = HelloInvalidState;
             else
                 p->Methods = calloc(p->NMethods,sizeof(int));
 
             break;
         case HelloMethods:
-            p->Methods[p->RemainingMethods++] = c;
+            p->Methods[p->CurrentMethod++] = c;
             LogInfo("HelloParser detected authentication method %d", c);
-            if (p->RemainingMethods == p->NMethods) {
+            if (p->CurrentMethod == p->NMethods) {
                 LogInfo("HelloParser no more authentication methods");
                 p->State = HelloDone;
             }
             break;
         case HelloDone:
         case HelloErrorUnsupportedVersion:
-            return true;
             break;
         default:
             p->State = HelloInvalidState;
             break;
     }
-    return false;
+    return p->State;
 }
 
-bool HelloParserFailed(HelloParser * p)
+bool HelloParserHasFailed(HelloParserState state)
 {
-    if (null == p)
-    {
-        LogError(false,"Cannot feed AuthParser if is NULL");
-        return true;
-    }
 
-    switch (p->State)
+    switch (state)
     {
+        case HelloInvalidState:
         case HelloErrorUnsupportedVersion:
             return true;
         default:
@@ -80,24 +75,38 @@ bool HelloParserFailed(HelloParser * p)
     }
 }
 
-bool HelloParserConsume(HelloParser * p, byte * c, int length){
+bool HelloParserHasFinished(HelloParserState state)
+{
+    switch (state)
+    {
+        case HelloDone:
+        case HelloInvalidState:
+        case HelloErrorUnsupportedVersion:
+            return true;
+        default:
+            return false;
+    }
+}
+
+int HelloParserConsume(HelloParser * p, byte * c, int length){
     LogInfo("HelloParser consuming %d bytes",length);
     if (null == p)
     {
         LogError(false,"Cannot consume if HelloParser is NULL");
-        return true;
+        return 0;
     }
 
     if (null == c){
         LogError(false,"HelloParser cannot consume NULL array");
-        return true;
+        return 0;
     }
 
     for (int i = 0; i < length; ++i) {
-        if (HelloParserFeed(p,c[i]))
-            return true;
+        HelloParserState state = HelloParserFeed(p,c[i]);
+        if (HelloParserHasFinished(state))
+            return i+1;
     }
-    return false;
+    return length;
 }
 
 void HelloParserDestroy(HelloParser *p) {

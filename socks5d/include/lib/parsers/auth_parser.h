@@ -27,12 +27,13 @@ typedef enum {
     AuthPLen,
     AuthPasswd,
     AuthInvalidProtocol,
+    AuthInvalidState,
     AuthFinished
-}AuthParserStates;
+}AuthParserState;
 
 
 typedef struct {
-    AuthParserStates State;
+    AuthParserState State;
     uint8_t ULen;
     int UNamePosition;
     char * UName;
@@ -58,25 +59,32 @@ void AuthParserDestroy(AuthParser *p);
  * It iterates the AuthParser one step for a given input
  * @param p Pointer to an AuthParser
  * @param c Byte to feed the AuthParser
- * @return True if the parser reached a final state.
+ * @return The current state
  */
-bool AuthParserFeed(AuthParser *p, byte c);
+AuthParserState AuthParserFeed(AuthParser *p, byte c);
 
 /**
  * It iterates through the AuthParser for a given number of steps
  * @param p Pointer to the parser instance
  * @param c Array of bytes to feed the parser
  * @param length Total amount of bytes to feed the parser
- * @return True if the parser reached a final state
+ * @return the number of bytes consumed
  */
-bool AuthParserConsume(AuthParser* p, byte * c, int length);
+int AuthParserConsume(AuthParser* p, byte * c, int length);
 
 /**
  * It checks if the parser reached a failed state
- * @param p Pointer to the parser instance
+ * @param state Current state
  * @return True if the parser is in a failed state
  */
-bool AuthParserFailed(AuthParser *p);
+bool AuthParserHasFailed(AuthParserState state);
+
+/**
+ * It checks if the parser has reached a final state
+ * @param state Current state
+ * @return True if the parser is in a final state
+ */
+bool AuthParserHasFinished(AuthParserState state);
 
 
 #endif //SERVER_AUTH_PARSER_H
