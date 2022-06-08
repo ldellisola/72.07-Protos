@@ -265,20 +265,19 @@ START_TEST(Feed_PortFirstByte_Succeeds){
     RequestParserState state = RequestParserFeed(parser,content);
     // Assert
         ck_assert_int_eq(state,RequestDestPortSecondByte);
-        ck_assert_int_eq(parser->DestPort, content);
+        ck_assert_int_eq(parser->DestPort[0], content);
 }
 END_TEST
 
 START_TEST(Feed_PortSecondByte_Succeeds){
     // Arrange
     parser->State = RequestDestPortSecondByte;
-    parser->DestPort = 0x01;
     byte content = 0x02;
     // Act
     RequestParserState state = RequestParserFeed(parser,content);
     // Assert
         ck_assert_int_eq(state,RequestDone);
-        ck_assert_int_eq(parser->DestPort,513 );
+        ck_assert_int_eq(parser->DestPort[1],0x02 );
 }
 END_TEST
 
@@ -311,7 +310,8 @@ START_TEST(Consume_CompleteMessageWithIPV4_Succeeds){
         ck_assert_int_eq(parser->DestAddress[1],address[1]);
         ck_assert_int_eq(parser->DestAddress[2],address[2]);
         ck_assert_int_eq(parser->DestAddress[3],address[3]);
-        ck_assert_int_eq(parser->DestPort,513);
+        ck_assert_int_eq(parser->DestPort[0],port[0]);
+        ck_assert_int_eq(parser->DestPort[1], port[1]);
 }
 END_TEST
 
@@ -341,8 +341,8 @@ START_TEST(Consume_CompleteMessageWithIPV6_Succeeds){
         ck_assert_int_eq(parser->AddressLength,16);
         for (int i = 0; i < 16; ++i)
             ck_assert_int_eq(parser->DestAddress[i],address[i]);
-
-        ck_assert_int_eq(parser->DestPort,513);
+        ck_assert_int_eq(parser->DestPort[0],port[0]);
+        ck_assert_int_eq(parser->DestPort[1], port[1]);
 }
 END_TEST
 
@@ -371,7 +371,8 @@ START_TEST(Consume_CompleteMessageWithFQDN_Succeeds){
         ck_assert_int_eq(parser->CMD,cmd);
         ck_assert_int_eq(parser->AddressLength,addrLen);
         ck_assert_str_eq((char*)parser->DestAddress,address);
-        ck_assert_int_eq(parser->DestPort,513);
+        ck_assert_int_eq(parser->DestPort[0],port[0]);
+        ck_assert_int_eq(parser->DestPort[1], port[1]);
     }
 END_TEST
 
@@ -422,7 +423,8 @@ START_TEST(Consume_CompleteMessageWithExtraLength_Succeeds){
         ck_assert_int_eq(parser->CMD,cmd);
         ck_assert_int_eq(parser->AddressLength,addrLen);
         ck_assert_str_eq((char*)parser->DestAddress,address);
-        ck_assert_int_eq(parser->DestPort,513);
+        ck_assert_int_eq(parser->DestPort[0],port[0]);
+        ck_assert_int_eq(parser->DestPort[1], port[1]);
     }
 END_TEST
 

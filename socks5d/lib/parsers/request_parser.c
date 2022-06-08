@@ -45,15 +45,15 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
             p->AType = c;
 
             switch (p->AType) {
-                case ATYP_IPV4:
+                case SOCKS5_ADDRESS_TYPE_IPV4:
                     p->State = RequestDestAddrIPV4;
                     p->AddressLength = 4;
                     break;
-                case ATYP_IPV6:
+                case SOCKS5_ADDRESS_TYPE_IPV6:
                     p->State = RequestDestAddrIPV6;
                     p->AddressLength = 16;
                     break;
-                case ATYP_DOMAINNAME:
+                case SOCKS5_ADDRESS_TYPE_FQDN:
                     p->State = RequestDestAddrFQDN;
                     break;
                 default:
@@ -82,13 +82,13 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
             break;
         case RequestDestPortFirstByte:
             LogInfo("RequestParser port first byte %x",c);
-            p->DestPort = c;
+            p->DestPort[0] = c;
             p->State = RequestDestPortSecondByte;
             break;
         case RequestDestPortSecondByte:
             LogInfo("RequestParser port second byte %x",c);
             // TODO: Check if its this way
-            p->DestPort |= (c << 8);
+            p->DestPort[1] = c;
             LogInfo("RequestParser complete port %d",p->DestPort);
             p->State = RequestDone;
             break;

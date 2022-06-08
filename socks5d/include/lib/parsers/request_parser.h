@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include "utils/utils.h"
 #include <netinet/in.h>
+#include "socks5/socks5.h"
 
 //Once the method-dependent subnegotiation has completed, the client
 //        sends the request details.  If the negotiated method includes
@@ -60,11 +61,6 @@
 //
 //   the address is a version-6 IP address, with a length of 16 octets.
 
-#define CMD_CONNECT  0x01
-#define CMD_BIND  0x02
-#define ATYP_IPV4  0x01
-#define ATYP_DOMAINNAME  0x03
-#define ATYP_IPV6  0x04
 
 
 typedef enum
@@ -92,7 +88,7 @@ typedef struct
     uint8_t * DestAddress;
     uint8_t AddressLength;
     uint8_t AddressPosition;
-    in_port_t DestPort;
+    byte DestPort[2];
 }RequestParser;
 
 /**

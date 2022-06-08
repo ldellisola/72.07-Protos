@@ -7,6 +7,7 @@ set(
         SOURCES
         socks5_connection.c
         socks5_server.c
+        socks5_messages.c
 )
 
 add_library(socks5 STATIC ${SOURCES})

@@ -8,6 +8,7 @@
 #include "parsers/auth_parser_test.h"
 #include "parsers/request_parser_test.h"
 #include "server/cli_test.h"
+#include "socks5/socks5_messages_test.h"
 
 
 int main(void) {
@@ -17,6 +18,7 @@ int main(void) {
             RegisterAuthParserTestSuit(),
             RegisterRequestParserTestSuit(),
             RegisterCliTestSuit(),
+            RegisterSocks5MessagesTestSuit(),
             NULL
     };
     int failedTests = 0;
