@@ -7,7 +7,7 @@ set(
         SOURCES
         utils.c
         logger.c
-)
+        buffer.c)
 
 add_library(utils STATIC ${SOURCES})
 

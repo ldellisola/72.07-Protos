@@ -56,7 +56,7 @@ void HelloParserDestroy(HelloParser* p);
  * It iterates the parser one step for a given input
  * @param p Pointer to an AuthParser
  * @param c Byte to feed the AuthParser
- * @return The current state
+ * @return The CurrentState state
  */
 HelloParserState HelloParserFeed(HelloParser *p, byte c);
 
@@ -67,7 +67,7 @@ HelloParserState HelloParserFeed(HelloParser *p, byte c);
  * @param length Total amount of bytes to feed the parser
  * @return the number of bytes consumed
  */
-int HelloParserConsume(HelloParser * p, byte * c, int length);
+size_t HelloParserConsume(HelloParser * p, byte * c, size_t length);
 
 /**
  * It checks if the parser reached a failed state

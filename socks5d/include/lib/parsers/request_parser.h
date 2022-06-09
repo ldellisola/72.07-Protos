@@ -107,7 +107,7 @@ void RequestParserDestroy(RequestParser * p);
  * It iterates the parser one step for a given input
  * @param p Pointer to an AuthParser
  * @param c Byte to feed the AuthParser
- * @return The current state
+ * @return The CurrentState state
  */
 RequestParserState RequestParserFeed(RequestParser* p, byte c);
 

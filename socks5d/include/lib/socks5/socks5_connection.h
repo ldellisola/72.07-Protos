@@ -6,29 +6,26 @@
 #define SERVER_SOCKS_CONNECTION_H
 
 #include "tcp/tcp.h"
-#include "../parsers/parser_types.h"
+#include "socks5/socks5_hello.h"
+#include "utils/buffer.h"
+#include "socks5_connection_status.h"
 
-typedef enum {
-    SOCKS5_CS_INIT,
-    SOCKS5_CS_AUTH,
-    SOCKS5_CS_REQUEST,
-    SOCKS5_CS_READY,
-    SOCKS5_CS_FINISHED,
-    SOCKS5_CS_FAILED
-}SOCKS5_CONNECTION_STATUS;
 
 typedef struct {
-    SOCKS5_CONNECTION_STATUS Status;
-    TcpSocket * Socket;
-    void * Parser;
-    ParserType ParserType;
+    CONNECTION_STATE State;
+    TcpConnection * TcpConnection;
+    FdHandler * Handler;
+    union {
+        HelloData Hello;
+    } Data;
+    ArrayBuffer ReadBuffer, WriteBuffer;
 } Socks5Connection;
 
 /**
-* It creates a Socks5 connection from a given TCP connection
-* @param tcpSocket  Active TCP socket connected to the client
+* It creates a Socks5 tcpConnection from a given TCP tcpConnection
+ * @param tcpConnection File descriptor for the socks tcpConnection
 */
-Socks5Connection *Socks5ConnectionInit(TcpSocket * tcpSocket);
+Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection);
 
 /**
  * It safely disposes a Socks5 connection
@@ -37,10 +34,10 @@ Socks5Connection *Socks5ConnectionInit(TcpSocket * tcpSocket);
 void Socks5ConnectionDestroy(Socks5Connection * connection);
 
 /**
- * It runs through the states of a Socks5 finite state machine
+ * It runs through the States of a Socks5 finite state machine
  * @param connection Socks5 connection
- * @param data Input data to consume
- * @param length Size of the data to consume
+ * @param data Input Data to consume
+ * @param length Size of the Data to consume
  * @return True if the machine reached a final state
  */
 bool RunSocks5(Socks5Connection * connection, byte * data, int length);

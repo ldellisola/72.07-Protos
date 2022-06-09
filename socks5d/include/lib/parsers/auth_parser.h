@@ -59,7 +59,7 @@ void AuthParserDestroy(AuthParser *p);
  * It iterates the AuthParser one step for a given input
  * @param p Pointer to an AuthParser
  * @param c Byte to feed the AuthParser
- * @return The current state
+ * @return The CurrentState state
  */
 AuthParserState AuthParserFeed(AuthParser *p, byte c);
 

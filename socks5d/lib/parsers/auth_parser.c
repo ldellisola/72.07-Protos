@@ -61,7 +61,7 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c) {
             p->UName[p->UNamePosition++] = c;
 
             if (p->UNamePosition == p->ULen) {
-                LogInfo("AuthParser username: %s",p->UName);
+                LogInfo("AuthParser username: %Selector",p->UName);
                 p->State = AuthPLen;
             }
             break;
@@ -77,7 +77,7 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c) {
             p->Passwd[p->PasswdPosition++] = c;
 
             if (p->PasswdPosition == p->PLen) {
-                LogInfo("AuthParser password: %s",p->Passwd);
+                LogInfo("AuthParser password: %Selector",p->Passwd);
                 p->State = AuthFinished;
             }
             break;

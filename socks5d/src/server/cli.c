@@ -13,6 +13,8 @@ bool HasArgument(int argc, char ** argv, const char * argument);
 const char * GetSingleArgumentValue(int argc, char ** argv, const char * argument);
 const char * GetMultipleArgumentValue(int argc, char ** argv, int* startIndex, const char * argument);
 
+void PrintVersion();
+
 CliArguments ParseCli(int argc, char ** argv){
     CliArguments args = {
             .SocksPort="1080",
@@ -20,22 +22,20 @@ CliArguments ParseCli(int argc, char ** argv){
             .EnablePasswordScanners=true,
             .LuluPort="8080",
             .LuluAddress="localhost",
-            .PrintHelp=false,
-            .PrintVersion=false,
             .UsersCount=0,
     };
 
     bool printHelp = HasArgument(argc,argv,"-h");
     if (printHelp){
         LogInfo("Printing Help Command");
-        args.PrintHelp = true;
-        return args;
+        PrintHelp();
+        exit(0);
     }
 
     const char * socks5Address = GetSingleArgumentValue(argc,argv,"-l");
     if (null != socks5Address){
         args.SocksAddress = socks5Address;
-        LogInfo("Using SOCKS5 ADDRESS %s",args.SocksAddress);
+        LogInfo("Using SOCKS5 ADDRESS %Selector",args.SocksAddress);
     }
     else
         LogInfo("Using SOCKS5 ADDRESS all interfaces");
@@ -51,29 +51,29 @@ CliArguments ParseCli(int argc, char ** argv){
 
     const char * luluAddress = GetSingleArgumentValue(argc,argv,"-L");
     if (null != luluAddress){
-        LogInfo("Using LULU ADDRESS %s",luluAddress);
+        LogInfo("Using LULU ADDRESS %Selector",luluAddress);
         args.LuluAddress = luluAddress;
     }
     else
-        LogInfo("Using default LULU ADDRESS %s",args.LuluAddress);
+        LogInfo("Using default LULU ADDRESS %Selector",args.LuluAddress);
 
 
     const char * socks5Port = GetSingleArgumentValue(argc, argv, "-p");
     if (null != socks5Port) {
         args.SocksPort = socks5Port;
-        LogInfo("Using SOCKS5 PORT %s",args.SocksPort);
+        LogInfo("Using SOCKS5 PORT %Selector",args.SocksPort);
     }
     else
-        LogInfo("Using default SOCKS5 PORT %s",args.SocksPort);
+        LogInfo("Using default SOCKS5 PORT %Selector",args.SocksPort);
 
 
     const char * luluPort = GetSingleArgumentValue(argc,argv,"-P");
     if (null != luluPort){
-        LogInfo("Using LULU PORT %s",luluPort);
+        LogInfo("Using LULU PORT %Selector",luluPort);
         args.LuluPort = luluPort;
     }
     else
-        LogInfo("Using default LULU PORT %s",args.LuluPort);
+        LogInfo("Using default LULU PORT %Selector",args.LuluPort);
 
     int start = 0;
     do{
@@ -91,7 +91,7 @@ CliArguments ParseCli(int argc, char ** argv){
         bzero(user.Password,51);
         strncpy(user.Password, userData + dividerPos +1, strlen(userData)-dividerPos-1);
         args.Users[args.UsersCount++] = user;
-        LogInfo("Detecting user %s:%s",user.Username,user.Password);
+        LogInfo("Detecting user %Selector:%Selector",user.Username,user.Password);
 
     } while (start < argc-1 && args.UsersCount < 10);
 
@@ -99,12 +99,16 @@ CliArguments ParseCli(int argc, char ** argv){
     if (printVersion)
     {
         LogInfo("Printing version");
-        args.PrintVersion = true;
-        return args;
+        PrintVersion();
+        exit(0);
     }
 
 
     return args;
+}
+
+void PrintVersion() {
+    printf("Version 0.0.1");
 }
 
 

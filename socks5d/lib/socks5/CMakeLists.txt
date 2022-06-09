@@ -8,7 +8,7 @@ set(
         socks5_connection.c
         socks5_server.c
         socks5_messages.c
-)
+        socks5_hello.c)
 
 add_library(socks5 STATIC ${SOURCES})
-target_link_libraries(socks5 PUBLIC parsers tcp utils)
+target_link_libraries(socks5 PUBLIC parsers tcp utils selector fsm)

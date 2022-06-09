@@ -76,7 +76,7 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
             p->DestAddress[p->AddressPosition++] = c;
 
             if(p->AddressLength == p->AddressPosition) {
-                LogInfo("RequestParser Address %s",p->DestAddress);
+                LogInfo("RequestParser Address %Selector",p->DestAddress);
                 p->State = RequestDestPortFirstByte;
             }
             break;

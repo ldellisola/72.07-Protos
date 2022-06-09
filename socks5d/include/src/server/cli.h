@@ -15,11 +15,9 @@ typedef struct {
 typedef struct {
     const char * SocksPort;
     const char * SocksAddress;
-    bool PrintHelp;
     bool EnablePasswordScanners;
     const char * LuluPort;
     const char * LuluAddress;
-    bool PrintVersion;
     User Users[10];
     int UsersCount;
 } CliArguments;

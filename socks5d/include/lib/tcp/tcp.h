@@ -9,68 +9,62 @@
 #include <stdbool.h>
 #include <sys/socket.h>
 #include "utils/utils.h"
+#include "selector/selector.h"
+#include "tcp/tcp_connection.h"
 #include <netdb.h>
 
 
-typedef union {
-    struct sockaddr_in6 ipv6;
-    struct sockaddr_in ipv4;
-    struct sockaddr base;
-} TcpSocketAddress;
-
-typedef struct {
-    int FileDescriptor;
-    int AddressFamily;
-    TcpSocketAddress AddressInfo;
-    bool IsPassive;
-}TcpSocket;
-
+/**
+ * It initializes a TCP server and creates the internal selector
+ * @param optionalOptions Optional parameter to define your own Selector options. If null it will use a default configuration
+ */
+void InitTcpServer(const SelectorOptions * optionalOptions);
 
 /**
- * It initializes a TCP server
+ * It sets up a listener socket on a given port, using an IPv4 address
  * @param port Port where the server will be listening to, in the form of a null terminated string
- * @return a new Tcp Socket
+ * @param handler A set of callbacks to execute on ReadHead, WriteHead and close
+ * @return Whether the operation was a success or not
  */
-TcpSocket  * InitTcpServer(const char * port);
+bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler);
+
+/**
+ * It runs the TCP server until it's stopped
+ * @return Whether there was an error or not.
+ */
+bool RunTcpServer();
+
+/**
+ * It stops the TCP server
+ */
+void StopTcpServer();
 
 /**
  * It blocks the main thread while waiting for a new tcp connection
- * @param server Tcp socket where the server is listening to
+ * @param fd file descriptor to listen to
  * @return A new tcp socket
  */
-TcpSocket * WaitForNewConnections(TcpSocket * tcpServer);
-
-/**
- * It safely disposes a tcp socket
- * @param socket socket to be disposed
- * @return OK or ERROR whether there were any errors.
- */
-int DisposeTcpSocket(TcpSocket * socket);
+TcpConnection * AcceptNewTcpConnection(int fd);
 
 /**
  * It reads content from a TCP socket
- * @param socket Tcp socket to read from
+ * @param socket Tcp socket to ReadHead from
  * @param buffer Buffer array to store the content
  * @param bufferLength Max size of the buffer
- * @return The size of the content read
+ * @return The size of the content ReadHead
  */
-size_t ReadFromTcpSocket(TcpSocket * socket, byte * buffer, int bufferLength);
+ssize_t ReadFromTcpConnection(TcpConnection * socket, byte * buffer, size_t bufferLength);
 
 /**
- * It writes data to a TCP socket
- * @param socket Tcp socket to write to
- * @param content Content to write to the socket
- * @param contentLength Content length to write
+ * It writes Data to a TCP socket
+ * @param socket Tcp socket to WriteHead to
+ * @param content Content to WriteHead to the socket
+ * @param contentLength Content length to WriteHead
  * @return The size of the content written
  */
-size_t WriteToTcpSocket(TcpSocket * socket, byte * content, int contentLength);
+size_t WriteToTcpConnection(TcpConnection * socket, byte * content, size_t contentLength);
 
-/**
- * It disconnects from a Tcp socket but it does not dispose it
- * @param socket
- * @return
- */
-int DisconnectFromTcpSocket(TcpSocket * socket);
+
 
 
 #endif //SERVER_TCP_H

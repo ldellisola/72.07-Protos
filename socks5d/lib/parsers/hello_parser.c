@@ -1,9 +1,11 @@
 
 
+#include <monetary.h>
 #include "parsers/hello_parser.h"
 #include "utils/logger.h"
 #include "utils/utils.h"
 
+// TODO: Stop allocating memory
 HelloParser * HelloParserInit()
 {
     LogInfo("Creating HelloParser...");
@@ -88,7 +90,7 @@ bool HelloParserHasFinished(HelloParserState state)
     }
 }
 
-int HelloParserConsume(HelloParser * p, byte * c, int length){
+size_t HelloParserConsume(HelloParser * p, byte * c, size_t length){
     LogInfo("HelloParser consuming %d bytes",length);
     if (null == p)
     {
@@ -98,10 +100,10 @@ int HelloParserConsume(HelloParser * p, byte * c, int length){
 
     if (null == c){
         LogError(false,"HelloParser cannot consume NULL array");
-        return 0;
+        return 0
     }
 
-    for (int i = 0; i < length; ++i) {
+    for (size_t i = 0; i < length; ++i) {
         HelloParserState state = HelloParserFeed(p,c[i]);
         if (HelloParserHasFinished(state))
             return i+1;

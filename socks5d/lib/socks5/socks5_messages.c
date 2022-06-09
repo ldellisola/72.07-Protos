@@ -10,7 +10,7 @@
 
 int BuildHelloResponse(byte *buffer, int length, int authenticationMethod) {
     if (length < 2) {
-        LogError(false,"Buffer to small to write HelloResponse");
+        LogError(false,"Buffer to small to WriteHead HelloResponse");
         return -1;
     }
 
@@ -21,7 +21,7 @@ int BuildHelloResponse(byte *buffer, int length, int authenticationMethod) {
 
 int BuildAuthResponse(byte *buffer, int length, bool authenticationSucceeded) {
     if (length < 2) {
-        LogError(false,"Buffer to small to write AuthResponse");
+        LogError(false,"Buffer to small to WriteHead AuthResponse");
         return -1;
     }
 
@@ -32,7 +32,7 @@ int BuildAuthResponse(byte *buffer, int length, bool authenticationSucceeded) {
 
 int BuildRequestResponseWithIPv4(byte *buffer, int length, int replyCommand, const byte *address, const byte * port) {
     if (length < 10){
-        LogError(false,"Buffer to small to write RequestResponse with IPv4");
+        LogError(false,"Buffer to small to WriteHead RequestResponse with IPv4");
         return -1;
     }
     if (null == address){
@@ -55,7 +55,7 @@ int BuildRequestResponseWithIPv4(byte *buffer, int length, int replyCommand, con
 
 int BuildRequestResponseWithIPv6(byte *buffer, int length, int replyCommand, const byte *address, const byte *port) {
     if (length < 22){
-        LogError(false,"Buffer to small to write RequestResponse with IPv6");
+        LogError(false,"Buffer to small to WriteHead RequestResponse with IPv6");
         return -1;
     }
     if (null == address){
@@ -82,7 +82,7 @@ int BuildRequestResponseWithFQDN(byte *buffer, int length, int replyCommand, con
     }
     int addressLen = strlen(address);
     if (length < 5 + addressLen + 1){
-        LogError(false,"Buffer to small to write RequestResponse with IPv6");
+        LogError(false,"Buffer to small to WriteHead RequestResponse with IPv6");
         return -1;
     }
 
@@ -100,6 +100,29 @@ int BuildRequestResponseWithFQDN(byte *buffer, int length, int replyCommand, con
     buffer[5 + addressLen+1] = port[1];
 
     return 5 + addressLen + 2;
+}
+
+int BuildRequestResponse(byte *buffer, int length, int replyCommand, int addressType, void *address, const byte *port) {
+
+    switch (addressType) {
+        case SOCKS5_ADDRESS_TYPE_FQDN:
+            return BuildRequestResponseWithFQDN(buffer,length,replyCommand,address,port);
+        case SOCKS5_ADDRESS_TYPE_IPV4:
+            return BuildRequestResponseWithIPv4(buffer,length,replyCommand,address,port);
+        case SOCKS5_ADDRESS_TYPE_IPV6:
+            return BuildRequestResponseWithIPv6(buffer,length,replyCommand,address,port);
+        default:
+            LogError(false,"Unsupported Address Type: %d",addressType);
+            return -1;
+    }
+}
+
+int BuildRequestResponseFromParser(byte *buffer, int length, int replyCommand, RequestParser *parser) {
+    if (null == parser) {
+        LogError(false,"RequestParser cannot be null");
+        return -1;
+    }
+    return BuildRequestResponse(buffer,length,replyCommand,parser->AType,parser->DestAddress,parser->DestPort);
 }
 
 

@@ -22,10 +22,8 @@
 
 
 
-
-
-#define CMD_CONNECT  0x01
-#define CMD_BIND  0x02
+#define SOCKS5_CMD_CONNECT  0x01
+#define SOCKS5_CMD_BIND  0x02
 
 #define SOCKS5_ADDRESS_TYPE_IPV4  0x01
 #define SOCKS5_ADDRESS_TYPE_FQDN  0x03
