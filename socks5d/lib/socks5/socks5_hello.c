@@ -42,8 +42,8 @@ unsigned HelloReadRun(void *data) {
     Socks5Connection * connection = ATTACHMENT(data);
     HelloData* d = &connection->Data.Hello;
     size_t bufferSize;
-    byte * buffer = BufferWritePtr(d->ReadBuffer, &bufferSize);
 
+    byte * buffer = BufferWritePtr(d->ReadBuffer, &bufferSize);
     ssize_t bytesRead = ReadFromTcpConnection(connection->TcpConnection, buffer, bufferSize);
 
     if (bytesRead < 0)
@@ -68,8 +68,9 @@ unsigned HelloReadRun(void *data) {
         int bytesWritten = BuildHelloResponse(buffer,bufferSize,authMethod);
         if (bytesWritten < 0)
             return CS_ERROR;
-
-        WriteToTcpConnection(connection->TcpConnection, buffer, bytesWritten);
+        BufferWriteAdv(d->WriteBuffer,bytesWritten);
+         // TODO: Ver donde va esto?
+//        WriteToTcpConnection(connection->TcpConnection, buffer, bytesWritten);
 
         return CS_HELLO_WRITE;
     }

@@ -100,7 +100,7 @@ size_t HelloParserConsume(HelloParser * p, byte * c, size_t length){
 
     if (null == c){
         LogError(false,"HelloParser cannot consume NULL array");
-        return 0
+        return 0;
     }
 
     for (size_t i = 0; i < length; ++i) {

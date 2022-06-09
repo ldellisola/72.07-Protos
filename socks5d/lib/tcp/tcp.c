@@ -53,7 +53,6 @@ bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler){
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(port);
 
-
     // TODO: allow multiple
     int servSock = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP);
 
@@ -139,8 +138,6 @@ TcpConnection *  AcceptNewTcpConnection(int fd){
     }
 
     TcpConnection * tcpConnection = CreateTcpConnection(client, &clientAddr, clientAddrLen);
-
-
 
     LogInfo("New TCP connection up and running on file descriptor %d",clientAddr);
 

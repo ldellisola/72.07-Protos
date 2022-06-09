@@ -43,7 +43,13 @@ void Socks5PassiveAccept(SelectorKey *key) {
         return;
     }
 
-    SelectorStatus status = SelectorRegister(key->Selector, client->FileDescriptor, connection->Handler, SELECTOR_OP_READ, connection);
+    SelectorStatus status = SelectorRegister(
+            key->Selector,
+            client->FileDescriptor,
+            connection->Handler,
+            SELECTOR_OP_READ,
+            connection
+            );
 
     if (SELECTOR_STATUS_SUCCESS != status){
         Socks5ConnectionDestroy(connection);

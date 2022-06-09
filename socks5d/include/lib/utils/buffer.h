@@ -103,11 +103,6 @@ typedef struct  {
 void BufferInit(ArrayBuffer *b, size_t n, byte *data);
 
 /**
- * Retorna un puntero donde se pueden escribir hasta `*nbytes`.
- * Se debe notificar mediante la función `BufferWriteAdv'
- */
-
-/**
  * It creates a small buffer to write to and it tells us how many bytes we can write to it
  * @param buffer internal buffer
  * @param n number of byte I can write to this buffer

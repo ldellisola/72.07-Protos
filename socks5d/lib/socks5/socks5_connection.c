@@ -189,56 +189,6 @@ bool Socks5ConnectionFailed(Socks5Connection *connection) {
 //
 //}
 //
-//bool HandleHello(Socks5Connection * connection, byte* data, int length) {
-//    HelloParser * parser = connection->Parser.Hello;
-//    // TODO: Figure out return value
-//    HelloParserConsume(parser, data, length);
-//    if (!HelloParserHasFinished(parser->State))
-//        return false;
-//
-//    bool hasFailed = HelloParserHasFailed(parser->State);
-//    // TODO: Handle Error
-//    if (hasFailed) {
-//        connection->State = SOCKS5_CS_FAILED;
-//        return false;
-//    }
-//
-//    SOCKS5_AUTH selectedAuthMethod = SOCKS5_AUTH_INVALID;
-//
-//    for(int i = 0; i < parser->NMethods; i++)
-//    {
-//        if ( SOCKS5_AUTH_USER_PASS == parser->Methods[i] || SOCKS5_AUTH_NO_AUTH == parser->Methods[i])
-//        {
-//            selectedAuthMethod = parser->Methods[i];
-//            break;
-//        }
-//    }
-//
-//    byte message[2];
-//    int messageLength = BuildHelloResponse(message,2,selectedAuthMethod);
-//    // TODO: Make non blocking
-//    WriteToTcpConnection(connection->TcpConnection, message, messageLength);
-//
-//    // TODO: Get IP if FQDN
-//    HelloParserDestroy(parser);
-//
-//    switch (selectedAuthMethod) {
-//        case SOCKS5_AUTH_NO_AUTH:
-//            connection->Parser.Request = RequestParserInit();
-//            connection->State = SOCKS5_CS_REQUEST;
-//            break;
-//        case SOCKS5_AUTH_USER_PASS:
-//            connection->Parser.Auth = AuthParserInit();
-//            connection->State = SOCKS5_CS_AUTH;
-//            break;
-//        default:
-//        case SOCKS5_AUTH_INVALID:
-//            connection->State = SOCKS5_CS_FAILED;
-//            return true;
-//    }
-//
-//    return false;
-//}
 //
 //bool HandleAuthentication(Socks5Connection *connection, byte *data, int length) {
 //    AuthParser *parser = connection->Parser.Auth;

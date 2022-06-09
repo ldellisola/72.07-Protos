@@ -6,7 +6,8 @@
 #include "cli_test.h"
 
 START_TEST(other_test){
-        ck_assert(true);
+
+    ck_assert_int_eq(1,1);
 }
 END_TEST
 
