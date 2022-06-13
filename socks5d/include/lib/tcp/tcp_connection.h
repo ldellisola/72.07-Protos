@@ -7,6 +7,7 @@
 #define SOCKS5D_TCP_CONNECTION_H
 
 #include <netinet/in.h>
+#include "selector/selector.h"
 
 
 
@@ -30,7 +31,7 @@ TcpConnection * CreateTcpConnection(int fd, struct sockaddr_storage * addr, sock
  * @param socket socket to be disposed
  * @return OK or ERROR whether there were any errors.
  */
-int DisposeTcpConnection(TcpConnection * socket);
+int DisposeTcpConnection(TcpConnection *socket, fd_selector selector);
 
 /**
  * It disconnects from a Tcp socket but it does not dispose it

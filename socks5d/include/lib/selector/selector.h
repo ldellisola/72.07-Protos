@@ -48,6 +48,7 @@
  */
 typedef struct fdselector * fd_selector;
 
+
 /** valores de retorno. */
 typedef enum {
     /** llamada exitosa */
@@ -159,7 +160,7 @@ SelectorStatus SelectorRegister(
 SelectorStatus SelectorUnregisterFd(fd_selector s, int fd);
 
 /** permite cambiar los intereses para un file descriptor */
-SelectorStatus selectorSetInterest(fd_selector s, int fd, FdInterest i);
+SelectorStatus SelectorSetInterest(fd_selector s, int fd, FdInterest i);
 
 /** permite cambiar los intereses para un file descriptor */
 SelectorStatus SelectorSetInterestKey(SelectorKey *key, FdInterest i);

@@ -79,7 +79,7 @@ typedef enum {
      *   - CS_ESTABLISH_CONNECTION cuando se leyeron todos los bytes
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
-    CS_DNS_READ,
+    //CS_DNS_READ,
     /**
      * Espero conectarrme al servidor
      *
@@ -91,7 +91,7 @@ typedef enum {
      *   - CS_REQUEST_ESTABLISH_CONNECTION cuando se leyeron todos los bytes
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
-    CS_ESTABLISH_CONNECTION,
+    //CS_ESTABLISH_CONNECTION,
     /**
      * envia la respuesta de `request' al cliente.
      *
@@ -103,9 +103,9 @@ typedef enum {
      *
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
-    CS_REQUEST_WRITE,
-    CS_ERROR,
-    CS_DONE
+    //CS_REQUEST_WRITE,
+    CS_DONE,
+    CS_ERROR
 
 } CONNECTION_STATE;
 

@@ -19,7 +19,7 @@ int BuildHelloResponse(byte *buffer, int length, int authenticationMethod) {
     return 2;
 }
 
-int BuildAuthResponse(byte *buffer, int length, bool authenticationSucceeded) {
+int BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceeded) {
     if (length < 2) {
         LogError(false,"Buffer to small to WriteHead AuthResponse");
         return -1;

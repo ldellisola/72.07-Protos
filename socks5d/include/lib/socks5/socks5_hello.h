@@ -9,7 +9,7 @@
 
 typedef struct {
     // TODO: Stop using a pointer to the parser
-    HelloParser * Parser;
+    HelloParser Parser;
     ArrayBuffer * WriteBuffer, * ReadBuffer;
     byte AuthenticationMethod;
 } HelloData;
@@ -20,6 +20,10 @@ void HelloReadInit(unsigned state, void * data);
 void HelloReadClose(unsigned state, void * data);
 
 unsigned HelloReadRun(void * data);
+
+unsigned HelloWriteRun(void *data);
+
+void HelloWriteClose(unsigned int state, void *data);
 
 #endif //SOCKS5D_SOCKS5_HELLO_H
 

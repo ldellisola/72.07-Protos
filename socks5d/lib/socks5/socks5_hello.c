@@ -17,9 +17,9 @@ typedef enum {
     SOCKS5_AUTH_INVALID = 0xFF
 }SOCKS5_AUTH;
 
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 SOCKS5_AUTH SelectAuthenticationMethod(byte * methods, int methodLength);
 
+#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 
 void HelloReadInit(unsigned int state, void *data) {
@@ -28,14 +28,13 @@ void HelloReadInit(unsigned int state, void *data) {
 
     d->ReadBuffer = &connection->ReadBuffer;
     d->WriteBuffer = &connection->WriteBuffer;
-    d->Parser = HelloParserInit();
+    HelloParserReset(&d->Parser);
 }
 
 void HelloReadClose(unsigned int state, void *data) {
     Socks5Connection * connection = ATTACHMENT(data);
     HelloData* d = &connection->Data.Hello;
-    HelloParserDestroy(d->Parser);
-    bzero(d, sizeof(HelloData));
+    HelloParserReset(&d->Parser);
 }
 
 unsigned HelloReadRun(void *data) {
@@ -44,7 +43,7 @@ unsigned HelloReadRun(void *data) {
     size_t bufferSize;
 
     byte * buffer = BufferWritePtr(d->ReadBuffer, &bufferSize);
-    ssize_t bytesRead = ReadFromTcpConnection(connection->TcpConnection, buffer, bufferSize);
+    ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead < 0)
     {
@@ -53,24 +52,23 @@ unsigned HelloReadRun(void *data) {
     }
 
     BufferWriteAdv(d->ReadBuffer,bytesRead);
-    HelloParserConsume(d->Parser,buffer,bytesRead);
+    HelloParserConsume(&d->Parser,buffer,bytesRead);
 
-    if (!HelloParserHasFinished(d->Parser->State))
+    if (!HelloParserHasFinished(d->Parser.State))
         return CS_HELLO_READ;
 
-    if (HelloParserHasFailed(d->Parser->State))
+    if (HelloParserHasFailed(d->Parser.State))
         return CS_ERROR;
 
     if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data,SELECTOR_OP_WRITE)){
-        int authMethod = SelectAuthenticationMethod(d->Parser->Methods, d->Parser->NMethods);
+        d->AuthenticationMethod = SelectAuthenticationMethod(d->Parser.Methods, d->Parser.NMethods);
+
 
         buffer = BufferWritePtr(d->WriteBuffer,&bufferSize);
-        int bytesWritten = BuildHelloResponse(buffer,bufferSize,authMethod);
+        int bytesWritten = BuildHelloResponse(buffer,bufferSize,d->AuthenticationMethod);
         if (bytesWritten < 0)
             return CS_ERROR;
         BufferWriteAdv(d->WriteBuffer,bytesWritten);
-         // TODO: Ver donde va esto?
-//        WriteToTcpConnection(connection->TcpConnection, buffer, bytesWritten);
 
         return CS_HELLO_WRITE;
     }
@@ -85,4 +83,38 @@ SOCKS5_AUTH SelectAuthenticationMethod(byte *methods, int methodLength) {
 
     return SOCKS5_AUTH_INVALID;
 }
+
+
+unsigned HelloWriteRun(void *data){
+    Socks5Connection * connection = ATTACHMENT(data);
+    HelloData* d = &connection->Data.Hello;
+
+    if (!BufferCanRead(d->WriteBuffer))
+    {
+        if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data,SELECTOR_OP_READ)) {
+            return d->AuthenticationMethod == SOCKS5_AUTH_USER_PASS ? CS_AUTH_READ : CS_REQUEST_READ;
+        }
+        return CS_ERROR;
+    }
+
+    size_t size;
+    byte * ptr = BufferReadPtr(d->WriteBuffer,&size);
+
+    size_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
+    BufferReadAdv(d->WriteBuffer,bytesWritten);
+
+    return CS_HELLO_WRITE;
+
+}
+
+void HelloWriteClose(unsigned int state, void *data) {
+    Socks5Connection * connection = ATTACHMENT(data);
+    HelloData* d = &connection->Data.Hello;
+
+    BufferReset(d->WriteBuffer);
+    BufferReset(d->ReadBuffer);
+}
+
+
+
 

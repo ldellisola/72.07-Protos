@@ -13,6 +13,7 @@
 #include "tcp/tcp_connection.h"
 #include <netdb.h>
 
+fd_selector GetSelect();
 
 /**
  * It initializes a TCP server and creates the internal selector

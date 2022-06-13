@@ -37,20 +37,20 @@ typedef struct
     HelloParserState State;
     uint8_t NMethods;
     uint8_t CurrentMethod;
-    uint8_t * Methods;
+    uint8_t Methods[255];
 }HelloParser;
 
 /**
  * It initializes a HelloParser instance
  * @return A new HelloParser instance
  */
-HelloParser * HelloParserInit();
+HelloParser HelloParserInit();
 
 /**
  * It safely disposes a parser instance
  * @param p Parser instance to be disposed
  */
-void HelloParserDestroy(HelloParser* p);
+void HelloParserReset(HelloParser* p);
 
 /**
  * It iterates the parser one step for a given input

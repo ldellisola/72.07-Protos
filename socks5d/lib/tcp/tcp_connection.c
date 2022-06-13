@@ -7,14 +7,19 @@
 #include "tcp/tcp_connection.h"
 #include "utils/logger.h"
 #include "utils/utils.h"
+#include "selector/selector.h"
 
-int DisposeTcpConnection(TcpConnection * socket){
+int DisposeTcpConnection(TcpConnection *socket, fd_selector selector) {
     if (socket == null) {
         LogError(false,"Failed to dispose TCP socket. Cannot be null");
         return ERROR;
     }
 
     LogInfo("Disposing TCP socket on file descriptor %d",socket->FileDescriptor);
+
+    if ( SELECTOR_STATUS_SUCCESS != SelectorUnregisterFd(selector,socket->FileDescriptor)){
+        LogError(false,"Cannot unregister file descriptor");
+    }
 
     if (close(socket->FileDescriptor) < 0){
         LogError(true,"Cannot close file descriptor %d",socket->FileDescriptor);
@@ -54,6 +59,7 @@ TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, sockle
 
     memcpy(&tcpSocket->Address, &addr, addrSize);
     tcpSocket->AddressLength = addrSize;
+    tcpSocket->FileDescriptor = fd;
 
     return tcpSocket;
 }

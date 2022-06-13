@@ -7,7 +7,8 @@ set(
         SOURCES
         hello_parser_test.c
         auth_parser_test.c
-        request_parser_test.c request_parser_test.h)
+        request_parser_test.c
+)
 
 add_library(parsers_test STATIC ${SOURCES})
 target_link_libraries(parsers_test PUBLIC parsers)

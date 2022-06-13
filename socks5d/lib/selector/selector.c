@@ -18,6 +18,7 @@
 #include <sys/socket.h>
 #include <sys/select.h>
 #include <sys/signal.h>
+#include <signal.h>
 #include "selector/selector.h"
 
 
@@ -399,7 +400,7 @@ SelectorStatus SelectorUnregisterFd(fd_selector s, int fd) {
     return ret;
 }
 
-SelectorStatus selectorSetInterest(fd_selector s, int fd, FdInterest i) {
+SelectorStatus SelectorSetInterest(fd_selector s, int fd, FdInterest i) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
 
     if(NULL == s || INVALID_FD(fd)) {
@@ -423,7 +424,7 @@ SelectorStatus SelectorSetInterestKey(SelectorKey *key, FdInterest i) {
     if(NULL == key || NULL == key->Selector || INVALID_FD(key->Fd)) {
         ret = SELECTOR_STATUS_IARGS;
     } else {
-        ret = selectorSetInterest(key->Selector, key->Fd, i);
+        ret = SelectorSetInterest(key->Selector, key->Fd, i);
     }
 
     return ret;

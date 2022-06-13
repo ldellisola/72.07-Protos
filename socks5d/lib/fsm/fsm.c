@@ -7,7 +7,9 @@
 
 #define N(x) (sizeof(x)/sizeof((x)[0]))
 
-void InitFsm(FiniteStateMachine *fsm) {
+void InitFsm(FiniteStateMachine *fsm, StateDefinition* stateDefinition){
+    fsm->States = stateDefinition;
+    fsm->CurrentState = &stateDefinition[0];
     // verificamos que los estados son correlativos, y que están bien asignados.
     for(unsigned i = 0 ; i <= fsm->StatesSize; i++) {
         if(i != fsm->States[i].state) {

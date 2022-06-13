@@ -2,38 +2,39 @@
 // Created by Lucas Dell'Isola on 05/06/2022.
 //
 
+#include <memory.h>
+#include <monetary.h>
 #include "parsers/auth_parser.h"
 #include "utils/logger.h"
 
-AuthParser * AuthParserInit() {
-    LogInfo("Creating AuthParser...");
-    AuthParser * ptr = calloc(1,sizeof(AuthParser));
+//AuthParser AuthParserInit() {
+//    LogInfo("Creating AuthParser...");
+//
+//    AuthParser parser;
+//    AuthParserReset(&parser);
+//
+//    LogInfo("AuthParser created!");
+//    return parser;
+//}
 
-    if (null == ptr) {
-        LogError(false, "Cannot allocate AuthParser");
-        return ptr;
-    }
-
-    ptr->State = AuthVersion;
-    LogInfo("AuthParser created!");
-    return ptr;
-}
-
-void AuthParserDestroy(AuthParser *p) {
-    LogInfo("Disposing AuthParser...");
+void AuthParserReset(AuthParser *p) {
+    LogInfo("Resetting AuthParser...");
     if (null == p) {
-        LogError(false, "Cannot destroy NULL AuthParser");
+        LogError(false, "Cannot reset NULL AuthParser");
         return;
     }
 
-    if (null != p->UName)
-        free(p->UName);
+    p->State = AuthVersion;
+    p->PLen = 0;
+    p->ULen = 0;
+    p->PasswdPosition = 0;
+    p->UNamePosition = 0;
 
-    if (null != p->Passwd)
-        free(p->Passwd);
 
-    free(p);
-    LogInfo("AuthParser disposed!");
+    memset(p->UName,0,256);
+    memset(p->Passwd,0,256);
+
+    LogInfo("AuthParser reset!");
 }
 
 AuthParserState AuthParserFeed(AuthParser *p, byte c) {
@@ -55,8 +56,6 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c) {
             p->State = 0 == p->ULen ? AuthInvalidState : AuthUName;
             break;
         case AuthUName:
-            if (null == p->UName)
-                p->UName = calloc(p->ULen+1,sizeof(char));
 
             p->UName[p->UNamePosition++] = c;
 
@@ -71,8 +70,6 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c) {
             p->State =  0 == p->PLen ? AuthInvalidState : AuthPasswd;
             break;
         case AuthPasswd:
-            if (null == p->Passwd)
-                p->Passwd = calloc(p->PLen +1,sizeof(char));
 
             p->Passwd[p->PasswdPosition++] = c;
 
@@ -101,7 +98,7 @@ bool AuthParserHasFailed(AuthParserState state){
     }
 }
 
-int AuthParserConsume(AuthParser *p, byte *c, int length) {
+ssize_t AuthParserConsume(AuthParser *p, byte *c, ssize_t length) {
     LogInfo("AuthParser consuming %d bytes",length);
     if (null == p)
     {

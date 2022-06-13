@@ -6,7 +6,8 @@ set(CMAKE_C_STANDARD 11)
 set(
         SOURCES
         tcp.c
-        tcp_connection.c ../../include/lib/tcp/tcp_connection.h)
+        tcp_connection.c
+)
 
 add_library(tcp STATIC ${SOURCES})
-target_link_libraries(tcp PUBLIC utils)
+target_link_libraries(tcp PUBLIC utils selector)

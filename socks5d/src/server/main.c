@@ -7,6 +7,7 @@
 #include "socks5/socks5_server.h"
 #include "utils/logger.h"
 
+
 static void sigterm_handler(const int signal) {
     printf("Signal %d, cleaning up and exiting\n",signal);
     StopTcpServer();
@@ -26,6 +27,7 @@ int main(int argc, char ** argv) {
     RegisterSocks5ServerOnIPv4(arguments.SocksPort);
 
     RunTcpServer();
+
 
 
 

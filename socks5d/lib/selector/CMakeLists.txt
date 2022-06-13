@@ -9,4 +9,4 @@ set(
 )
 
 add_library(selector STATIC ${SOURCES})
-target_link_libraries(selector PUBLIC utils)
+target_link_libraries(selector PUBLIC utils pthread)

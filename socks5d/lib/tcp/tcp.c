@@ -10,28 +10,29 @@
 #include "utils/utils.h"
 #include "utils/logger.h"
 #include "selector/selector.h"
-
 #include "tcp/tcp.h"
 
 
-fd_selector selector      = NULL;
-bool isRunning = true;
+static fd_selector selector = NULL;
+static bool isRunning = true;
+
+const SelectorOptions options = {
+        .Signal = SIGALRM,
+        .SelectTimeout = {
+                .tv_sec = 10,
+                .tv_nsec = 0,
+        }
+};
 
 void InitTcpServer(const SelectorOptions * optionalOptions) {
-    const SelectorOptions options = {
-            .Signal = SIGALRM,
-            .SelectTimeout = {
-                    .tv_sec = 10,
-                    .tv_nsec = 0,
-            }
-    };
+
 
     if (0 != SelectorInit(null == optionalOptions ? &options : optionalOptions)){
         LogError(false,"Cannot initialize Selector");
         return;
     }
 
-    selector = SelectorNew(1024);
+    selector = (struct fdselector *)SelectorNew(1024);
     if (null == selector){
         LogError(false,"Cannot create selector");
     }
@@ -92,7 +93,7 @@ bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler){
         return false;
     }
 
-    SelectorStatus status = SelectorRegister(selector,servSock,handler,SELECTOR_OP_READ,null);
+    SelectorStatus status = SelectorRegister((fd_selector) selector,servSock,handler,SELECTOR_OP_READ,null);
 
     if (status != SELECTOR_STATUS_SUCCESS){
         LogError(false,"Cannot register TCP socket on selector");
@@ -106,7 +107,7 @@ bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler){
 bool RunTcpServer() {
     SelectorStatus selectorStatus;
     while (isRunning){
-        selectorStatus = SelectorSelect(selector);
+        selectorStatus = SelectorSelect((fd_selector) selector);
         if (selectorStatus != SELECTOR_STATUS_SUCCESS){
             LogError(false,"Error on selector. Exiting...");
             return false;

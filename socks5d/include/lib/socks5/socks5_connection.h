@@ -9,14 +9,19 @@
 #include "socks5/socks5_hello.h"
 #include "utils/buffer.h"
 #include "socks5_connection_status.h"
+#include "fsm/fsm.h"
+#include "socks5_auth.h"
 
 
 typedef struct {
+    FiniteStateMachine Fsm;
     CONNECTION_STATE State;
-    TcpConnection * TcpConnection;
+    TcpConnection * ClientTcpConnection;
+    TcpConnection * RemoteTcpConnection;
     FdHandler * Handler;
     union {
         HelloData Hello;
+        AuthData Auth;
     } Data;
     ArrayBuffer ReadBuffer, WriteBuffer;
 } Socks5Connection;
@@ -31,7 +36,7 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection);
  * It safely disposes a Socks5 connection
  * @param connection Socks5 connection to dispose
  */
-void Socks5ConnectionDestroy(Socks5Connection * connection);
+void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector);
 
 /**
  * It runs through the States of a Socks5 finite state machine

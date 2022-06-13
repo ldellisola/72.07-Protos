@@ -26,7 +26,7 @@ int BuildHelloResponse(byte * buffer, int length, int authenticationMethod);
  * @param authenticationSucceeded Whether the user is authenticated or not
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildAuthResponse(byte * buffer, int length, bool authenticationSucceeded);
+int BuildAuthResponse(byte * buffer, size_t length, bool authenticationSucceeded);
 
 /**
  * It writes the RequestResponse with an IPv4 address

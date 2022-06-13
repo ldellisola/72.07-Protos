@@ -1,22 +1,20 @@
 
 
 #include <monetary.h>
+#include <memory.h>
 #include "parsers/hello_parser.h"
 #include "utils/logger.h"
 #include "utils/utils.h"
 
-// TODO: Stop allocating memory
-HelloParser * HelloParserInit()
+HelloParser HelloParserInit()
 {
     LogInfo("Creating HelloParser...");
-    HelloParser * p = calloc(1,sizeof(HelloParser));
+    HelloParser parser = {
+            .State = HelloVersion,
+    };
+    memset(parser.Methods,0,255);
 
-    if (null == p) {
-        LogError(false, "Cannot allocate space for HelloParser");
-        return null;
-    }
-
-    return p;
+    return parser;
 }
 
 HelloParserState HelloParserFeed(HelloParser *p, byte c)
@@ -42,8 +40,6 @@ HelloParserState HelloParserFeed(HelloParser *p, byte c)
 
             if (p->NMethods <= 0)
                 p->State = HelloInvalidState;
-            else
-                p->Methods = calloc(p->NMethods,sizeof(int));
 
             break;
         case HelloMethods:
@@ -111,16 +107,17 @@ size_t HelloParserConsume(HelloParser * p, byte * c, size_t length){
     return length;
 }
 
-void HelloParserDestroy(HelloParser *p) {
-    LogInfo("Disposing HelloParser...");
+void HelloParserReset(HelloParser *p) {
+    LogInfo("Resetting HelloParser...");
     if (null == p) {
-        LogError(false, "Cannot destroy NULL HelloParser");
+        LogError(false, "Cannot reset NULL HelloParser");
         return;
     }
 
-    if (null != p->Methods)
-        free(p->Methods);
+    p->State = HelloVersion;
+    p->NMethods = 0;
+    p->CurrentMethod = 0;
+    memset(p->Methods,0,255);
 
-    free(p);
-    LogInfo("AuthParser disposed!");
+    LogInfo("AuthParser value reset!");
 }

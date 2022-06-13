@@ -110,7 +110,13 @@ void BufferInit(ArrayBuffer *b, size_t n, byte *data);
  */
 byte * BufferWritePtr(ArrayBuffer *buffer, size_t *n);
 
+/**
+ * It moves the buffer head n bytes
+ * @param b the buffer
+ * @param bytes the number of bytes to move the head
+ */
 void BufferWriteAdv(ArrayBuffer *b, ssize_t bytes);
+
 
 byte * BufferReadPtr(ArrayBuffer *b, size_t *nbyte);
 void BufferReadAdv(ArrayBuffer *b, ssize_t bytes);

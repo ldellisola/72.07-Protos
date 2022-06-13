@@ -11,6 +11,7 @@
 #include "parsers/request_parser.h"
 #include "socks5/socks5_messages.h"
 #include "fsm/fsm.h"
+#include "socks5/socks5_auth.h"
 
 // TODO: Test
 
@@ -30,31 +31,49 @@ FdHandler socks5ConnectionHandler = {
         .handle_block  = Socks5ConnectionBlock,
 };
 
-//static const StateDefinition socks5ConnectionFsm[] = {
-//        {
-//            .state = CS_HELLO_READ,
-//            .on_arrival = HelloReadInit,
-//            .on_departure = HelloReadClose,
-//            .on_read_ready = HelloReadRun
-//        },
-//        {
-//            .state = CS_HELLO_WRITE,
-//        },
-//        {
-//            .state = CS_ERROR
-//        },
-//        {
-//            .state = CS_DONE
-//        }
-//};
+void nothing(unsigned aa,void * sss){
+
+}
+
+static StateDefinition socks5ConnectionFsm[] = {
+        {
+            .state = CS_HELLO_READ,
+            .on_arrival = HelloReadInit,
+            .on_departure = HelloReadClose,
+            .on_read_ready = HelloReadRun
+        },
+        {
+            .state = CS_HELLO_WRITE,
+            .on_write_ready = HelloWriteRun,
+            .on_departure = HelloWriteClose
+        },
+        {
+            .state = CS_AUTH_READ,
+            .on_arrival = AuthReadInit,
+            .on_departure = AuthReadClose,
+            .on_read_ready = AuthReadRun
+            },
+        {
+          .state = CS_AUTH_WRITE,
+          .on_write_ready = AuthWriteRun,
+          .on_departure = AuthWriteClose
+        },
+        {
+            .state = CS_DONE,
+                .on_arrival = nothing
+        },
+        {
+                .state = CS_ERROR,
+                .on_arrival = nothing
+        },
+};
 
 
 bool HandleHello(Socks5Connection * connection, byte* data, int length);
 bool HandleAuthentication(Socks5Connection *connection, byte *data, int length);
 bool HandleRequest(Socks5Connection *connection, byte *data, int length);
 
-#define SOCKS5_DEFAULT_USER "admin"
-#define SOCKS5_DEFAULT_PASSWORD "admin"
+
 
 Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection) {
     LogInfo("Creating Socks5Connection.");
@@ -64,10 +83,12 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection) {
     if (null == tcpConnection)
         LogError(false,"Cannot allocate space for Socks5Connection");
 
-//    connection->State = SOCKS5_CS_INIT;
-//    connection->Parser.Hello = HelloParserInit();
-    connection->TcpConnection = tcpConnection;
+    connection->State = CS_HELLO_READ;
+    connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &socks5ConnectionHandler;
+    connection->Fsm.InitialState = CS_HELLO_READ;
+    connection->Fsm.StatesSize = CS_ERROR;
+    InitFsm(&connection->Fsm,socks5ConnectionFsm);
 
     void * readBuffer = calloc(500,sizeof(byte));
     void * writeBuffer = calloc(500,sizeof(byte));
@@ -79,15 +100,18 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection) {
 }
 
 
-void Socks5ConnectionDestroy(Socks5Connection *connection) {
+void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector) {
     LogInfo("Disposing Socks5Connection...");
     if (null == connection) {
         LogError(false, "Cannot destroy NULL Socks5Connection");
         return;
     }
 
-    if (null != connection->TcpConnection)
-        DisposeTcpConnection(connection->TcpConnection);
+    if (null != connection->ClientTcpConnection)
+        DisposeTcpConnection(connection->ClientTcpConnection, selector);
+
+    if (null != connection->RemoteTcpConnection)
+        DisposeTcpConnection(connection->RemoteTcpConnection, selector);
 
     if (null != connection->ReadBuffer.Data)
         free(connection->ReadBuffer.Data);
@@ -101,45 +125,6 @@ void Socks5ConnectionDestroy(Socks5Connection *connection) {
 
 
 
-bool RunSocks5(Socks5Connection *connection, byte *data, int length) {
-    LogInfo("Running Socks5Connection FSM");
-
-    if(null == connection)
-    {
-        LogError(false,"Socks5Connection cannot be NULL");
-        return true;
-    }
-
-//    switch (connection->State) {
-//        case SOCKS5_CS_INIT: return HandleHello(connection, data, length);
-//        case SOCKS5_CS_AUTH: return HandleAuthentication(connection, data, length);
-//        case SOCKS5_CS_REQUEST: return HandleRequest(connection,data,length);
-//        case SOCKS5_CS_READY:
-//            break;
-//        case SOCKS5_CS_FINISHED:
-//            return true;
-//        case SOCKS5_CS_FAILED:
-//            break;
-//    }
-
-    return false;
-
-}
-
-bool Socks5ConnectionFailed(Socks5Connection *connection) {
-    if (null == connection)
-    {
-        LogError(false,"Socks5Connection cannot be NULL to check if it failed");
-        return true;
-    }
-
-//    if (SOCKS5_CS_FAILED == connection->State)
-//        return true;
-
-    return false;
-}
-
-//
 //bool HandleRequest(Socks5Connection *connection, byte *data, int length) {
 //    RequestParser * parser = connection->Parser.Request;
 //   // TODO: Figure out return value
@@ -160,7 +145,7 @@ bool Socks5ConnectionFailed(Socks5Connection *connection) {
 //   if (parser->CMD != SOCKS5_CMD_CONNECT){
 //       // TODO: Send method not implemented
 //       messageSize = BuildRequestResponseFromParser(message,1024,SOCKS5_REPLY_COMMAND_NOT_SUPPORTED,parser);
-//       WriteToTcpConnection(connection->TcpConnection, message, messageSize);
+//       WriteToTcpConnection(connection->ClientTcpConnection, message, messageSize);
 //       return false;
 //   }
 //
@@ -168,14 +153,14 @@ bool Socks5ConnectionFailed(Socks5Connection *connection) {
 //       // TODO: support other address type
 //       // TODO: Send Method not implemented
 //       messageSize = BuildRequestResponseFromParser(message,1024,SOCKS5_REPLY_ADDRESS_TYPE_NOT_SUPPORTED,parser);
-//       WriteToTcpConnection(connection->TcpConnection, message, messageSize);
+//       WriteToTcpConnection(connection->ClientTcpConnection, message, messageSize);
 //       return false;
 //   }
 //
-//   TcpConnection * other = ConnectToTcpServer(parser->DestAddress, parser->DestPort);
+//   ClientTcpConnection * other = ConnectToTcpServer(parser->DestAddress, parser->DestPort);
 //   if (null == other){
 //       messageSize = BuildRequestResponseFromParser(message,1024,SOCKS5_REPLY_GENERAL_FAILURE,parser);
-//       WriteToTcpConnection(connection->TcpConnection, message, messageSize);
+//       WriteToTcpConnection(connection->ClientTcpConnection, message, messageSize);
 //       return false;
 //   }
 //
@@ -211,27 +196,46 @@ bool Socks5ConnectionFailed(Socks5Connection *connection) {
 //    // TODO: Make non blocking
 //    byte message[2];
 //    int messageLength = BuildAuthResponse(message,2,isLoggedIn);
-//    WriteToTcpConnection(connection->TcpConnection, message, messageLength);
+//    WriteToTcpConnection(connection->ClientTcpConnection, message, messageLength);
 //
 //    connection->State = isLoggedIn ? SOCKS5_CS_REQUEST : SOCKS5_CS_FINISHED;
 //
 //    return !isLoggedIn;
 //}
 
-void Socks5ConnectionRead(SelectorKey *key) {
+#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
+void Socks5ConnectionDone(SelectorKey * key);
+
+void Socks5ConnectionRead(SelectorKey *key) {
+    FiniteStateMachine *fsm   = &ATTACHMENT(key)->Fsm;
+    CONNECTION_STATE st = HandleReadFsm(fsm, key);
+
+    if(CS_ERROR == st || CS_DONE == st) {
+        Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
+    }
 }
 
 void Socks5ConnectionWrite(SelectorKey *key) {
+    FiniteStateMachine *fsm   = &ATTACHMENT(key)->Fsm;
+    CONNECTION_STATE st = HandleWriteFsm(fsm, key);
 
+    if(CS_ERROR == st || CS_DONE == st) {
+        Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
+    }
 }
 
 void Socks5ConnectionBlock(SelectorKey *key) {
+    FiniteStateMachine *fsm   = &ATTACHMENT(key)->Fsm;
+    CONNECTION_STATE st = HandleBlockFsm(fsm, key);
 
+    if(CS_ERROR == st || CS_DONE == st) {
+        Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
+    }
 }
 
 void Socks5ConnectionClose(SelectorKey *key) {
-
+    Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
 }
 
 

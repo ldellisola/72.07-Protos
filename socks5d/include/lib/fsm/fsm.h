@@ -63,7 +63,7 @@ typedef struct {
 
 
 /** inicializa el la máquina */
-void InitFsm(FiniteStateMachine *fsm);
+void InitFsm(FiniteStateMachine *fsm, StateDefinition* stateDefinition);
 
 /** obtiene el identificador del estado actual */
 unsigned GetStateFromFsm(FiniteStateMachine *fsm);

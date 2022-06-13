@@ -9,16 +9,15 @@
 
 void Socks5PassiveAccept(SelectorKey * key);
 
+const FdHandler socksv5 = {
+        .handle_read       = Socks5PassiveAccept,
+        .handle_write      = NULL,
+        .handle_close      = NULL, // nada que liberar
+};
 
 void RegisterSocks5ServerOnIPv4(const char *port) {
     LogInfo("Starting SOCKS5 server...");
     int portNum = atoi(port);
-
-    const FdHandler socksv5 = {
-            .handle_read       = Socks5PassiveAccept,
-            .handle_write      = NULL,
-            .handle_close      = NULL, // nada que liberar
-    };
 
     // TODO: Make address agnostic
     IPv4ListenOnTcpPort(portNum,&socksv5);
@@ -52,7 +51,7 @@ void Socks5PassiveAccept(SelectorKey *key) {
             );
 
     if (SELECTOR_STATUS_SUCCESS != status){
-        Socks5ConnectionDestroy(connection);
+        Socks5ConnectionDestroy(connection, NULL);
         LogError(false,"Cannot register new SOCKS5 connection to the selector");
     }
 }
