@@ -18,9 +18,9 @@
 typedef struct {
     FiniteStateMachine Fsm;
     CONNECTION_STATE State;
-    TcpConnection * ClientTcpConnection;
-    TcpConnection * RemoteTcpConnection;
-    const FdHandler * Handler;
+    TcpConnection *ClientTcpConnection;
+    TcpConnection *RemoteTcpConnection;
+    const FdHandler *Handler;
     union {
         HelloData Hello;
         AuthData Auth;
@@ -40,7 +40,6 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection);
  * @param connection Socks5 connection to dispose
  */
 void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector);
-
 
 
 #endif //SERVER_SOCKS_CONNECTION_H

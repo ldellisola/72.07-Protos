@@ -6,7 +6,7 @@ set(
         SOURCES
         main.c
         cli.c
-        )
+)
 
 add_executable(server ${SOURCES})
 add_library(server_lib ${SOURCES})

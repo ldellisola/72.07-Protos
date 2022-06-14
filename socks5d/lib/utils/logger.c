@@ -18,9 +18,9 @@ void LogInfo(const char *message, ...) {
     va_list arg;
     va_start (arg, message);
 
-    fprintf(stdout,"INFO: ");
-    vfprintf (stdout, message, arg);
-    fprintf(stdout,"\n");
+    fprintf(stdout, "INFO: ");
+    vfprintf(stdout, message, arg);
+    fprintf(stdout, "\n");
 
     va_end (arg);
 }
@@ -29,11 +29,11 @@ void LogError(bool showInnerError, const char *message, ...) {
     va_list arg;
     va_start (arg, message);
 
-            fprintf(stderr, "ERROR: ");
-            vfprintf (stderr, message, arg);
-            fprintf(stderr,"\n");
-            if (showInnerError)
-                fprintf(stderr,"\tReason: %s\n",strerror(errno));
+    fprintf(stderr, "ERROR: ");
+    vfprintf(stderr, message, arg);
+    fprintf(stderr, "\n");
+    if (showInnerError)
+        fprintf(stderr, "\tReason: %s\n", strerror(errno));
 
     va_end (arg);
 }

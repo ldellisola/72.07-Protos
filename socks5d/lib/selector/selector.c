@@ -27,9 +27,9 @@
 #define ERROR_DEFAULT_MSG "something failed"
 
 /** retorna una descripción humana del fallo */
-const char * SelectorError(SelectorStatus status) {
+const char *SelectorError(SelectorStatus status) {
     const char *msg;
-    switch(status) {
+    switch (status) {
         case SELECTOR_STATUS_SUCCESS:
             msg = "Success";
             break;
@@ -60,14 +60,14 @@ static void WakeHandler(const int signal) {
 SelectorOptions conf;
 static sigset_t emptyset, blockset;
 
-SelectorStatus SelectorInit(const SelectorOptions  *c) {
+SelectorStatus SelectorInit(const SelectorOptions *c) {
     memcpy(&conf, c, sizeof(conf));
 
     // inicializamos el sistema de comunicación entre threads y el selector
     // principal. La técnica se encuentra descripta en
     // "The new pselect() system call" <https://lwn.net/Articles/176911/>
     //  March 24, 2006
-    SelectorStatus   ret = SELECTOR_STATUS_SUCCESS;
+    SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
     struct sigaction act = {
             .sa_handler = WakeHandler,
     };
@@ -75,8 +75,8 @@ SelectorStatus SelectorInit(const SelectorOptions  *c) {
     // 0. calculamos mascara para evitar que se interrumpa antes de llegar al
     //    select
     sigemptyset(&blockset);
-    sigaddset  (&blockset, conf.Signal);
-    if(-1 == sigprocmask(SIG_BLOCK, &blockset, NULL)) {
+    sigaddset(&blockset, conf.Signal);
+    if (-1 == sigprocmask(SIG_BLOCK, &blockset, NULL)) {
         ret = SELECTOR_STATUS_IO;
         goto finally;
     }
@@ -103,16 +103,16 @@ SelectorStatus SelectorClose(void) {
 
 // estructuras internas
 typedef struct {
-    int                 Fd;
-    FdInterest         Interest;
-    const FdHandler   *Handler;
-    void *              Data;
+    int Fd;
+    FdInterest Interest;
+    const FdHandler *Handler;
+    void *Data;
 } Item;
 
 /* tarea bloqueante */
 typedef struct blocking_job {
     /** selector dueño de la resolucion */
-    fd_selector  S;
+    fd_selector S;
     /** file descriptor dueño de la resolucion */
     int Fd;
 
@@ -133,8 +133,8 @@ struct fdselector {
     // almacenamos en una jump table donde la entrada es el file descriptor.
     // Asumimos que el espacio de file descriptors no va a ser esparso; pero
     // esto podría mejorarse utilizando otra estructura de datos
-    Item    *Fds;
-    size_t          FdSize;  // cantidad de elementos posibles de Fds
+    Item *Fds;
+    size_t FdSize;  // cantidad de elementos posibles de Fds
 
     /** Fd maximo para usar en select() */
     int MaxFd;  // max(.Fds[].Fd)
@@ -142,7 +142,7 @@ struct fdselector {
     /** descriptores prototipicos ser usados en select */
     fd_set MasterRead, MasterWrite;
     /** para ser usado en el select() (recordar que select cambia el valor) */
-    fd_set  SlaveRead,  SlaveWrite;
+    fd_set SlaveRead, SlaveWrite;
 
     /** timeout prototipico para usar en select() */
     struct timespec MasterTimeout;
@@ -150,14 +150,14 @@ struct fdselector {
     struct timespec SlaveTimeout;
 
     // notificaciónes entre blocking jobs y el selector
-    volatile pthread_t      SelectorThread;
+    volatile pthread_t SelectorThread;
     /** protege el acceso a resolutions jobs */
-    pthread_mutex_t         ResolutionMutex;
+    pthread_mutex_t ResolutionMutex;
     /**
      * lista de trabajos blockeantes que finalizaron y que pueden ser
      * notificados.
      */
-    BlockingJob   *ResolutionJobs;
+    BlockingJob *ResolutionJobs;
 };
 
 /** cantidad máxima de file descriptors que la plataforma puede manejar */
@@ -172,14 +172,14 @@ struct fdselector {
 static size_t next_capacity(const size_t n) {
     unsigned bits = 0;
     size_t tmp = n;
-    while(tmp != 0) {
+    while (tmp != 0) {
         tmp >>= 1;
         bits++;
     }
     tmp = 1UL << bits;
 
     assert(tmp >= n);
-    if(tmp > ITEMS_MAX_SIZE) {
+    if (tmp > ITEMS_MAX_SIZE) {
         tmp = ITEMS_MAX_SIZE;
     }
 
@@ -196,7 +196,7 @@ static inline void item_init(Item *item) {
  */
 static void items_init(fd_selector s, const size_t last) {
     assert(last <= s->FdSize);
-    for(size_t i = last; i < s->FdSize; i++) {
+    for (size_t i = last; i < s->FdSize; i++) {
         item_init(s->Fds + i);
     }
 }
@@ -206,10 +206,10 @@ static void items_init(fd_selector s, const size_t last) {
  */
 static int items_max_fd(fd_selector s) {
     int max = 0;
-    for(int i = 0; i <= s->MaxFd; i++) {
+    for (int i = 0; i <= s->MaxFd; i++) {
         Item *item = s->Fds + i;
-        if(ITEM_USED(item)) {
-            if(item->Fd > max) {
+        if (ITEM_USED(item)) {
+            if (item->Fd > max) {
                 max = item->Fd;
             }
         }
@@ -217,16 +217,16 @@ static int items_max_fd(fd_selector s) {
     return max;
 }
 
-static void items_update_fdset_for_fd(fd_selector s, const Item * item) {
+static void items_update_fdset_for_fd(fd_selector s, const Item *item) {
     FD_CLR(item->Fd, &s->MasterRead);
     FD_CLR(item->Fd, &s->MasterWrite);
 
-    if(ITEM_USED(item)) {
-        if(item->Interest & SELECTOR_OP_READ) {
+    if (ITEM_USED(item)) {
+        if (item->Interest & SELECTOR_OP_READ) {
             FD_SET(item->Fd, &(s->MasterRead));
         }
 
-        if(item->Interest & SELECTOR_OP_WRITE) {
+        if (item->Interest & SELECTOR_OP_WRITE) {
             FD_SET(item->Fd, &(s->MasterWrite));
         }
     }
@@ -241,18 +241,18 @@ static SelectorStatus ensure_capacity(fd_selector s, const size_t n) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
 
     const size_t element_size = sizeof(*s->Fds);
-    if(n < s->FdSize) {
+    if (n < s->FdSize) {
         // nada para hacer, entra...
         ret = SELECTOR_STATUS_SUCCESS;
-    } else if(n > ITEMS_MAX_SIZE) {
+    } else if (n > ITEMS_MAX_SIZE) {
         // me estás pidiendo más de lo que se puede.
         ret = SELECTOR_STATUS_MAXFD;
-    } else if(NULL == s->Fds) {
+    } else if (NULL == s->Fds) {
         // primera vez.. alocamos
         const size_t new_size = next_capacity(n);
 
         s->Fds = calloc(new_size, element_size);
-        if(NULL == s->Fds) {
+        if (NULL == s->Fds) {
             ret = SELECTOR_STATUS_ENOMEM;
         } else {
             s->FdSize = new_size;
@@ -261,14 +261,14 @@ static SelectorStatus ensure_capacity(fd_selector s, const size_t n) {
     } else {
         // hay que agrandar...
         const size_t new_size = next_capacity(n);
-        if (new_size > SIZE_MAX/element_size) { // ver MEM07-C
+        if (new_size > SIZE_MAX / element_size) { // ver MEM07-C
             ret = SELECTOR_STATUS_ENOMEM;
         } else {
             Item *tmp = realloc(s->Fds, new_size * element_size);
-            if(NULL == tmp) {
+            if (NULL == tmp) {
                 ret = SELECTOR_STATUS_ENOMEM;
             } else {
-                s->Fds     = tmp;
+                s->Fds = tmp;
                 const size_t old_size = s->FdSize;
                 s->FdSize = new_size;
 
@@ -283,14 +283,14 @@ static SelectorStatus ensure_capacity(fd_selector s, const size_t n) {
 fd_selector SelectorNew(size_t initial_elements) {
     size_t size = sizeof(struct fdselector);
     fd_selector ret = malloc(size);
-    if(ret != NULL) {
+    if (ret != NULL) {
         memset(ret, 0x00, size);
-        ret->MasterTimeout.tv_sec  = conf.SelectTimeout.tv_sec;
+        ret->MasterTimeout.tv_sec = conf.SelectTimeout.tv_sec;
         ret->MasterTimeout.tv_nsec = conf.SelectTimeout.tv_nsec;
         assert(ret->MaxFd == 0);
-        ret->ResolutionJobs  = 0;
+        ret->ResolutionJobs = 0;
         pthread_mutex_init(&ret->ResolutionMutex, 0);
-        if(0 != ensure_capacity(ret, initial_elements)) {
+        if (0 != ensure_capacity(ret, initial_elements)) {
             SelectorDestroy(ret);
             ret = NULL;
         }
@@ -300,20 +300,20 @@ fd_selector SelectorNew(size_t initial_elements) {
 
 void SelectorDestroy(fd_selector s) {
     // lean ya que se llama desde los casos fallidos de _new.
-    if(s != NULL) {
-        if(s->Fds != NULL) {
-            for(size_t i = 0; i < s->FdSize ; i++) {
-                if(ITEM_USED(s->Fds + i)) {
+    if (s != NULL) {
+        if (s->Fds != NULL) {
+            for (size_t i = 0; i < s->FdSize; i++) {
+                if (ITEM_USED(s->Fds + i)) {
                     SelectorUnregisterFd(s, i);
                 }
             }
             pthread_mutex_destroy(&s->ResolutionMutex);
-            for(BlockingJob *j = s->ResolutionJobs; j != NULL;
-                j = j->Next) {
+            for (BlockingJob *j = s->ResolutionJobs; j != NULL;
+                 j = j->Next) {
                 free(j);
             }
             free(s->Fds);
-            s->Fds     = NULL;
+            s->Fds = NULL;
             s->FdSize = 0;
         }
         free(s);
@@ -323,40 +323,39 @@ void SelectorDestroy(fd_selector s) {
 #define INVALID_FD(fd)  ((fd) < 0 || (fd) >= ITEMS_MAX_SIZE)
 
 SelectorStatus SelectorRegister(
-        fd_selector        s,
-        int          fd,
-        const FdHandler  *handler,
+        fd_selector s,
+        int fd,
+        const FdHandler *handler,
         FdInterest interest,
-        void *data)
-        {
+        void *data) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
     // 0. validación de argumentos
-    if(s == NULL || INVALID_FD(fd) || handler == NULL) {
+    if (s == NULL || INVALID_FD(fd) || handler == NULL) {
         ret = SELECTOR_STATUS_IARGS;
         goto finally;
     }
     // 1. tenemos espacio?
-    size_t ufd = (size_t)fd;
-    if(ufd > s->FdSize) {
+    size_t ufd = (size_t) fd;
+    if (ufd > s->FdSize) {
         ret = ensure_capacity(s, ufd);
-        if(SELECTOR_STATUS_SUCCESS != ret) {
+        if (SELECTOR_STATUS_SUCCESS != ret) {
             goto finally;
         }
     }
 
     // 2. registración
-    Item * item = s->Fds + ufd;
-    if(ITEM_USED(item)) {
+    Item *item = s->Fds + ufd;
+    if (ITEM_USED(item)) {
         ret = SELECTOR_STATUS_FDINUSE;
         goto finally;
     } else {
-        item->Fd       = fd;
-        item->Handler  = handler;
+        item->Fd = fd;
+        item->Handler = handler;
         item->Interest = interest;
-        item->Data     = data;
+        item->Data = data;
 
         // actualizo colaterales
-        if(fd > s->MaxFd) {
+        if (fd > s->MaxFd) {
             s->MaxFd = fd;
         }
         items_update_fdset_for_fd(s, item);
@@ -369,18 +368,18 @@ SelectorStatus SelectorRegister(
 SelectorStatus SelectorUnregisterFd(fd_selector s, int fd) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
 
-    if(NULL == s || INVALID_FD(fd)) {
+    if (NULL == s || INVALID_FD(fd)) {
         ret = SELECTOR_STATUS_IARGS;
         goto finally;
     }
 
     Item *item = s->Fds + fd;
-    if(!ITEM_USED(item)) {
+    if (!ITEM_USED(item)) {
         ret = SELECTOR_STATUS_IARGS;
         goto finally;
     }
 
-    if(item->Handler->handle_close != NULL) {
+    if (item->Handler->handle_close != NULL) {
         SelectorKey key = {
                 .Selector    = s,
                 .Fd   = item->Fd,
@@ -403,12 +402,12 @@ SelectorStatus SelectorUnregisterFd(fd_selector s, int fd) {
 SelectorStatus SelectorSetInterest(fd_selector s, int fd, FdInterest i) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
 
-    if(NULL == s || INVALID_FD(fd)) {
+    if (NULL == s || INVALID_FD(fd)) {
         ret = SELECTOR_STATUS_IARGS;
         goto finally;
     }
     Item *item = s->Fds + fd;
-    if(!ITEM_USED(item)) {
+    if (!ITEM_USED(item)) {
         ret = SELECTOR_STATUS_IARGS;
         goto finally;
     }
@@ -421,7 +420,7 @@ SelectorStatus SelectorSetInterest(fd_selector s, int fd, FdInterest i) {
 SelectorStatus SelectorSetInterestKey(SelectorKey *key, FdInterest i) {
     SelectorStatus ret;
 
-    if(NULL == key || NULL == key->Selector || INVALID_FD(key->Fd)) {
+    if (NULL == key || NULL == key->Selector || INVALID_FD(key->Fd)) {
         ret = SELECTOR_STATUS_IARGS;
     } else {
         ret = SelectorSetInterest(key->Selector, key->Fd, i);
@@ -442,21 +441,21 @@ static void handle_iteration(fd_selector s) {
 
     for (int i = 0; i <= n; i++) {
         Item *item = s->Fds + i;
-        if(ITEM_USED(item)) {
-            key.Fd   = item->Fd;
+        if (ITEM_USED(item)) {
+            key.Fd = item->Fd;
             key.Data = item->Data;
-            if(FD_ISSET(item->Fd, &s->SlaveRead)) {
-                if(SELECTOR_OP_READ & item->Interest) {
-                    if(0 == item->Handler->handle_read) {
+            if (FD_ISSET(item->Fd, &s->SlaveRead)) {
+                if (SELECTOR_OP_READ & item->Interest) {
+                    if (0 == item->Handler->handle_read) {
                         assert(("SELECTOR_OP_READ arrived but no Handler. bug!" == 0));
                     } else {
                         item->Handler->handle_read(&key);
                     }
                 }
             }
-            if(FD_ISSET(i, &s->SlaveWrite)) {
-                if(SELECTOR_OP_WRITE & item->Interest) {
-                    if(0 == item->Handler->handle_write) {
+            if (FD_ISSET(i, &s->SlaveWrite)) {
+                if (SELECTOR_OP_WRITE & item->Interest) {
+                    if (0 == item->Handler->handle_write) {
                         assert(("SELECTOR_OP_WRITE arrived but no Handler. bug!" == 0));
                     } else {
                         item->Handler->handle_write(&key);
@@ -472,12 +471,12 @@ static void handle_block_notifications(fd_selector s) {
             .Selector = s,
     };
     pthread_mutex_lock(&s->ResolutionMutex);
-    BlockingJob * next;
-    for(BlockingJob *j = s->ResolutionJobs; j != NULL; j  = next) {
+    BlockingJob *next;
+    for (BlockingJob *j = s->ResolutionJobs; j != NULL; j = next) {
 
         Item *item = s->Fds + j->Fd;
-        if(ITEM_USED(item)) {
-            key.Fd   = item->Fd;
+        if (ITEM_USED(item)) {
+            key.Fd = item->Fd;
             key.Data = item->Data;
             item->Handler->handle_block(&key);
         }
@@ -489,16 +488,16 @@ static void handle_block_notifications(fd_selector s) {
 }
 
 
-SelectorStatus SelectorNotifyBlock(fd_selector  s,const int    fd) {
+SelectorStatus SelectorNotifyBlock(fd_selector s, const int fd) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
 
     // TODO(juan): usar un pool
     BlockingJob *job = malloc(sizeof(*job));
-    if(job == NULL) {
+    if (job == NULL) {
         ret = SELECTOR_STATUS_ENOMEM;
         goto finally;
     }
-    job->S  = s;
+    job->S = s;
     job->Fd = fd;
 
     // encolamos en el selector los resultados
@@ -525,8 +524,8 @@ SelectorStatus SelectorSelect(fd_selector s) {
 
     int fds = pselect(s->MaxFd + 1, &s->SlaveRead, &s->SlaveWrite, 0, &s->SlaveTimeout,
                       &emptyset);
-    if(-1 == fds) {
-        switch(errno) {
+    if (-1 == fds) {
+        switch (errno) {
             case EAGAIN:
             case EINTR:
                 // si una señal nos interrumpio. ok!
@@ -534,9 +533,9 @@ SelectorStatus SelectorSelect(fd_selector s) {
             case EBADF:
                 // ayuda a encontrar casos donde se cierran los Fd pero no
                 // se desregistraron
-                for(int i = 0 ; i < s->MaxFd; i++) {
-                    if(FD_ISSET(i, &s->MasterRead) || FD_ISSET(i, &s->MasterWrite)) {
-                        if(-1 == fcntl(i, F_GETFD, 0)) {
+                for (int i = 0; i < s->MaxFd; i++) {
+                    if (FD_ISSET(i, &s->MasterRead) || FD_ISSET(i, &s->MasterWrite)) {
+                        if (-1 == fcntl(i, F_GETFD, 0)) {
                             fprintf(stderr, "Bad descriptor detected: %d\n", i);
                         }
                     }
@@ -551,7 +550,7 @@ SelectorStatus SelectorSelect(fd_selector s) {
     } else {
         handle_iteration(s);
     }
-    if(ret == SELECTOR_STATUS_SUCCESS) {
+    if (ret == SELECTOR_STATUS_SUCCESS) {
         handle_block_notifications(s);
     }
     finally:
@@ -561,10 +560,10 @@ SelectorStatus SelectorSelect(fd_selector s) {
 int SelectorFdSetNio(const int fd) {
     int ret = 0;
     int flags = fcntl(fd, F_GETFD, 0);
-    if(flags == -1) {
+    if (flags == -1) {
         ret = -1;
     } else {
-        if(fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
+        if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) == -1) {
             ret = -1;
         }
     }

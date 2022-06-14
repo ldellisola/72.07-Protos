@@ -7,6 +7,6 @@
 
 #include <check.h>
 
-Suite * RegisterAuthParserTestSuit();
+Suite *RegisterAuthParserTestSuit();
 
 #endif //SOCKS5D_AUTH_PARSER_TEST_H

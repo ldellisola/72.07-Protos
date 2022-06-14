@@ -5,6 +5,6 @@
 #ifndef SOCKS5D_LULU_CLIENT_TEST_H
 #define SOCKS5D_LULU_CLIENT_TEST_H
 
-Suite * RegisterTcpTestSuit();
+Suite *RegisterTcpTestSuit();
 
 #endif //SOCKS5D_LULU_CLIENT_TEST_H

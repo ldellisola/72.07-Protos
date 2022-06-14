@@ -19,7 +19,7 @@ typedef enum {
     HelloFinished,
     HelloInvalidState
 
-}HelloParserState;
+} HelloParserState;
 
 typedef struct {
     HelloParserState State;
@@ -27,14 +27,19 @@ typedef struct {
     char UName[51];
     char Passwd[51];
     uint8_t index;
-    char* word;
+    char *word;
 
-}HelloParser;
+} HelloParser;
 
 HelloParserState HelloParserFeed(HelloParser *p, byte c);
+
 void HelloParserReset(HelloParser *p);
+
 ssize_t HelloParserConsume(HelloParser *p, byte *c, ssize_t length);
+
 bool HelloParserHasFailed(HelloParserState state);
+
 bool HelloParserHasFinished(HelloParserState state);
+
 #endif //SOCKS5D_CLIENT_HELLO_PARSER_H
 

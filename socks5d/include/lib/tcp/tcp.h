@@ -19,7 +19,7 @@ fd_selector GetSelect();
  * It initializes a TCP server and creates the internal selector
  * @param optionalOptions Optional parameter to define your own Selector options. If null it will use a default configuration
  */
-void InitTcpServer(const SelectorOptions * optionalOptions);
+void InitTcpServer(const SelectorOptions *optionalOptions);
 
 /**
  * It sets up a listener socket on a given port, using an IPv4 address
@@ -45,7 +45,7 @@ void StopTcpServer();
  * @param fd file descriptor to listen to
  * @return A new tcp socket
  */
-TcpConnection * AcceptNewTcpConnection(int fd);
+TcpConnection *AcceptNewTcpConnection(int fd);
 
 /**
  * It reads content from a TCP socket
@@ -54,7 +54,7 @@ TcpConnection * AcceptNewTcpConnection(int fd);
  * @param bufferLength Max size of the buffer
  * @return The size of the content ReadHead
  */
-ssize_t ReadFromTcpConnection(TcpConnection * socket, byte * buffer, size_t bufferLength);
+ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t bufferLength);
 
 /**
  * It writes Data to a TCP socket
@@ -63,12 +63,10 @@ ssize_t ReadFromTcpConnection(TcpConnection * socket, byte * buffer, size_t buff
  * @param contentLength Content length to WriteHead
  * @return The size of the content written
  */
-size_t WriteToTcpConnection(TcpConnection * socket, byte * content, size_t contentLength);
+size_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength);
 
 
 TcpConnection *ConnectToIPv4TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data);
-
-
 
 
 #endif //SERVER_TCP_H

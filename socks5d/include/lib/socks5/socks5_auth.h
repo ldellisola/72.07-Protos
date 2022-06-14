@@ -10,19 +10,19 @@
 
 typedef struct {
     AuthParser Parser;
-    ArrayBuffer * WriteBuffer, * ReadBuffer;
+    ArrayBuffer *WriteBuffer, *ReadBuffer;
     bool AuthSucceeded;
 } AuthData;
 
 
-void AuthReadInit(unsigned state, void * data);
+void AuthReadInit(unsigned state, void *data);
 
-void AuthReadClose(unsigned state, void * data);
+void AuthReadClose(unsigned state, void *data);
 
-unsigned AuthReadRun(void * data);
+unsigned AuthReadRun(void *data);
 
-void AuthWriteClose(unsigned state, void * data);
+void AuthWriteClose(unsigned state, void *data);
 
-unsigned AuthWriteRun(void * data);
+unsigned AuthWriteRun(void *data);
 
 #endif //SOCKS5D_SOCKS5_AUTH_H

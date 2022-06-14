@@ -4,8 +4,9 @@
 
 #ifndef SOCKS5D_HELLO_PARSER_TEST_H
 #define SOCKS5D_HELLO_PARSER_TEST_H
+
 #include <check.h>
 
-Suite * RegisterHelloParserTestSuit();
+Suite *RegisterHelloParserTestSuit();
 
 #endif //SOCKS5D_HELLO_PARSER_TEST_H

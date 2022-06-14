@@ -21,12 +21,12 @@ void EstablishConnectionClose(unsigned int state, void *data) {
 }
 
 unsigned EstablishConnectionRun(void *data) {
-    Socks5Connection * connection = ATTACHMENT(data);
-    RequestData * d = &connection->Data.Request;
+    Socks5Connection *connection = ATTACHMENT(data);
+    RequestData *d = &connection->Data.Request;
 
     int status = connect(
             connection->RemoteTcpConnection->FileDescriptor,
-            (struct sockaddr *)&connection->RemoteTcpConnection->Address,
+            (struct sockaddr *) &connection->RemoteTcpConnection->Address,
             connection->RemoteTcpConnection->AddressLength
     );
 
@@ -60,11 +60,13 @@ unsigned EstablishConnectionRun(void *data) {
             break;
     }
 
-    if (SELECTOR_STATUS_SUCCESS != SelectorSetInterest(((SelectorKey*)data)->Selector, connection->ClientTcpConnection->FileDescriptor,SELECTOR_OP_WRITE)){
+    if (SELECTOR_STATUS_SUCCESS !=
+        SelectorSetInterest(((SelectorKey *) data)->Selector, connection->ClientTcpConnection->FileDescriptor,
+                            SELECTOR_OP_WRITE)) {
         return CS_ERROR;
     }
 
-    if (SELECTOR_STATUS_SUCCESS != SelectorSetInterestKey(data, SELECTOR_OP_NOOP)){
+    if (SELECTOR_STATUS_SUCCESS != SelectorSetInterestKey(data, SELECTOR_OP_NOOP)) {
         return CS_ERROR;
     }
 

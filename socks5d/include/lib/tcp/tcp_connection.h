@@ -16,7 +16,7 @@ typedef struct {
     socklen_t AddressLength;
     bool CanWrite;
     bool CanRead;
-}TcpConnection;
+} TcpConnection;
 
 /**
  * It returns a new instance of a TCP connection
@@ -25,7 +25,7 @@ typedef struct {
  * @param addrSize size of the address of the client
  * @return a new Tcp connection
  */
-TcpConnection * CreateTcpConnection(int fd, struct sockaddr_storage * addr, socklen_t addrSize);
+TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, socklen_t addrSize);
 
 /**
  * It safely disposes a tcp socket
@@ -40,14 +40,14 @@ int DisposeTcpConnection(TcpConnection *socket, fd_selector selector);
  * @param how
  * @return
  */
-int DisconnectFromTcpConnection(TcpConnection * socket, int how);
+int DisconnectFromTcpConnection(TcpConnection *socket, int how);
 
 /**
  * It says if the TCP Connection is is completely shut down (not read or write)
  * @param connection Tcp connection to evaluate
  * @return True if both read and write channels are closed
  */
-bool IsTcpConnectionDisconnected(TcpConnection * connection);
+bool IsTcpConnectionDisconnected(TcpConnection *connection);
 
 
 #endif //SOCKS5D_TCP_CONNECTION_H

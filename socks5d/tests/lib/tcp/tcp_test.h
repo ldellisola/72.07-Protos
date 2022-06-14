@@ -7,6 +7,6 @@
 
 #include <check.h>
 
-Suite * RegisterTcpTestSuit();
+Suite *RegisterTcpTestSuit();
 
 #endif //SOCKS5D_TCP_TEST_H

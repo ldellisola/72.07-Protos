@@ -2,6 +2,7 @@
 
 #ifndef SERVER_REQUEST_PARSER_H
 #define SERVER_REQUEST_PARSER_H
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -63,8 +64,7 @@
 
 
 
-typedef enum
-{
+typedef enum {
     RequestVersion,
     RequestCMD,
     RequestRSV,
@@ -80,8 +80,7 @@ typedef enum
 } RequestParserState;
 
 
-typedef struct
-{
+typedef struct {
     RequestParserState State;
     byte CMD;
     byte AType;
@@ -89,7 +88,7 @@ typedef struct
     byte AddressLength;
     byte AddressPosition;
     byte DestPort[2];
-}RequestParser;
+} RequestParser;
 
 /**
  * It initializes a new RequestParser instance
@@ -101,7 +100,7 @@ RequestParser RequestParserInit();
  * It restores a RequestParser instance
  * @param p The parser instance
  */
-void RequestParserReset(RequestParser * p);
+void RequestParserReset(RequestParser *p);
 
 /**
  * It iterates the parser one step for a given input
@@ -109,7 +108,7 @@ void RequestParserReset(RequestParser * p);
  * @param c Byte to feed the AuthParser
  * @return The CurrentState state
  */
-RequestParserState RequestParserFeed(RequestParser* p, byte c);
+RequestParserState RequestParserFeed(RequestParser *p, byte c);
 
 /**
  * It iterates through the parser for a given number of steps
@@ -118,7 +117,7 @@ RequestParserState RequestParserFeed(RequestParser* p, byte c);
  * @param length Total amount of bytes to feed the parser
  * @return number of bytes consumed
  */
-size_t RequestParserConsume(RequestParser* p, byte* c, size_t length);
+size_t RequestParserConsume(RequestParser *p, byte *c, size_t length);
 
 /**
  * It checks if the parser reached a failed state

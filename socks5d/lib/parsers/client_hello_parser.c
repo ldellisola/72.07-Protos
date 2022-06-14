@@ -6,15 +6,15 @@
 #include "parsers/client_hello_parser.h"
 #include "utils/logger.h"
 
-HelloParserState traverseWord(HelloParser *p, byte c, HelloParserState nextState, char* nextWord){
+HelloParserState traverseWord(HelloParser *p, byte c, HelloParserState nextState, char *nextWord) {
     // CASO TERMINAR: no hay siguiente argumento
-    if(p->index == strlen(p->word) && nextWord == null){
+    if (p->index == strlen(p->word) && nextWord == null) {
         return c == CR ? nextState : HelloInvalidState;
     }
 
     // CASO TERMINAR: hay siguiente argumento
-    if(p->index == strlen(p->word)){
-        if( c == '|'){
+    if (p->index == strlen(p->word)) {
+        if (c == '|') {
             p->index = 0;
             strcpy(p->word, nextWord);
             return nextState;
@@ -24,7 +24,7 @@ HelloParserState traverseWord(HelloParser *p, byte c, HelloParserState nextState
     }
 
     // CASO SEGUIR: el caracter es parte de la palabra, seguir
-    if(c == p->word[p->index]){
+    if (c == p->word[p->index]) {
         p->index++;
         return p->State;
     }
@@ -32,6 +32,7 @@ HelloParserState traverseWord(HelloParser *p, byte c, HelloParserState nextState
     return HelloInvalidState;
 
 }
+
 void HelloParserReset(HelloParser *p) {
     LogInfo("Resetting HelloParser...");
     if (null == p) {
@@ -43,15 +44,15 @@ void HelloParserReset(HelloParser *p) {
     p->index = 0;
     strcpy(p->word, "HELLO");
 
-    memset(p->UName,0,51);
-    memset(p->Passwd,0,51);
+    memset(p->UName, 0, 51);
+    memset(p->Passwd, 0, 51);
 
     LogInfo("HelloParser reset!");
 }
 
-HelloParserState HelloParserFeed(HelloParser *p, byte c){
+HelloParserState HelloParserFeed(HelloParser *p, byte c) {
     LogInfo("Feeding %d to HelloParser", c);
-    if(null == p){
+    if (null == p) {
         LogError(false, "Cannot feed HelloParser if is NULL");
         return HelloInvalidState;
     }
@@ -73,30 +74,30 @@ HelloParserState HelloParserFeed(HelloParser *p, byte c){
     return HelloInvalidState;
 }
 
-bool HelloParserHasFailed(HelloParserState state){
-    return  state == HelloInvalidState ? true:false;
+bool HelloParserHasFailed(HelloParserState state) {
+    return state == HelloInvalidState ? true : false;
 }
 
 ssize_t HelloParserConsume(HelloParser *p, byte *c, ssize_t length) {
-    LogInfo("AuthParser consuming %d bytes",length);
-    if (null == p)
-    {
-        LogError(false,"Cannot consume if HelloParser is NULL");
+    LogInfo("AuthParser consuming %d bytes", length);
+    if (null == p) {
+        LogError(false, "Cannot consume if HelloParser is NULL");
         return 0;
     }
 
-    if (null == c){
-        LogError(false,"HelloParser cannot consume NULL array");
+    if (null == c) {
+        LogError(false, "HelloParser cannot consume NULL array");
         return 0;
     }
 
     for (int i = 0; i < length; ++i) {
-        HelloParserState state = HelloParserFeed(p,c[i]);
+        HelloParserState state = HelloParserFeed(p, c[i]);
         if (HelloParserHasFinished(state))
-            return i+1;
+            return i + 1;
     }
     return length;
 }
+
 bool HelloParserHasFinished(HelloParserState state) {
     switch (state) {
         default:

@@ -15,30 +15,28 @@ RequestParser RequestParserInit() {
 }
 
 RequestParserState RequestParserFeed(RequestParser *p, byte c) {
-    LogInfo("Feeding %d to RequestParser",c);
-    if (null == p)
-    {
-        LogError(false,"Cannot feed RequestParser if is NULL");
+    LogInfo("Feeding %d to RequestParser", c);
+    if (null == p) {
+        LogError(false, "Cannot feed RequestParser if is NULL");
         return RequestInvalidState;
     }
 
-    switch (p->State)
-    {
+    switch (p->State) {
         case RequestVersion:
             p->State = 0x05 == c ? RequestCMD : RequestErrorUnsupportedVersion;
-            LogInfo("RequestParser socks5 protocol version: %d",c);
+            LogInfo("RequestParser socks5 protocol version: %d", c);
             break;
         case RequestCMD:
-            LogInfo("RequestParser detected command %d",c);
+            LogInfo("RequestParser detected command %d", c);
             p->CMD = c;
             p->State = RequestRSV;
             break;
         case RequestRSV:
-            LogInfo("RequestParser reserved byte %d",c);
+            LogInfo("RequestParser reserved byte %d", c);
             p->State = 0 == c ? RequestAType : RequestInvalidState;
             break;
         case RequestAType:
-            LogInfo("RequestParser address type %d",c);
+            LogInfo("RequestParser address type %d", c);
             p->AType = c;
 
             switch (p->AType) {
@@ -73,21 +71,21 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
 
             p->DestAddress[p->AddressPosition++] = c;
 
-            if(p->AddressLength == p->AddressPosition) {
-                LogInfo("RequestParser Address %Selector",p->DestAddress);
+            if (p->AddressLength == p->AddressPosition) {
+                LogInfo("RequestParser Address %Selector", p->DestAddress);
                 p->State = RequestDestPortFirstByte;
             }
             break;
         case RequestDestPortFirstByte:
-            LogInfo("RequestParser port first byte %x",c);
+            LogInfo("RequestParser port first byte %x", c);
             p->DestPort[0] = c;
             p->State = RequestDestPortSecondByte;
             break;
         case RequestDestPortSecondByte:
-            LogInfo("RequestParser port second byte %x",c);
+            LogInfo("RequestParser port second byte %x", c);
             // TODO: Check if its this way
             p->DestPort[1] = c;
-            LogInfo("RequestParser complete port %d",p->DestPort);
+            LogInfo("RequestParser complete port %d", p->DestPort);
             p->State = RequestDone;
             break;
         case RequestDone:
@@ -111,8 +109,8 @@ void RequestParserReset(RequestParser *p) {
 
     p->State = RequestVersion;
     p->AddressLength = 0;
-    memset(p->DestAddress,0,256);
-    memset(p->DestPort,0,2);
+    memset(p->DestAddress, 0, 256);
+    memset(p->DestPort, 0, 2);
     p->AType = 0;
     p->AddressPosition = 0;
     p->CMD = 0;
@@ -121,27 +119,26 @@ void RequestParserReset(RequestParser *p) {
 }
 
 size_t RequestParserConsume(RequestParser *p, byte *c, size_t length) {
-    LogInfo("RequestParser consuming %d bytes",length);
-    if (null == p)
-    {
-        LogError(false,"Cannot consume if RequestParser is NULL");
+    LogInfo("RequestParser consuming %d bytes", length);
+    if (null == p) {
+        LogError(false, "Cannot consume if RequestParser is NULL");
         return 0;
     }
 
-    if (null == c){
-        LogError(false,"RequestParser cannot consume NULL array");
+    if (null == c) {
+        LogError(false, "RequestParser cannot consume NULL array");
         return 0;
     }
 
     for (size_t i = 0; i < length; ++i) {
         RequestParserState state = RequestParserFeed(p, c[i]);
         if (RequestParserHasFinished(state))
-            return i+1;
+            return i + 1;
     }
     return length;
 }
 
-bool RequestParserFailed(RequestParserState state){
+bool RequestParserFailed(RequestParserState state) {
     switch (state) {
         case RequestErrorUnsupportedVersion:
         case RequestInvalidState:

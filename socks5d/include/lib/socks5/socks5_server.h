@@ -11,8 +11,7 @@
  * @param port Port where the server will be listening to, in the form of a null terminated string
  * @return A TCP ClientTcpConnection
  */
-void RegisterSocks5ServerOnIPv4(const char * port);
-
+void RegisterSocks5ServerOnIPv4(const char *port);
 
 
 #endif //SERVER_SOCKS_SERVER_H

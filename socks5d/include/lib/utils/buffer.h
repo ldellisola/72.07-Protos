@@ -87,14 +87,14 @@
  * W=0                     Size=6
  */
 
-typedef struct  {
+typedef struct {
     byte *Data;
     /** límite superior del buffer. inmutable */
     uint8_t *Size;
     /** puntero de lectura */
-    byte * ReadHead;
+    byte *ReadHead;
     /** puntero de escritura */
-    byte * WriteHead;
+    byte *WriteHead;
 } ArrayBuffer;
 
 /**
@@ -108,7 +108,7 @@ void BufferInit(ArrayBuffer *b, size_t n, byte *data);
  * @param n number of byte I can write to this buffer
  * @return It returns a pointer where I can write up to N bytes
  */
-byte * BufferWritePtr(ArrayBuffer *buffer, size_t *n);
+byte *BufferWritePtr(ArrayBuffer *buffer, size_t *n);
 
 /**
  * It moves the buffer head n bytes
@@ -118,7 +118,8 @@ byte * BufferWritePtr(ArrayBuffer *buffer, size_t *n);
 void BufferWriteAdv(ArrayBuffer *b, ssize_t bytes);
 
 
-byte * BufferReadPtr(ArrayBuffer *b, size_t *nbyte);
+byte *BufferReadPtr(ArrayBuffer *b, size_t *nbyte);
+
 void BufferReadAdv(ArrayBuffer *b, ssize_t bytes);
 
 /**

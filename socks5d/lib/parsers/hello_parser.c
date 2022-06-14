@@ -6,29 +6,25 @@
 #include "utils/logger.h"
 #include "utils/utils.h"
 
-HelloParser HelloParserInit()
-{
+HelloParser HelloParserInit() {
     LogInfo("Creating HelloParser...");
     HelloParser parser = {
             .State = HelloVersion,
     };
-    memset(parser.Methods,0,255);
+    memset(parser.Methods, 0, 255);
 
     return parser;
 }
 
-HelloParserState HelloParserFeed(HelloParser *p, byte c)
-{
+HelloParserState HelloParserFeed(HelloParser *p, byte c) {
     LogInfo("Feeding %d to HelloParser", c);
 
-    if (null == p)
-    {
-        LogError(false,"Cannot feed HelloParser if is NULL");
+    if (null == p) {
+        LogError(false, "Cannot feed HelloParser if is NULL");
         return HelloInvalidState;
     }
 
-    switch (p->State)
-    {
+    switch (p->State) {
         case HelloVersion:
             LogInfo("HelloParser socks5 protocol version: %d", c);
             p->State = 0x05 == c ? HelloNMethods : HelloErrorUnsupportedVersion;
@@ -60,11 +56,9 @@ HelloParserState HelloParserFeed(HelloParser *p, byte c)
     return p->State;
 }
 
-bool HelloParserHasFailed(HelloParserState state)
-{
+bool HelloParserHasFailed(HelloParserState state) {
 
-    switch (state)
-    {
+    switch (state) {
         case HelloInvalidState:
         case HelloErrorUnsupportedVersion:
             return true;
@@ -73,10 +67,8 @@ bool HelloParserHasFailed(HelloParserState state)
     }
 }
 
-bool HelloParserHasFinished(HelloParserState state)
-{
-    switch (state)
-    {
+bool HelloParserHasFinished(HelloParserState state) {
+    switch (state) {
         case HelloDone:
         case HelloInvalidState:
         case HelloErrorUnsupportedVersion:
@@ -86,23 +78,22 @@ bool HelloParserHasFinished(HelloParserState state)
     }
 }
 
-size_t HelloParserConsume(HelloParser * p, byte * c, size_t length){
-    LogInfo("HelloParser consuming %d bytes",length);
-    if (null == p)
-    {
-        LogError(false,"Cannot consume if HelloParser is NULL");
+size_t HelloParserConsume(HelloParser *p, byte *c, size_t length) {
+    LogInfo("HelloParser consuming %d bytes", length);
+    if (null == p) {
+        LogError(false, "Cannot consume if HelloParser is NULL");
         return 0;
     }
 
-    if (null == c){
-        LogError(false,"HelloParser cannot consume NULL array");
+    if (null == c) {
+        LogError(false, "HelloParser cannot consume NULL array");
         return 0;
     }
 
     for (size_t i = 0; i < length; ++i) {
-        HelloParserState state = HelloParserFeed(p,c[i]);
+        HelloParserState state = HelloParserFeed(p, c[i]);
         if (HelloParserHasFinished(state))
-            return i+1;
+            return i + 1;
     }
     return length;
 }
@@ -117,7 +108,7 @@ void HelloParserReset(HelloParser *p) {
     p->State = HelloVersion;
     p->NMethods = 0;
     p->CurrentMethod = 0;
-    memset(p->Methods,0,255);
+    memset(p->Methods, 0, 255);
 
     LogInfo("AuthParser value reset!");
 }

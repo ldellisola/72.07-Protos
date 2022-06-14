@@ -1,6 +1,7 @@
 
 #ifndef SERVER_HELLO_PARSER_H
 #define SERVER_HELLO_PARSER_H
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -22,23 +23,21 @@
 
 
 
-typedef enum
-{
+typedef enum {
     HelloVersion,
     HelloNMethods,
     HelloMethods,
     HelloDone,
     HelloErrorUnsupportedVersion,
     HelloInvalidState,
-}HelloParserState;
+} HelloParserState;
 
-typedef struct
-{
+typedef struct {
     HelloParserState State;
     uint8_t NMethods;
     uint8_t CurrentMethod;
     uint8_t Methods[255];
-}HelloParser;
+} HelloParser;
 
 /**
  * It initializes a HelloParser instance
@@ -50,7 +49,7 @@ HelloParser HelloParserInit();
  * It safely disposes a parser instance
  * @param p Parser instance to be disposed
  */
-void HelloParserReset(HelloParser* p);
+void HelloParserReset(HelloParser *p);
 
 /**
  * It iterates the parser one step for a given input
@@ -67,7 +66,7 @@ HelloParserState HelloParserFeed(HelloParser *p, byte c);
  * @param length Total amount of bytes to feed the parser
  * @return the number of bytes consumed
  */
-size_t HelloParserConsume(HelloParser * p, byte * c, size_t length);
+size_t HelloParserConsume(HelloParser *p, byte *c, size_t length);
 
 /**
  * It checks if the parser reached a failed state

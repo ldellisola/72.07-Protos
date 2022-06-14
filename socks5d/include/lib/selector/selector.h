@@ -4,6 +4,7 @@
 
 #ifndef SOCKS5D_SELECTOR_H
 #define SOCKS5D_SELECTOR_H
+
 #include <sys/time.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -46,36 +47,36 @@
  *  - esperar algún evento: `selector_iteratate'
  *  - destruir los recursos de la librería `SelectorClose'
  */
-typedef struct fdselector * fd_selector;
+typedef struct fdselector *fd_selector;
 
 
 /** valores de retorno. */
 typedef enum {
     /** llamada exitosa */
-    SELECTOR_STATUS_SUCCESS  = 0,
+    SELECTOR_STATUS_SUCCESS = 0,
     /** no pudimos alocar memoria */
-    SELECTOR_STATUS_ENOMEM   = 1,
+    SELECTOR_STATUS_ENOMEM = 1,
     /** llegamos al límite de descriptores que la plataforma puede manejar */
-    SELECTOR_STATUS_MAXFD    = 2,
+    SELECTOR_STATUS_MAXFD = 2,
     /** argumento ilegal */
-    SELECTOR_STATUS_IARGS    = 3,
+    SELECTOR_STATUS_IARGS = 3,
     /** descriptor ya está en uso */
-    SELECTOR_STATUS_FDINUSE  = 4,
+    SELECTOR_STATUS_FDINUSE = 4,
     /** I/O error check errno */
-    SELECTOR_STATUS_IO       = 5,
+    SELECTOR_STATUS_IO = 5,
 } SelectorStatus;
 
 /** retorna una descripción humana del fallo */
-const char * SelectorError(SelectorStatus status);
+const char *SelectorError(SelectorStatus status);
 
 /** opciones de inicialización del selector */
-typedef struct{
+typedef struct {
     /** señal a utilizar para notificaciones internas */
     const int Signal;
 
     /** tiempo máximo de bloqueo durante `selector_iteratate' */
     struct timespec SelectTimeout;
-}SelectorOptions;
+} SelectorOptions;
 
 /** inicializa la librería */
 SelectorStatus SelectorInit(const SelectorOptions *c);
@@ -98,10 +99,10 @@ void SelectorDestroy(fd_selector s);
  * SELECTOR_OP_NOOP es útil para cuando no se tiene ningún interés.
  */
 typedef enum {
-    SELECTOR_OP_NOOP    = 0,
-    SELECTOR_OP_READ    = 1 << 0,
-    SELECTOR_OP_WRITE   = 1 << 2,
-} FdInterest ;
+    SELECTOR_OP_NOOP = 0,
+    SELECTOR_OP_READ = 1 << 0,
+    SELECTOR_OP_WRITE = 1 << 2,
+} FdInterest;
 
 /**
  * Quita un interés de una lista de intereses
@@ -115,24 +116,26 @@ typedef struct {
     /** el selector que dispara el evento */
     fd_selector Selector;
     /** el file descriptor en cuestión */
-    int         Fd;
+    int Fd;
     /** dato provisto por el usuario */
-    void *      Data;
-}SelectorKey;
+    void *Data;
+} SelectorKey;
 
 /**
  * Manejador de los diferentes eventos..
  */
 typedef struct {
-    void (*handle_read)      (SelectorKey *key);
-    void (*handle_write)     (SelectorKey *key);
-    void (*handle_block)     (SelectorKey *key);
+    void (*handle_read)(SelectorKey *key);
+
+    void (*handle_write)(SelectorKey *key);
+
+    void (*handle_block)(SelectorKey *key);
 
     /**
      * llamado cuando se se desregistra el Fd
      * Seguramente deba liberar los recusos alocados en Data.
      */
-    void (*handle_close)     (SelectorKey *key);
+    void (*handle_close)(SelectorKey *key);
 
 } FdHandler;
 
@@ -148,10 +151,10 @@ typedef struct {
  * @return 0 si fue exitoso el registro.
  */
 SelectorStatus SelectorRegister(
-        fd_selector        s,
-        int          fd,
-        const FdHandler  *handler,
-        FdInterest  interest,
+        fd_selector s,
+        int fd,
+        const FdHandler *handler,
+        FdInterest interest,
         void *data);
 
 /**
@@ -180,7 +183,7 @@ SelectorStatus SelectorSelect(fd_selector s);
 int SelectorFdSetNio(const int fd);
 
 /** notifica que un trabajo bloqueante terminó */
-SelectorStatus SelectorNotifyBlock(fd_selector s, const int   fd);
+SelectorStatus SelectorNotifyBlock(fd_selector s, const int fd);
 
 
 #endif //SOCKS5D_SELECTOR_H

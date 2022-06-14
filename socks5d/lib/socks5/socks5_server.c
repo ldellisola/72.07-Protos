@@ -9,7 +9,7 @@
 #include "socks5/socks5_connection.h"
 #include "socks5/socks5_server.h"
 
-void Socks5PassiveAccept(SelectorKey * key);
+void Socks5PassiveAccept(SelectorKey *key);
 
 const FdHandler socksv5 = {
         .handle_read       = Socks5PassiveAccept,
@@ -22,7 +22,7 @@ void RegisterSocks5ServerOnIPv4(const char *port) {
     int portNum = atoi(port);
 
     // TODO: Make address agnostic
-    IPv4ListenOnTcpPort(portNum,&socksv5);
+    IPv4ListenOnTcpPort(portNum, &socksv5);
 
     LogInfo("SOCKS5 server up and running!");
 }
@@ -30,17 +30,17 @@ void RegisterSocks5ServerOnIPv4(const char *port) {
 
 void Socks5PassiveAccept(SelectorKey *key) {
 
-    TcpConnection * client = AcceptNewTcpConnection(key->Fd);
+    TcpConnection *client = AcceptNewTcpConnection(key->Fd);
 
-    if (null == client){
-        LogError(false,"Cannot accept client connection");
+    if (null == client) {
+        LogError(false, "Cannot accept client connection");
         return;
     }
 
-    Socks5Connection * connection = Socks5ConnectionInit(client);
+    Socks5Connection *connection = Socks5ConnectionInit(client);
 
-    if (null == connection){
-        LogError(false,"Cannot create connection");
+    if (null == connection) {
+        LogError(false, "Cannot create connection");
         return;
     }
 
@@ -50,11 +50,11 @@ void Socks5PassiveAccept(SelectorKey *key) {
             connection->Handler,
             SELECTOR_OP_READ,
             connection
-            );
+    );
 
-    if (SELECTOR_STATUS_SUCCESS != status){
+    if (SELECTOR_STATUS_SUCCESS != status) {
         Socks5ConnectionDestroy(connection, NULL);
-        LogError(false,"Cannot register new SOCKS5 connection to the selector");
+        LogError(false, "Cannot register new SOCKS5 connection to the selector");
     }
 }
 

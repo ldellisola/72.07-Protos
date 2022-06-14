@@ -29,7 +29,7 @@ typedef enum {
     AuthInvalidProtocol,
     AuthInvalidState,
     AuthFinished
-}AuthParserState;
+} AuthParserState;
 
 
 typedef struct {
@@ -40,7 +40,7 @@ typedef struct {
     uint8_t PLen;
     char Passwd[256];
     int PasswdPosition;
-}AuthParser;
+} AuthParser;
 
 
 /**
@@ -70,7 +70,7 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c);
  * @param length Total amount of bytes to feed the parser
  * @return the number of bytes consumed
  */
-size_t AuthParserConsume(AuthParser* p, byte * c, size_t length);
+size_t AuthParserConsume(AuthParser *p, byte *c, size_t length);
 
 /**
  * It checks if the parser reached a failed state

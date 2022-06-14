@@ -31,27 +31,26 @@ void AuthParserReset(AuthParser *p) {
     p->UNamePosition = 0;
 
 
-    memset(p->UName,0,256);
-    memset(p->Passwd,0,256);
+    memset(p->UName, 0, 256);
+    memset(p->Passwd, 0, 256);
 
     LogInfo("AuthParser reset!");
 }
 
 AuthParserState AuthParserFeed(AuthParser *p, byte c) {
-    LogInfo("Feeding %d to AuthParser",c);
-    if (null == p)
-    {
-        LogError(false,"Cannot feed AuthParser if is NULL");
+    LogInfo("Feeding %d to AuthParser", c);
+    if (null == p) {
+        LogError(false, "Cannot feed AuthParser if is NULL");
         return AuthInvalidState;
     }
 
     switch (p->State) {
         case AuthVersion:
             p->State = 0x05 == c ? AuthULen : AuthInvalidProtocol;
-            LogInfo("AuthParser socks5 protocol version: %d",c);
+            LogInfo("AuthParser socks5 protocol version: %d", c);
             break;
         case AuthULen:
-            LogInfo("AuthParser username length: %d",c);
+            LogInfo("AuthParser username length: %d", c);
             p->ULen = c;
             p->State = 0 == p->ULen ? AuthInvalidState : AuthUName;
             break;
@@ -60,21 +59,21 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c) {
             p->UName[p->UNamePosition++] = c;
 
             if (p->UNamePosition == p->ULen) {
-                LogInfo("AuthParser username: %Selector",p->UName);
+                LogInfo("AuthParser username: %Selector", p->UName);
                 p->State = AuthPLen;
             }
             break;
         case AuthPLen:
-            LogInfo("AuthParser password length: %d",c);
+            LogInfo("AuthParser password length: %d", c);
             p->PLen = c;
-            p->State =  0 == p->PLen ? AuthInvalidState : AuthPasswd;
+            p->State = 0 == p->PLen ? AuthInvalidState : AuthPasswd;
             break;
         case AuthPasswd:
 
             p->Passwd[p->PasswdPosition++] = c;
 
             if (p->PasswdPosition == p->PLen) {
-                LogInfo("AuthParser password: %Selector",p->Passwd);
+                LogInfo("AuthParser password: %Selector", p->Passwd);
                 p->State = AuthFinished;
             }
             break;
@@ -87,7 +86,7 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c) {
     return p->State;
 }
 
-bool AuthParserHasFailed(AuthParserState state){
+bool AuthParserHasFailed(AuthParserState state) {
 
     switch (state) {
         case AuthInvalidState:
@@ -99,22 +98,21 @@ bool AuthParserHasFailed(AuthParserState state){
 }
 
 size_t AuthParserConsume(AuthParser *p, byte *c, size_t length) {
-    LogInfo("AuthParser consuming %d bytes",length);
-    if (null == p)
-    {
-        LogError(false,"Cannot consume if AuthParser is NULL");
+    LogInfo("AuthParser consuming %d bytes", length);
+    if (null == p) {
+        LogError(false, "Cannot consume if AuthParser is NULL");
         return 0;
     }
 
-    if (null == c){
-        LogError(false,"AuthParser cannot consume NULL array");
+    if (null == c) {
+        LogError(false, "AuthParser cannot consume NULL array");
         return 0;
     }
 
     for (size_t i = 0; i < length; ++i) {
-        AuthParserState state = AuthParserFeed(p,c[i]);
+        AuthParserState state = AuthParserFeed(p, c[i]);
         if (AuthParserHasFinished(state))
-            return i+1;
+            return i + 1;
     }
     return length;
 }

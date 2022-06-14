@@ -4,8 +4,9 @@
 
 #ifndef SOCKS5D_REQUEST_PARSER_TEST_H
 #define SOCKS5D_REQUEST_PARSER_TEST_H
+
 #include <check.h>
 
-Suite * RegisterRequestParserTestSuit();
+Suite *RegisterRequestParserTestSuit();
 
 #endif //SOCKS5D_REQUEST_PARSER_TEST_H

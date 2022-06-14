@@ -18,14 +18,14 @@ START_TEST(Consumes_WholeMessageWithMultipleAuthenticationMethods_Succeeds)
     {
         // Arrange
         int messageLength = 4;
-        byte message[] = {0x05,0x02,0x00,0x01};
+        byte message[] = {0x05, 0x02, 0x00, 0x01};
         //Act
-        size_t bytesConsumed = HelloParserConsume(&parser,message,messageLength);
+        size_t bytesConsumed = HelloParserConsume(&parser, message, messageLength);
         //Assert
         ck_assert_int_eq(bytesConsumed, messageLength);
-        ck_assert_int_eq(parser.State,HelloDone);
+        ck_assert_int_eq(parser.State, HelloDone);
         ck_assert_int_eq(parser.NMethods, 2);
-        ck_assert_ptr_ne(parser.Methods,null);
+        ck_assert_ptr_ne(parser.Methods, null);
         ck_assert_int_eq(parser.Methods[0], 0x00);
         ck_assert_int_eq(parser.Methods[1], 0x01);
         ck_assert_int_eq(parser.CurrentMethod, 2);
@@ -36,14 +36,14 @@ START_TEST(Consumes_WholeMessageWithSingleAuthenticationMethod_Succeeds)
     {
         // Arrange
         int messageLength = 3;
-        byte message[] = {0x05,0x01,0x00};
+        byte message[] = {0x05, 0x01, 0x00};
         // Act
-        size_t bytesConsumed = HelloParserConsume(&parser,message,messageLength);
+        size_t bytesConsumed = HelloParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(bytesConsumed, messageLength);
-        ck_assert_int_eq(parser.State,HelloDone);
+        ck_assert_int_eq(parser.State, HelloDone);
         ck_assert_int_eq(parser.NMethods, 1);
-        ck_assert_ptr_ne(parser.Methods,null);
+        ck_assert_ptr_ne(parser.Methods, null);
         ck_assert_int_eq(parser.Methods[0], 0x00);
         ck_assert_int_eq(parser.CurrentMethod, 1);
     }
@@ -58,7 +58,7 @@ START_TEST(Feeds_CorrectSOCKS5Version_Succeeds)
         // Arrange
         int socks5Version = 0x05;
         // Act
-        HelloParserState state = HelloParserFeed(&parser,socks5Version);
+        HelloParserState state = HelloParserFeed(&parser, socks5Version);
         // Assert
         ck_assert_int_eq(parser.State, HelloNMethods);
         ck_assert_int_eq(parser.State, state);
@@ -70,7 +70,7 @@ START_TEST(Feeds_IncorrectSOCKS5Version_Fails)
         // Arrange
         int socks5Version = 0x04;
         // Act
-        HelloParserState state = HelloParserFeed(&parser,socks5Version);
+        HelloParserState state = HelloParserFeed(&parser, socks5Version);
         // Assert
         ck_assert_int_eq(parser.State, state);
         ck_assert_int_eq(parser.State, HelloErrorUnsupportedVersion);
@@ -80,38 +80,40 @@ END_TEST
 START_TEST(Feeds_NullParser_Fails)
     {
         // Arrange
-        HelloParser * nullParser = null;
+        HelloParser *nullParser = null;
         int socks5Version = 0x05;
         // Act
-        HelloParserState state = HelloParserFeed(nullParser,socks5Version);
+        HelloParserState state = HelloParserFeed(nullParser, socks5Version);
         // Assert
         ck_assert_int_eq(state, HelloInvalidState);
     }
 END_TEST
 
-START_TEST(Feeds_ValidNumberOfMethods_Succeeds){
-    // Arrange
-    byte nMethods = 2;
-    parser.State = HelloNMethods;
-    // Act
-    HelloParserState state = HelloParserFeed(&parser,nMethods);
-    // Assert
-        ck_assert_int_eq(state,HelloMethods);
-        ck_assert_int_eq(parser.NMethods,nMethods);
+START_TEST(Feeds_ValidNumberOfMethods_Succeeds)
+    {
+        // Arrange
+        byte nMethods = 2;
+        parser.State = HelloNMethods;
+        // Act
+        HelloParserState state = HelloParserFeed(&parser, nMethods);
+        // Assert
+        ck_assert_int_eq(state, HelloMethods);
+        ck_assert_int_eq(parser.NMethods, nMethods);
         ck_assert_ptr_ne(parser.Methods, null);
-}
+    }
 END_TEST
 
-START_TEST(Feeds_InvalidNumberOfMethods_Fails){
-    // Arrange
-    byte nMethods = 0;
-    parser.State = HelloNMethods;
-    // Act
-    HelloParserState state = HelloParserFeed(&parser,nMethods);
-    // Assert
-        ck_assert_int_eq(state,HelloInvalidState);
-        ck_assert_int_eq(parser.NMethods,nMethods);
-}
+START_TEST(Feeds_InvalidNumberOfMethods_Fails)
+    {
+        // Arrange
+        byte nMethods = 0;
+        parser.State = HelloNMethods;
+        // Act
+        HelloParserState state = HelloParserFeed(&parser, nMethods);
+        // Assert
+        ck_assert_int_eq(state, HelloInvalidState);
+        ck_assert_int_eq(parser.NMethods, nMethods);
+    }
 END_TEST
 
 START_TEST(Feeds_SingleMethod_Succeeds)
@@ -122,13 +124,13 @@ START_TEST(Feeds_SingleMethod_Succeeds)
         parser.State = HelloMethods;
         int method = 0x01;
         // Act
-        HelloParserState state = HelloParserFeed(&parser,method);
+        HelloParserState state = HelloParserFeed(&parser, method);
         // Assert
-        ck_assert_int_eq(state,HelloDone);
-        ck_assert_int_eq(parser.Methods[0],method);
-        ck_assert_int_eq(parser.CurrentMethod,parser.NMethods);
+        ck_assert_int_eq(state, HelloDone);
+        ck_assert_int_eq(parser.Methods[0], method);
+        ck_assert_int_eq(parser.CurrentMethod, parser.NMethods);
     }
-    END_TEST
+END_TEST
 
 START_TEST(Feeds_MultipleMethod_Succeeds)
     {
@@ -138,26 +140,27 @@ START_TEST(Feeds_MultipleMethod_Succeeds)
         parser.State = HelloMethods;
         int method = 0x01;
         // Act
-        HelloParserState state = HelloParserFeed(&parser,method);
+        HelloParserState state = HelloParserFeed(&parser, method);
         // Assert
-        ck_assert_int_eq(state,HelloMethods);
-        ck_assert_int_eq(parser.Methods[0],method);
-        ck_assert_int_ne(parser.CurrentMethod,parser.NMethods);
+        ck_assert_int_eq(state, HelloMethods);
+        ck_assert_int_eq(parser.Methods[0], method);
+        ck_assert_int_ne(parser.CurrentMethod, parser.NMethods);
         // Clean up
     }
-    END_TEST
+END_TEST
 
-START_TEST(parser_initializes_correcty){
-    // Arrange
-    // Act
-    parser = HelloParserInit();
-    // Assert
-    ck_assert_int_eq(parser.State,HelloVersion);
+START_TEST(parser_initializes_correcty)
+    {
+        // Arrange
+        // Act
+        parser = HelloParserInit();
+        // Assert
+        ck_assert_int_eq(parser.State, HelloVersion);
         ck_assert_int_eq(parser.NMethods, 0);
         ck_assert_int_eq(parser.CurrentMethod, 0);
-    // Dispose
+        // Dispose
         HelloParserReset(&parser);
-}
+    }
 END_TEST
 
 

@@ -7,7 +7,7 @@
 
 #include <check.h>
 
-Suite * RegisterSocks5MessagesTestSuit();
+Suite *RegisterSocks5MessagesTestSuit();
 
 
 #endif //SOCKS5D_SOCKS5_MESSAGES_TEST_H

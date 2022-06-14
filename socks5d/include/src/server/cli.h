@@ -10,24 +10,25 @@
 typedef struct {
     char Username[51];
     char Password[51];
-}User;
+} User;
 
 typedef struct {
-    const char * SocksPort;
-    const char * SocksAddress;
+    const char *SocksPort;
+    const char *SocksAddress;
     bool EnablePasswordScanners;
-    const char * LuluPort;
-    const char * LuluAddress;
+    const char *LuluPort;
+    const char *LuluAddress;
     User Users[10];
     int UsersCount;
 } CliArguments;
 
 // TODO:Test
 
-CliArguments ParseCli(int argc, char** argv);
-void PrintHelp();
-void PrintCLI(CliArguments arguments);
+CliArguments ParseCli(int argc, char **argv);
 
+void PrintHelp();
+
+void PrintCLI(CliArguments arguments);
 
 
 #endif //SERVER_CLI_H

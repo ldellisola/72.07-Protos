@@ -9,13 +9,15 @@
 #include "utils/utils.h"
 #include "utils/logger.h"
 
-bool HasArgument(int argc, char ** argv, const char * argument);
-const char * GetSingleArgumentValue(int argc, char ** argv, const char * argument);
-const char * GetMultipleArgumentValue(int argc, char ** argv, int* startIndex, const char * argument);
+bool HasArgument(int argc, char **argv, const char *argument);
+
+const char *GetSingleArgumentValue(int argc, char **argv, const char *argument);
+
+const char *GetMultipleArgumentValue(int argc, char **argv, int *startIndex, const char *argument);
 
 void PrintVersion();
 
-CliArguments ParseCli(int argc, char ** argv){
+CliArguments ParseCli(int argc, char **argv) {
     CliArguments args = {
             .SocksPort="1080",
             .SocksAddress = null,
@@ -25,79 +27,73 @@ CliArguments ParseCli(int argc, char ** argv){
             .UsersCount=0,
     };
 
-    bool printHelp = HasArgument(argc,argv,"-h");
-    if (printHelp){
+    bool printHelp = HasArgument(argc, argv, "-h");
+    if (printHelp) {
         LogInfo("Printing Help Command");
         PrintHelp();
         exit(0);
     }
 
-    const char * socks5Address = GetSingleArgumentValue(argc,argv,"-l");
-    if (null != socks5Address){
+    const char *socks5Address = GetSingleArgumentValue(argc, argv, "-l");
+    if (null != socks5Address) {
         args.SocksAddress = socks5Address;
-        LogInfo("Using SOCKS5 ADDRESS %Selector",args.SocksAddress);
-    }
-    else
+        LogInfo("Using SOCKS5 ADDRESS %Selector", args.SocksAddress);
+    } else
         LogInfo("Using SOCKS5 ADDRESS all interfaces");
 
-    bool enablePasswordScanners = !HasArgument(argc,argv,"-N");
-    if(enablePasswordScanners)
+    bool enablePasswordScanners = !HasArgument(argc, argv, "-N");
+    if (enablePasswordScanners)
         LogInfo("Password scanners enabled");
-    else
-    {
+    else {
         args.EnablePasswordScanners = false;
         LogInfo("Password scanners disabled");
     }
 
-    const char * luluAddress = GetSingleArgumentValue(argc,argv,"-L");
-    if (null != luluAddress){
-        LogInfo("Using LULU ADDRESS %Selector",luluAddress);
+    const char *luluAddress = GetSingleArgumentValue(argc, argv, "-L");
+    if (null != luluAddress) {
+        LogInfo("Using LULU ADDRESS %Selector", luluAddress);
         args.LuluAddress = luluAddress;
-    }
-    else
-        LogInfo("Using default LULU ADDRESS %Selector",args.LuluAddress);
+    } else
+        LogInfo("Using default LULU ADDRESS %Selector", args.LuluAddress);
 
 
-    const char * socks5Port = GetSingleArgumentValue(argc, argv, "-p");
+    const char *socks5Port = GetSingleArgumentValue(argc, argv, "-p");
     if (null != socks5Port) {
         args.SocksPort = socks5Port;
-        LogInfo("Using SOCKS5 PORT %Selector",args.SocksPort);
-    }
-    else
-        LogInfo("Using default SOCKS5 PORT %Selector",args.SocksPort);
+        LogInfo("Using SOCKS5 PORT %Selector", args.SocksPort);
+    } else
+        LogInfo("Using default SOCKS5 PORT %Selector", args.SocksPort);
 
 
-    const char * luluPort = GetSingleArgumentValue(argc,argv,"-P");
-    if (null != luluPort){
-        LogInfo("Using LULU PORT %Selector",luluPort);
+    const char *luluPort = GetSingleArgumentValue(argc, argv, "-P");
+    if (null != luluPort) {
+        LogInfo("Using LULU PORT %Selector", luluPort);
         args.LuluPort = luluPort;
-    }
-    else
-        LogInfo("Using default LULU PORT %Selector",args.LuluPort);
+    } else
+        LogInfo("Using default LULU PORT %Selector", args.LuluPort);
 
     int start = 0;
-    do{
-        const char * userData = GetMultipleArgumentValue(argc,argv,&start,"-u");
+    do {
+        const char *userData = GetMultipleArgumentValue(argc, argv, &start, "-u");
         if (null == userData)
             continue;
-        char * dividerAdds = strchr(userData,':');
+        char *dividerAdds = strchr(userData, ':');
         if (null == dividerAdds)
             continue;
-        int dividerPos = dividerAdds-userData;
+        int dividerPos = dividerAdds - userData;
 
         User user;
-        bzero(user.Username,51);
-        strncpy(user.Username,userData,dividerPos);
-        bzero(user.Password,51);
-        strncpy(user.Password, userData + dividerPos +1, strlen(userData)-dividerPos-1);
+        bzero(user.Username, 51);
+        strncpy(user.Username, userData, dividerPos);
+        bzero(user.Password, 51);
+        strncpy(user.Password, userData + dividerPos + 1, strlen(userData) - dividerPos - 1);
         args.Users[args.UsersCount++] = user;
-        LogInfo("Detecting user %Selector:%Selector",user.Username,user.Password);
+        LogInfo("Detecting user %Selector:%Selector", user.Username, user.Password);
 
-    } while (start < argc-1 && args.UsersCount < 10);
+    } while (start < argc - 1 && args.UsersCount < 10);
 
-    bool printVersion = HasArgument(argc,argv,"-v");
-    if (printVersion)
-    {
+    bool printVersion = HasArgument(argc, argv, "-v");
+    if (printVersion) {
         LogInfo("Printing version");
         PrintVersion();
         exit(0);
@@ -112,7 +108,7 @@ void PrintVersion() {
 }
 
 
-void PrintHelp(){
+void PrintHelp() {
     printf("socks5d [ POSIX style options ]\n");
     printf("OPCIONES\n");
     printf("\t-h     Imprime la ayuda y termina.\n\n");
@@ -125,30 +121,30 @@ void PrintHelp(){
     printf("\t-v     Imprime información sobre la versión versión y termina.\n\n");
 }
 
-void PrintCLI(CliArguments arguments){
+void PrintCLI(CliArguments arguments) {
 
 }
 
 bool HasArgument(int argc, char **argv, const char *argument) {
 
     for (int i = 0; i < argc; ++i) {
-        if (0 == strcmp(argument,argv[i]))
+        if (0 == strcmp(argument, argv[i]))
             return true;
     }
 
     return false;
 }
 
-const char * GetSingleArgumentValue(int argc, char ** argv, const char * argument){
+const char *GetSingleArgumentValue(int argc, char **argv, const char *argument) {
     int start = 0;
-    return GetMultipleArgumentValue(argc,argv,&start,argument);
+    return GetMultipleArgumentValue(argc, argv, &start, argument);
 }
 
-const char * GetMultipleArgumentValue(int argc, char ** argv, int* startIndex, const char * argument){
-    while (*startIndex < argc-1){
+const char *GetMultipleArgumentValue(int argc, char **argv, int *startIndex, const char *argument) {
+    while (*startIndex < argc - 1) {
         int i = (*startIndex)++;
-        if (0 == strcmp(argument,argv[i]))
-            return argv[i+1];
+        if (0 == strcmp(argument, argv[i]))
+            return argv[i + 1];
     }
     return null;
 }

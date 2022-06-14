@@ -11,18 +11,18 @@
 
 int DisposeTcpConnection(TcpConnection *socket, fd_selector selector) {
     if (socket == null) {
-        LogError(false,"Failed to dispose TCP socket. Cannot be null");
+        LogError(false, "Failed to dispose TCP socket. Cannot be null");
         return ERROR;
     }
 
-    LogInfo("Disposing TCP socket on file descriptor %d",socket->FileDescriptor);
+    LogInfo("Disposing TCP socket on file descriptor %d", socket->FileDescriptor);
 
-    if ( SELECTOR_STATUS_SUCCESS != SelectorUnregisterFd(selector,socket->FileDescriptor)){
-        LogError(false,"Cannot unregister file descriptor");
+    if (SELECTOR_STATUS_SUCCESS != SelectorUnregisterFd(selector, socket->FileDescriptor)) {
+        LogError(false, "Cannot unregister file descriptor");
     }
 
-    if (close(socket->FileDescriptor) < 0){
-        LogError(true,"Cannot close file descriptor %d",socket->FileDescriptor);
+    if (close(socket->FileDescriptor) < 0) {
+        LogError(true, "Cannot close file descriptor %d", socket->FileDescriptor);
         return ERROR;
     }
 
@@ -35,17 +35,16 @@ int DisposeTcpConnection(TcpConnection *socket, fd_selector selector) {
     return OK;
 }
 
-int DisconnectFromTcpConnection(TcpConnection * socket, int how){
-    if (socket == null)
-    {
-        LogError(false,"Failed to disconnect TCP socket. Cannot be null");
+int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
+    if (socket == null) {
+        LogError(false, "Failed to disconnect TCP socket. Cannot be null");
         return ERROR;
     }
 
-    LogInfo("Disconnecting from TCP socket on file descriptor %d...",socket->FileDescriptor);
+    LogInfo("Disconnecting from TCP socket on file descriptor %d...", socket->FileDescriptor);
 
-    if (shutdown(socket->FileDescriptor,how) < 0){
-        LogError(true,"Cannot close TCP socket on file descriptor %d...",socket->FileDescriptor);
+    if (shutdown(socket->FileDescriptor, how) < 0) {
+        LogError(true, "Cannot close TCP socket on file descriptor %d...", socket->FileDescriptor);
         return ERROR;
     }
 
@@ -63,13 +62,13 @@ int DisconnectFromTcpConnection(TcpConnection * socket, int how){
     }
 
 
-    LogInfo("Successfully disconnected from TCP socket on file descriptor %d!",socket->FileDescriptor);
+    LogInfo("Successfully disconnected from TCP socket on file descriptor %d!", socket->FileDescriptor);
 
     return OK;
 }
 
-TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage * addr, socklen_t addrSize) {
-    TcpConnection * tcpSocket = calloc(1, sizeof(TcpConnection));
+TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, socklen_t addrSize) {
+    TcpConnection *tcpSocket = calloc(1, sizeof(TcpConnection));
 
     memcpy(&tcpSocket->Address, addr, addrSize);
     tcpSocket->AddressLength = addrSize;
@@ -81,9 +80,8 @@ TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage * addr, sockl
 }
 
 bool IsTcpConnectionDisconnected(TcpConnection *connection) {
-    if (null == connection)
-    {
-        LogError(false,"Tcp connection cannot be null");
+    if (null == connection) {
+        LogError(false, "Tcp connection cannot be null");
     }
 
     return !connection->CanWrite && !connection->CanRead;

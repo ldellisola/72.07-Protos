@@ -10,7 +10,7 @@
 //.on_departure = ConnectedConnectionClose
 
 
-unsigned ConnectedConnectionRun(void * data);
+unsigned ConnectedConnectionRun(void *data);
 
 
 #endif //SOCKS5D_SOCKS5_CONNECTED_H

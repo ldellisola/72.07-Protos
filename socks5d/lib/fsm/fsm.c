@@ -7,51 +7,51 @@
 
 #define N(x) (sizeof(x)/sizeof((x)[0]))
 
-void InitFsm(FiniteStateMachine *fsm, StateDefinition* stateDefinition){
+void InitFsm(FiniteStateMachine *fsm, StateDefinition *stateDefinition) {
     fsm->States = stateDefinition;
     fsm->CurrentState = &stateDefinition[0];
     // verificamos que los estados son correlativos, y que están bien asignados.
-    for(unsigned i = 0 ; i <= fsm->StatesSize; i++) {
-        if(i != fsm->States[i].state) {
+    for (unsigned i = 0; i <= fsm->StatesSize; i++) {
+        if (i != fsm->States[i].state) {
             abort();
         }
     }
 
-    if(fsm->InitialState < fsm->StatesSize) {
+    if (fsm->InitialState < fsm->StatesSize) {
         fsm->CurrentState = NULL;
     } else {
         abort();
     }
 }
 
-inline static void handle_first(FiniteStateMachine *fsm, void * selectorKey) {
-    if(fsm->CurrentState == NULL) {
+inline static void handle_first(FiniteStateMachine *fsm, void *selectorKey) {
+    if (fsm->CurrentState == NULL) {
         fsm->CurrentState = fsm->States + fsm->InitialState;
-        if(NULL != fsm->CurrentState->on_arrival) {
+        if (NULL != fsm->CurrentState->on_arrival) {
             fsm->CurrentState->on_arrival(fsm->CurrentState->state, selectorKey);
         }
     }
 }
 
-inline static void jump(FiniteStateMachine *fsm, unsigned next, void * selectorKey) {
-    if(next > fsm->StatesSize) {
+inline static void jump(FiniteStateMachine *fsm, unsigned next, void *selectorKey) {
+    if (next > fsm->StatesSize) {
         abort();
     }
-    if(fsm->CurrentState != fsm->States + next) {
-        if(fsm->CurrentState != NULL && fsm->CurrentState->on_departure != NULL) {
+    if (fsm->CurrentState != fsm->States + next) {
+        if (fsm->CurrentState != NULL && fsm->CurrentState->on_departure != NULL) {
             fsm->CurrentState->on_departure(fsm->CurrentState->state, selectorKey);
         }
         fsm->CurrentState = fsm->States + next;
 
-        if(NULL != fsm->CurrentState->on_arrival) {
+        if (NULL != fsm->CurrentState->on_arrival) {
             fsm->CurrentState->on_arrival(fsm->CurrentState->state, selectorKey);
         }
     }
 }
 
-unsigned HandleReadFsm(FiniteStateMachine *fsm, void * selectorKey) {
+unsigned HandleReadFsm(FiniteStateMachine *fsm, void *selectorKey) {
     handle_first(fsm, selectorKey);
-    if(fsm->CurrentState->on_read_ready == 0) {
+    if (fsm->CurrentState->on_read_ready == 0) {
         abort();
     }
     const unsigned int ret = fsm->CurrentState->on_read_ready(selectorKey);
@@ -60,9 +60,9 @@ unsigned HandleReadFsm(FiniteStateMachine *fsm, void * selectorKey) {
     return ret;
 }
 
-unsigned HandleWriteFsm(FiniteStateMachine *fsm, void * selectorKey) {
+unsigned HandleWriteFsm(FiniteStateMachine *fsm, void *selectorKey) {
     handle_first(fsm, selectorKey);
-    if(fsm->CurrentState->on_write_ready == 0) {
+    if (fsm->CurrentState->on_write_ready == 0) {
         abort();
     }
     const unsigned int ret = fsm->CurrentState->on_write_ready(selectorKey);
@@ -71,9 +71,9 @@ unsigned HandleWriteFsm(FiniteStateMachine *fsm, void * selectorKey) {
     return ret;
 }
 
-unsigned HandleBlockFsm(FiniteStateMachine *fsm, void * selectorKey) {
+unsigned HandleBlockFsm(FiniteStateMachine *fsm, void *selectorKey) {
     handle_first(fsm, selectorKey);
-    if(fsm->CurrentState->on_block_ready == 0) {
+    if (fsm->CurrentState->on_block_ready == 0) {
         abort();
     }
     const unsigned int ret = fsm->CurrentState->on_block_ready(selectorKey);
@@ -82,16 +82,16 @@ unsigned HandleBlockFsm(FiniteStateMachine *fsm, void * selectorKey) {
     return ret;
 }
 
-void HandleCloseFsm(FiniteStateMachine *fsm, void * selectorKey) {
-    if(fsm->CurrentState != NULL && fsm->CurrentState->on_departure != NULL) {
+void HandleCloseFsm(FiniteStateMachine *fsm, void *selectorKey) {
+    if (fsm->CurrentState != NULL && fsm->CurrentState->on_departure != NULL) {
         fsm->CurrentState->on_departure(fsm->CurrentState->state, selectorKey);
     }
 }
 
 unsigned GetStateFromFsm(FiniteStateMachine *fsm) {
     unsigned ret = fsm->InitialState;
-    if(fsm->CurrentState != NULL) {
-        ret= fsm->CurrentState->state;
+    if (fsm->CurrentState != NULL) {
+        ret = fsm->CurrentState->state;
     }
     return ret;
 }

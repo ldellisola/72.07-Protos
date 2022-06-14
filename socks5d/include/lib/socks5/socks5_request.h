@@ -10,20 +10,20 @@
 
 typedef struct {
     RequestParser Parser;
-    ArrayBuffer * WriteBuffer, * ReadBuffer;
+    ArrayBuffer *WriteBuffer, *ReadBuffer;
     byte Command;
 } RequestData;
 
 
-void RequestReadInit(unsigned state, void * data);
+void RequestReadInit(unsigned state, void *data);
 
-void RequestReadClose(unsigned state, void * data);
+void RequestReadClose(unsigned state, void *data);
 
-unsigned RequestReadRun(void * data);
+unsigned RequestReadRun(void *data);
 
-void RequestWriteClose(unsigned state, void * data);
+void RequestWriteClose(unsigned state, void *data);
 
-unsigned RequestWriteRun(void * data);
+unsigned RequestWriteRun(void *data);
 
 void RequestWriteInit(unsigned int state, void *data);
 

@@ -36,49 +36,52 @@ typedef struct {
     unsigned state;
 
     /** ejecutado al arribar al estado */
-    void     (*on_arrival)    (const unsigned state, void * selectorKey);
+    void (*on_arrival)(const unsigned state, void *selectorKey);
+
     /** ejecutado al salir del estado */
-    void     (*on_departure)  (const unsigned state, void * selectorKey);
+    void (*on_departure)(const unsigned state, void *selectorKey);
+
     /** ejecutado cuando hay datos disponibles para ser leidos */
-    unsigned (*on_read_ready) (void * selectorKey);
+    unsigned (*on_read_ready)(void *selectorKey);
+
     /** ejecutado cuando hay datos disponibles para ser escritos */
-    unsigned (*on_write_ready)(void * selectorKey);
+    unsigned (*on_write_ready)(void *selectorKey);
+
     /** ejecutado cuando hay una resolución de nombres lista */
-    unsigned (*on_block_ready)(void * selectorKey);
-}StateDefinition;
+    unsigned (*on_block_ready)(void *selectorKey);
+} StateDefinition;
 
 typedef struct {
     /** declaración de cual es el estado inicial */
-    unsigned                        InitialState;
+    unsigned InitialState;
     /**
      * declaracion de los estados: deben estar ordenados segun .[].state.
      */
-    const StateDefinition *         States;
+    const StateDefinition *States;
     /** cantidad de estados */
-    unsigned                        StatesSize;
+    unsigned StatesSize;
     /** estado actual */
-    const StateDefinition *         CurrentState;
+    const StateDefinition *CurrentState;
 } FiniteStateMachine;
 
 
-
 /** inicializa el la máquina */
-void InitFsm(FiniteStateMachine *fsm, StateDefinition* stateDefinition);
+void InitFsm(FiniteStateMachine *fsm, StateDefinition *stateDefinition);
 
 /** obtiene el identificador del estado actual */
 unsigned GetStateFromFsm(FiniteStateMachine *fsm);
 
 /** indica que ocurrió el evento ReadHead. retorna nuevo id de nuevo estado. */
-unsigned HandleReadFsm(FiniteStateMachine *fsm, void * selectorKey);
+unsigned HandleReadFsm(FiniteStateMachine *fsm, void *selectorKey);
 
 /** indica que ocurrió el evento WriteHead. retorna nuevo id de nuevo estado. */
-unsigned HandleWriteFsm(FiniteStateMachine *fsm, void * selectorKey);
+unsigned HandleWriteFsm(FiniteStateMachine *fsm, void *selectorKey);
 
 /** indica que ocurrió el evento block. retorna nuevo id de nuevo estado. */
-unsigned HandleBlockFsm(FiniteStateMachine *fsm, void * selectorKey);
+unsigned HandleBlockFsm(FiniteStateMachine *fsm, void *selectorKey);
 
 /** indica que ocurrió el evento close. retorna nuevo id de nuevo estado. */
-void HandleCloseFsm(FiniteStateMachine *fsm, void * selectorKey);
+void HandleCloseFsm(FiniteStateMachine *fsm, void *selectorKey);
 
 
 #endif //SOCKS5D_FSM_H

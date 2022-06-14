@@ -7,10 +7,10 @@
 
 #include "utils/buffer.h"
 
-void EstablishConnectionInit(unsigned state, void * data);
+void EstablishConnectionInit(unsigned state, void *data);
 
-void EstablishConnectionClose(unsigned state, void * data);
+void EstablishConnectionClose(unsigned state, void *data);
 
-unsigned EstablishConnectionRun(void * data);
+unsigned EstablishConnectionRun(void *data);
 
 #endif //SOCKS5D_SOCKS5_ESTABLISH_CONNECTION_H

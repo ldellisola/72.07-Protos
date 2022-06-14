@@ -5,18 +5,17 @@
 #ifndef SOCKS5D_SOCKS5_REMOTE_H
 #define SOCKS5D_SOCKS5_REMOTE_H
 
-void RemoteReadInit(unsigned state, void * data);
+void RemoteReadInit(unsigned state, void *data);
 
-unsigned RemoteReadRun(void * data);
+unsigned RemoteReadRun(void *data);
 
-void RemoteReadClose(unsigned state, void * data);
+void RemoteReadClose(unsigned state, void *data);
 
 
+void RemoteWriteInit(unsigned state, void *data);
 
-void RemoteWriteInit(unsigned state, void * data);
+unsigned RemoteWriteRun(void *data);
 
-unsigned RemoteWriteRun(void * data);
-
-void RemoteWriteClose(unsigned state, void * data);
+void RemoteWriteClose(unsigned state, void *data);
 
 #endif //SOCKS5D_SOCKS5_REMOTE_H

@@ -12,14 +12,10 @@
 #define ERROR -1
 
 
-
 typedef uint8_t byte;
 
 
 int printSocketAddress(int fd, char *addrBuffer);
-
-
-
 
 
 #endif //SERVER_UTILS_H

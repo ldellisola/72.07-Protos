@@ -16,7 +16,8 @@ typedef enum {
 
 void SetLogLevel(LOG_TYPE minimumType);
 
-void LogInfo(const char * message,...);
+void LogInfo(const char *message, ...);
+
 void LogError(bool showInnerError, const char *message, ...);
 
 

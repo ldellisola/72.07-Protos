@@ -9,27 +9,24 @@
 
 
 static void sigterm_handler(const int signal) {
-    printf("Signal %d, cleaning up and exiting\n",signal);
+    printf("Signal %d, cleaning up and exiting\n", signal);
     StopTcpServer();
 }
 
-int main(int argc, char ** argv) {
+int main(int argc, char **argv) {
     close(0);
     setvbuf(stdout, NULL, _IONBF, 0);
     SetLogLevel(LOG_INFO);
 
     signal(SIGTERM, sigterm_handler);
-    signal(SIGINT,  sigterm_handler);
+    signal(SIGINT, sigterm_handler);
 
-    CliArguments arguments = ParseCli(argc,argv);
+    CliArguments arguments = ParseCli(argc, argv);
 
     InitTcpServer(null);
     RegisterSocks5ServerOnIPv4(arguments.SocksPort);
 
     RunTcpServer();
-
-
-
 
 
 }

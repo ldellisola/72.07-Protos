@@ -13,7 +13,7 @@
 
 int main(void) {
 
-    Suite *suites [] = {
+    Suite *suites[] = {
             RegisterHelloParserTestSuit(),
             RegisterAuthParserTestSuit(),
             RegisterRequestParserTestSuit(),
@@ -24,8 +24,8 @@ int main(void) {
     int failedTests = 0;
     int currentSuit = 0;
 
-    while (NULL != suites[currentSuit]){
-        SRunner *sr  = srunner_create(suites[currentSuit]);
+    while (NULL != suites[currentSuit]) {
+        SRunner *sr = srunner_create(suites[currentSuit]);
         srunner_run_all(sr, CK_NORMAL);
         failedTests += srunner_ntests_failed(sr);
         srunner_free(sr);
