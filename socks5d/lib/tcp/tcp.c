@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <signal.h>
+#include <errno.h>
 #include "utils/utils.h"
 #include "utils/logger.h"
 #include "selector/selector.h"
@@ -81,7 +82,7 @@ bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler){
     LogInfo("Set TCP server socket to listen");
 
     if (-1 == SelectorFdSetNio(servSock)) {
-        LogError(false, "Cannot get server socket flags");
+        LogError(false, "Cannot set server socket flags");
         close(servSock);
         return false;
     }
@@ -195,6 +196,53 @@ size_t WriteToTcpConnection(TcpConnection * socket, byte * content, size_t conte
     LogInfo("Wrote %d bytes to TCP socket on file descriptor %d",bytes,socket->FileDescriptor);
 
     return bytes;
+}
+
+TcpConnection *ConnectToIPv4TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data) {
+    int sock = socket(AF_INET,SOCK_STREAM, IPPROTO_TCP);
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof(int));
+
+    if (-1 == SelectorFdSetNio(sock)) {
+        LogError(false, "Cannot set server socket flags");
+        close(sock);
+        return false;
+    }
+
+    if (null == selector)
+    {
+        LogError(false,"Selector not created!");
+        close(sock);
+        return false;
+    }
+
+    SelectorStatus status = SelectorRegister(
+            selector,
+            sock,
+            handler,
+            SELECTOR_OP_WRITE|SELECTOR_OP_READ,
+            data
+    );
+
+    if (status != SELECTOR_STATUS_SUCCESS){
+        LogError(false,"Cannot register TCP socket on selector");
+        close(sock);
+        return null;
+    }
+
+    struct sockaddr_in addr = {
+            .sin_family = AF_INET
+    };
+
+    memcpy(&(addr.sin_addr),address,4);
+    memcpy(&(addr.sin_port),port,2);
+
+    int result = connect(sock,(struct sockaddr*) &addr, sizeof(addr));
+
+    if (EINPROGRESS ==  errno || 0 == result){
+        return CreateTcpConnection(sock,(struct sockaddr_storage *) &addr,sizeof(addr));
+    }
+
+    return null;
 }
 
 

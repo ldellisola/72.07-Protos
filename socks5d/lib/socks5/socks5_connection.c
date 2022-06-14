@@ -6,34 +6,28 @@
 #include "socks5/socks5_connection.h"
 #include "socks5/socks5_hello.h"
 #include "utils/logger.h"
-#include "parsers/hello_parser.h"
 #include "parsers/auth_parser.h"
-#include "parsers/request_parser.h"
-#include "socks5/socks5_messages.h"
 #include "fsm/fsm.h"
 #include "socks5/socks5_auth.h"
+#include "socks5/socks5_request.h"
+#include "socks5/socks5_establish_connection.h"
+#include "socks5/socks5_connected.h"
+#include "socks5/socks5_client.h"
+#include "socks5/socks5_remote.h"
 
 // TODO: Test
-
-
-
-
 
 static void Socks5ConnectionRead(SelectorKey *key);
 static void Socks5ConnectionWrite(SelectorKey *key);
 static void Socks5ConnectionBlock(SelectorKey *key);
-static void Socks5ConnectionClose(SelectorKey *key);
+//static void Socks5ConnectionClose(SelectorKey *key);
 
-FdHandler socks5ConnectionHandler = {
+const FdHandler socks5ConnectionHandler = {
         .handle_read   = Socks5ConnectionRead,
         .handle_write  = Socks5ConnectionWrite,
-        .handle_close  = Socks5ConnectionClose,
+//        .handle_close  = Socks5ConnectionClose,
         .handle_block  = Socks5ConnectionBlock,
 };
-
-void nothing(unsigned aa,void * sss){
-
-}
 
 static StateDefinition socks5ConnectionFsm[] = {
         {
@@ -59,19 +53,60 @@ static StateDefinition socks5ConnectionFsm[] = {
           .on_departure = AuthWriteClose
         },
         {
+          .state = CS_REQUEST_READ,
+          .on_arrival = RequestReadInit,
+          .on_departure = RequestReadClose,
+          .on_read_ready = RequestReadRun
+        },
+        {
+          .state = CS_REQUEST_WRITE,
+          .on_arrival = RequestWriteInit,
+          .on_write_ready = RequestWriteRun,
+          .on_departure = RequestWriteClose
+        },
+        {
+          .state = CS_ESTABLISH_CONNECTION,
+          .on_arrival = EstablishConnectionInit,
+          .on_write_ready = EstablishConnectionRun,
+          .on_departure = EstablishConnectionClose
+        },
+        {
+          .state = CS_CONNECTED,
+          .on_read_ready = ConnectedConnectionRun,
+        },
+        {
+            .state = CS_CLIENT_READ,
+            .on_arrival = ClientReadInit,
+            .on_read_ready = ClientReadRun,
+            .on_departure = ClientReadClose
+            },
+        {
+            .state = CS_REMOTE_WRITE,
+            .on_arrival = RemoteWriteInit,
+            .on_write_ready = RemoteWriteRun,
+            .on_departure = RemoteWriteClose
+        },
+        {
+            .state = CS_REMOTE_READ,
+            .on_arrival = RemoteReadInit,
+            .on_read_ready = RemoteReadRun,
+            .on_departure = RemoteReadClose
+        },
+        {
+            .state = CS_CLIENT_WRITE,
+            .on_arrival = ClientWriteInit,
+            .on_write_ready = ClientWriteRun,
+            .on_departure = ClientWriteClose
+        },
+        {
             .state = CS_DONE,
-                .on_arrival = nothing
         },
         {
                 .state = CS_ERROR,
-                .on_arrival = nothing
         },
 };
 
 
-bool HandleHello(Socks5Connection * connection, byte* data, int length);
-bool HandleAuthentication(Socks5Connection *connection, byte *data, int length);
-bool HandleRequest(Socks5Connection *connection, byte *data, int length);
 
 
 
@@ -90,10 +125,10 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection) {
     connection->Fsm.StatesSize = CS_ERROR;
     InitFsm(&connection->Fsm,socks5ConnectionFsm);
 
-    void * readBuffer = calloc(500,sizeof(byte));
-    void * writeBuffer = calloc(500,sizeof(byte));
-    BufferInit(&connection->WriteBuffer,500,writeBuffer);
-    BufferInit(&connection->ReadBuffer,500,readBuffer);
+    void * readBuffer = calloc(5000,sizeof(byte));
+    void * writeBuffer = calloc(5000,sizeof(byte));
+    BufferInit(&connection->WriteBuffer,5000,writeBuffer);
+    BufferInit(&connection->ReadBuffer,5000,readBuffer);
 
     LogInfo("Socks5Connection Created!");
     return connection;
@@ -125,87 +160,7 @@ void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector)
 
 
 
-//bool HandleRequest(Socks5Connection *connection, byte *data, int length) {
-//    RequestParser * parser = connection->Parser.Request;
-//   // TODO: Figure out return value
-//   RequestParserConsume(parser,data,length);
-//
-//   if (!RequestParserHasFinished(parser->State))
-//       return false;
-//
-//   bool hasFailed = RequestParserHasFinished(parser->State);
-//   if (hasFailed){
-//       // TODO: Handle error
-//       connection->State = SOCKS5_CS_FAILED;
-//       return false;
-//   }
-//
-//   byte message[1024];
-//   int messageSize;
-//   if (parser->CMD != SOCKS5_CMD_CONNECT){
-//       // TODO: Send method not implemented
-//       messageSize = BuildRequestResponseFromParser(message,1024,SOCKS5_REPLY_COMMAND_NOT_SUPPORTED,parser);
-//       WriteToTcpConnection(connection->ClientTcpConnection, message, messageSize);
-//       return false;
-//   }
-//
-//   if (parser->AType != SOCKS5_ADDRESS_TYPE_IPV4){
-//       // TODO: support other address type
-//       // TODO: Send Method not implemented
-//       messageSize = BuildRequestResponseFromParser(message,1024,SOCKS5_REPLY_ADDRESS_TYPE_NOT_SUPPORTED,parser);
-//       WriteToTcpConnection(connection->ClientTcpConnection, message, messageSize);
-//       return false;
-//   }
-//
-//   ClientTcpConnection * other = ConnectToTcpServer(parser->DestAddress, parser->DestPort);
-//   if (null == other){
-//       messageSize = BuildRequestResponseFromParser(message,1024,SOCKS5_REPLY_GENERAL_FAILURE,parser);
-//       WriteToTcpConnection(connection->ClientTcpConnection, message, messageSize);
-//       return false;
-//   }
-//
-//
-//
-//
-//   // TODO: Reply
-//
-//
-//    return true;
-//
-//}
-//
-//
-//bool HandleAuthentication(Socks5Connection *connection, byte *data, int length) {
-//    AuthParser *parser = connection->Parser.Auth;
-//    // TODO: Figure out return value
-//    AuthParserConsume(parser, data, length);
-//
-//    if (!AuthParserHasFinished(parser->State))
-//        return false;
-//
-//    if (AuthParserHasFailed(parser->State)){
-//        connection->State = SOCKS5_CS_FAILED;
-//        return true;
-//    }
-//
-//    // TODO Implement real user system
-//    bool isLoggedIn =   strncmp(parser->UName,SOCKS5_DEFAULT_USER, strlen(SOCKS5_DEFAULT_USER)) == 0 &&
-//                        strncmp(parser->Passwd,SOCKS5_DEFAULT_PASSWORD,strlen(SOCKS5_DEFAULT_PASSWORD)) == 0;
-//
-//
-//    // TODO: Make non blocking
-//    byte message[2];
-//    int messageLength = BuildAuthResponse(message,2,isLoggedIn);
-//    WriteToTcpConnection(connection->ClientTcpConnection, message, messageLength);
-//
-//    connection->State = isLoggedIn ? SOCKS5_CS_REQUEST : SOCKS5_CS_FINISHED;
-//
-//    return !isLoggedIn;
-//}
-
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
-
-void Socks5ConnectionDone(SelectorKey * key);
 
 void Socks5ConnectionRead(SelectorKey *key) {
     FiniteStateMachine *fsm   = &ATTACHMENT(key)->Fsm;
@@ -234,9 +189,9 @@ void Socks5ConnectionBlock(SelectorKey *key) {
     }
 }
 
-void Socks5ConnectionClose(SelectorKey *key) {
-    Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
-}
+//void Socks5ConnectionClose(SelectorKey *key) {
+//    Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
+//}
 
 
 

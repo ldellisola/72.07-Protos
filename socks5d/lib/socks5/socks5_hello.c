@@ -66,7 +66,7 @@ unsigned HelloReadRun(void *data) {
 
         buffer = BufferWritePtr(d->WriteBuffer,&bufferSize);
         int bytesWritten = BuildHelloResponse(buffer,bufferSize,d->AuthenticationMethod);
-        if (bytesWritten < 0)
+        if (0 == bytesWritten)
             return CS_ERROR;
         BufferWriteAdv(d->WriteBuffer,bytesWritten);
 

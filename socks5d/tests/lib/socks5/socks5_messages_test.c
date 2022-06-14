@@ -19,7 +19,7 @@ START_TEST(BuildHello_Succeeds){
     // Arrange
     int authenticationMethod = 0x01;
     // Act
-    int size = BuildHelloResponse(buffer,bufferSize,authenticationMethod);
+        size_t size = BuildHelloResponse(buffer,bufferSize,authenticationMethod);
     // Assert
         ck_assert_int_eq(size,2);
         ck_assert_int_eq(buffer[0],SOCKS5_PROTOCOL_VERSION);
@@ -35,7 +35,7 @@ START_TEST(BuildAuth_LoggedIn_Success){
     // Arrange
     bool authenticationSucceeded = true;
     // Act
-    int size = BuildAuthResponse(buffer,bufferSize,authenticationSucceeded);
+        size_t size = BuildAuthResponse(buffer,bufferSize,authenticationSucceeded);
     // Assert
         ck_assert_int_eq(size,2);
         ck_assert_int_eq(buffer[0],SOCKS5_PROTOCOL_VERSION);
@@ -47,7 +47,7 @@ START_TEST(BuildAuth_InvalidUser_Success){
     // Arrange
     bool authenticationSucceeded = false;
     // Act
-    int size = BuildAuthResponse(buffer,bufferSize,authenticationSucceeded);
+        size_t size = BuildAuthResponse(buffer,bufferSize,authenticationSucceeded);
     // Assert
         ck_assert_int_eq(size,2);
         ck_assert_int_eq(buffer[0],SOCKS5_PROTOCOL_VERSION);
@@ -65,7 +65,7 @@ START_TEST(BuildRequest_IPv4_Success){
     byte address[] = {127,0,0,1};
     int reply = SOCKS5_REPLY_SUCCEEDED;
     // Act
-    int size = BuildRequestResponseWithIPv4(buffer,bufferSize,reply,address,port);
+        size_t size = BuildRequestResponseWithIPv4(buffer,bufferSize,reply,address,port);
     // Assert
         ck_assert_int_eq(size,10);
         ck_assert_int_eq(buffer[0],SOCKS5_PROTOCOL_VERSION);
@@ -87,7 +87,7 @@ START_TEST(BuildRequest_IPv6_Success){
         byte address[] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
         int reply = SOCKS5_REPLY_SUCCEEDED;
     // Act
-    int size = BuildRequestResponseWithIPv6(buffer,bufferSize,reply,address,port);
+        size_t size = BuildRequestResponseWithIPv6(buffer,bufferSize,reply,address,port);
     // Assert
         ck_assert_int_eq(size,22);
         ck_assert_int_eq(buffer[0],SOCKS5_PROTOCOL_VERSION);
@@ -108,7 +108,7 @@ START_TEST(BuildRequest_FQDN_Success){
     int addressLen = 11;
     byte port[] ={0x01,0x02};
     // Act
-    int size = BuildRequestResponseWithFQDN(buffer,bufferSize,reply,address,port);
+        size_t size = BuildRequestResponseWithFQDN(buffer,bufferSize,reply,address,port);
     // Assert
         ck_assert_int_eq(size,18);
         ck_assert_int_eq(buffer[0],SOCKS5_PROTOCOL_VERSION);

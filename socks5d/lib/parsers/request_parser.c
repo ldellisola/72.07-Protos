@@ -1,20 +1,17 @@
 
 
+#include <memory.h>
 #include "utils/logger.h"
 #include "parsers/request_parser.h"
 
-RequestParser *RequestParserInit() {
+RequestParser RequestParserInit() {
     LogInfo("Creating RequestParser...");
-    RequestParser * ptr = calloc(1,sizeof(RequestParser));
+    RequestParser parser;
 
-    if (null == ptr) {
-        LogError(false, "Cannot allocate RequestParser");
-        return ptr;
-    }
+    RequestParserReset(&parser);
 
-    ptr->State = RequestVersion;
     LogInfo("RequestParser created!");
-    return ptr;
+    return parser;
 }
 
 RequestParserState RequestParserFeed(RequestParser *p, byte c) {
@@ -55,6 +52,7 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
                     break;
                 case SOCKS5_ADDRESS_TYPE_FQDN:
                     p->State = RequestDestAddrFQDN;
+                    p->AddressLength = 0;
                     break;
                 default:
                     p->State = RequestInvalidState;
@@ -62,16 +60,16 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
             }
             break;
         case RequestDestAddrFQDN:
-            if (null == p->DestAddress && 0 == p->AddressLength){
+
+            if (0 == p->AddressLength) {
                 p->AddressLength = c;
                 if (p->AddressLength <= 0)
                     p->State = RequestInvalidState;
                 break;
             }
+
         case RequestDestAddrIPV4:
         case RequestDestAddrIPV6:
-            if (null == p->DestAddress)
-                p->DestAddress = calloc(p->AddressLength + 1, sizeof(uint8_t));
 
             p->DestAddress[p->AddressPosition++] = c;
 
@@ -104,21 +102,25 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
     return p->State;
 }
 
-void RequestParserDestroy(RequestParser *p) {
-    LogInfo("Disposing RequestParser...");
+void RequestParserReset(RequestParser *p) {
+    LogInfo("Resetting RequestParser...");
     if (null == p) {
-        LogError(false, "Cannot destroy NULL RequestParser");
+        LogError(false, "Cannot reset NULL RequestParser");
         return;
     }
 
-    if (null != p->DestAddress)
-        free(p->DestAddress);
+    p->State = RequestVersion;
+    p->AddressLength = 0;
+    memset(p->DestAddress,0,256);
+    memset(p->DestPort,0,2);
+    p->AType = 0;
+    p->AddressPosition = 0;
+    p->CMD = 0;
 
-    free(p);
-    LogInfo("AuthParser disposed!");
+    LogInfo("AuthParser reset!");
 }
 
-int RequestParserConsume(RequestParser *p, byte *c, int length) {
+size_t RequestParserConsume(RequestParser *p, byte *c, size_t length) {
     LogInfo("RequestParser consuming %d bytes",length);
     if (null == p)
     {
@@ -131,7 +133,7 @@ int RequestParserConsume(RequestParser *p, byte *c, int length) {
         return 0;
     }
 
-    for (int i = 0; i < length; ++i) {
+    for (size_t i = 0; i < length; ++i) {
         RequestParserState state = RequestParserFeed(p, c[i]);
         if (RequestParserHasFinished(state))
             return i+1;

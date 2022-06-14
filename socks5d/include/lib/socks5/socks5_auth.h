@@ -9,7 +9,6 @@
 #include "utils/buffer.h"
 
 typedef struct {
-    // TODO: Stop using a pointer to the parser
     AuthParser Parser;
     ArrayBuffer * WriteBuffer, * ReadBuffer;
     bool AuthSucceeded;

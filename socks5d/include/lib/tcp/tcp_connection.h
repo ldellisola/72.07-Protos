@@ -7,14 +7,15 @@
 #define SOCKS5D_TCP_CONNECTION_H
 
 #include <netinet/in.h>
+#include <stdbool.h>
 #include "selector/selector.h"
-
-
 
 typedef struct {
     int FileDescriptor;
     struct sockaddr_storage Address;
     socklen_t AddressLength;
+    bool CanWrite;
+    bool CanRead;
 }TcpConnection;
 
 /**
@@ -36,9 +37,17 @@ int DisposeTcpConnection(TcpConnection *socket, fd_selector selector);
 /**
  * It disconnects from a Tcp socket but it does not dispose it
  * @param socket
+ * @param how
  * @return
  */
-int DisconnectFromTcpConnection(TcpConnection * socket);
+int DisconnectFromTcpConnection(TcpConnection * socket, int how);
+
+/**
+ * It says if the TCP Connection is is completely shut down (not read or write)
+ * @param connection Tcp connection to evaluate
+ * @return True if both read and write channels are closed
+ */
+bool IsTcpConnectionDisconnected(TcpConnection * connection);
 
 
 #endif //SOCKS5D_TCP_CONNECTION_H

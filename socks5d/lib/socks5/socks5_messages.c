@@ -8,10 +8,10 @@
 #include "socks5/socks5.h"
 
 
-int BuildHelloResponse(byte *buffer, int length, int authenticationMethod) {
+size_t BuildHelloResponse(byte *buffer, size_t length, int authenticationMethod) {
     if (length < 2) {
         LogError(false,"Buffer to small to WriteHead HelloResponse");
-        return -1;
+        return 0;
     }
 
     buffer[0] = SOCKS5_PROTOCOL_VERSION;
@@ -19,10 +19,10 @@ int BuildHelloResponse(byte *buffer, int length, int authenticationMethod) {
     return 2;
 }
 
-int BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceeded) {
+size_t BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceeded) {
     if (length < 2) {
         LogError(false,"Buffer to small to WriteHead AuthResponse");
-        return -1;
+        return 0;
     }
 
     buffer[0] = SOCKS5_PROTOCOL_VERSION;
@@ -30,14 +30,14 @@ int BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceeded)
     return 2;
 }
 
-int BuildRequestResponseWithIPv4(byte *buffer, int length, int replyCommand, const byte *address, const byte * port) {
+size_t BuildRequestResponseWithIPv4(byte *buffer, size_t length, int replyCommand, const byte *address, const byte * port) {
     if (length < 10){
         LogError(false,"Buffer to small to WriteHead RequestResponse with IPv4");
-        return -1;
+        return 0;
     }
     if (null == address){
         LogError(false,"Address cannot be null");
-        return -1;
+        return 0;
     }
 
     buffer[0] = SOCKS5_PROTOCOL_VERSION;
@@ -53,14 +53,14 @@ int BuildRequestResponseWithIPv4(byte *buffer, int length, int replyCommand, con
     return 10;
 }
 
-int BuildRequestResponseWithIPv6(byte *buffer, int length, int replyCommand, const byte *address, const byte *port) {
+size_t BuildRequestResponseWithIPv6(byte *buffer, size_t length, int replyCommand, const byte *address, const byte *port) {
     if (length < 22){
         LogError(false,"Buffer to small to WriteHead RequestResponse with IPv6");
-        return -1;
+        return 0;
     }
     if (null == address){
         LogError(false,"Address cannot be null");
-        return -1;
+        return 0;
     }
 
     buffer[0] = SOCKS5_PROTOCOL_VERSION;
@@ -75,34 +75,31 @@ int BuildRequestResponseWithIPv6(byte *buffer, int length, int replyCommand, con
     return 22;
 }
 
-int BuildRequestResponseWithFQDN(byte *buffer, int length, int replyCommand, const char *address, const byte *port) {
+size_t BuildRequestResponseWithFQDN(byte *buffer, size_t length, int replyCommand, const char *address, const byte *port) {
     if (null == address){
         LogError(false,"Address cannot be null");
-        return -1;
+        return 0;
     }
-    int addressLen = strlen(address);
+    size_t addressLen = strlen(address);
     if (length < 5 + addressLen + 1){
         LogError(false,"Buffer to small to WriteHead RequestResponse with IPv6");
-        return -1;
+        return 0;
     }
-
-
-
 
     buffer[0] = SOCKS5_PROTOCOL_VERSION;
     buffer[1] = replyCommand;
     buffer[2] = 0;
     buffer[3] = SOCKS5_ADDRESS_TYPE_FQDN;
     buffer[4] = addressLen;
-    for (int i = 0; i < addressLen; ++i)
+    for (size_t i = 0; i < addressLen; ++i)
         buffer[5+i] = address[i];
     buffer[5+ addressLen] = port[0];
     buffer[5 + addressLen+1] = port[1];
 
-    return 5 + addressLen + 2;
+    return addressLen + 2+5;
 }
 
-int BuildRequestResponse(byte *buffer, int length, int replyCommand, int addressType, void *address, const byte *port) {
+size_t BuildRequestResponse(byte *buffer, size_t length, int replyCommand, int addressType, void *address, const byte *port) {
 
     switch (addressType) {
         case SOCKS5_ADDRESS_TYPE_FQDN:
@@ -117,7 +114,7 @@ int BuildRequestResponse(byte *buffer, int length, int replyCommand, int address
     }
 }
 
-int BuildRequestResponseFromParser(byte *buffer, int length, int replyCommand, RequestParser *parser) {
+size_t BuildRequestResponseFromParser(byte *buffer, size_t length, int replyCommand, RequestParser *parser) {
     if (null == parser) {
         LogError(false,"RequestParser cannot be null");
         return -1;

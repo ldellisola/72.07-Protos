@@ -17,7 +17,7 @@
  * @param authenticationMethod chosen authentication method
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildHelloResponse(byte * buffer, int length, int authenticationMethod);
+size_t BuildHelloResponse(byte * buffer, size_t length, int authenticationMethod);
 
 /**
  * It writes the AuthResponse message to a buffer
@@ -26,7 +26,7 @@ int BuildHelloResponse(byte * buffer, int length, int authenticationMethod);
  * @param authenticationSucceeded Whether the user is authenticated or not
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildAuthResponse(byte * buffer, size_t length, bool authenticationSucceeded);
+size_t BuildAuthResponse(byte * buffer, size_t length, bool authenticationSucceeded);
 
 /**
  * It writes the RequestResponse with an IPv4 address
@@ -37,7 +37,7 @@ int BuildAuthResponse(byte * buffer, size_t length, bool authenticationSucceeded
  * @param port byte array of two elements with the port'Selector bytes in network order
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildRequestResponseWithIPv4(byte * buffer, int length, int replyCommand, const byte* address, const byte * port);
+size_t BuildRequestResponseWithIPv4(byte * buffer, size_t length, int replyCommand, const byte* address, const byte * port);
 
 /**
  * It writes the RequestResponse with an IPv6 address
@@ -48,7 +48,7 @@ int BuildRequestResponseWithIPv4(byte * buffer, int length, int replyCommand, co
  * @param port byte array of two elements with the port'Selector bytes in network order
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildRequestResponseWithIPv6(byte * buffer, int length, int replyCommand, const byte* address, const byte *port);
+size_t BuildRequestResponseWithIPv6(byte * buffer, size_t length, int replyCommand, const byte* address, const byte *port);
 
 /**
  * It writes the RequestResponse with an FQDN address
@@ -59,7 +59,7 @@ int BuildRequestResponseWithIPv6(byte * buffer, int length, int replyCommand, co
  * @param port byte array of two elements with the port'Selector bytes in network order
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildRequestResponseWithFQDN(byte * buffer, int length, int replyCommand, const char * address, const byte * port);
+size_t BuildRequestResponseWithFQDN(byte * buffer, size_t length, int replyCommand, const char * address, const byte * port);
 
 /**
  * It writes the RequestResponse
@@ -71,7 +71,7 @@ int BuildRequestResponseWithFQDN(byte * buffer, int length, int replyCommand, co
  * @param port byte array of two elements with the port'Selector bytes in network order
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildRequestResponse(byte * buffer, int length, int replyCommand,int addressType , void * address, const byte * port);
+size_t BuildRequestResponse(byte * buffer, size_t length, int replyCommand, int addressType , void * address, const byte * port);
 
 /**
  * It writes the RequestResponse
@@ -81,7 +81,7 @@ int BuildRequestResponse(byte * buffer, int length, int replyCommand,int address
  * @param parser RequestParser user to recieve the Data
  * @return the length of the message, -1 if the buffer is to small
  */
-int BuildRequestResponseFromParser(byte * buffer, int length, int replyCommand, RequestParser * parser);
+size_t BuildRequestResponseFromParser(byte * buffer, size_t length, int replyCommand, RequestParser * parser);
 
 
 #endif //SOCKS5D_SOCKS5_MESSAGES_H

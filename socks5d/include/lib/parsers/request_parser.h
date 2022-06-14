@@ -83,11 +83,11 @@ typedef enum
 typedef struct
 {
     RequestParserState State;
-    uint8_t CMD;
-    uint8_t AType;
-    uint8_t * DestAddress;
-    uint8_t AddressLength;
-    uint8_t AddressPosition;
+    byte CMD;
+    byte AType;
+    byte DestAddress[256];
+    byte AddressLength;
+    byte AddressPosition;
     byte DestPort[2];
 }RequestParser;
 
@@ -95,13 +95,13 @@ typedef struct
  * It initializes a new RequestParser instance
  * @return a RequestParser instance
  */
-RequestParser * RequestParserInit();
+RequestParser RequestParserInit();
 
 /**
- * It safely disposes a RequestParser instance
+ * It restores a RequestParser instance
  * @param p The parser instance
  */
-void RequestParserDestroy(RequestParser * p);
+void RequestParserReset(RequestParser * p);
 
 /**
  * It iterates the parser one step for a given input
@@ -118,7 +118,7 @@ RequestParserState RequestParserFeed(RequestParser* p, byte c);
  * @param length Total amount of bytes to feed the parser
  * @return number of bytes consumed
  */
-int RequestParserConsume(RequestParser* p, byte* c, int length);
+size_t RequestParserConsume(RequestParser* p, byte* c, size_t length);
 
 /**
  * It checks if the parser reached a failed state

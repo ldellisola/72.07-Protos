@@ -16,14 +16,13 @@ void AuthReadInit(unsigned int state, void *data) {
     Socks5Connection * connection = ATTACHMENT(data);
     AuthData * d = &connection->Data.Auth;
 
+    d->AuthSucceeded = false;
     d->ReadBuffer = &connection->ReadBuffer;
     d->WriteBuffer = &connection->WriteBuffer;
     AuthParserReset(&d->Parser);
 }
 
 void AuthReadClose(unsigned int state, void *data) {
-    Socks5Connection * connection = ATTACHMENT(data);
-    AuthData* d = &connection->Data.Auth;
 
 }
 
@@ -55,9 +54,9 @@ unsigned AuthReadRun(void *data) {
         d->AuthSucceeded = LogInUser(d->Parser.UName, d->Parser.Passwd);
 
         buffer = BufferWritePtr(d->WriteBuffer,&bufferSize);
-        int bytesWritten = BuildAuthResponse(buffer,bufferSize,d->AuthSucceeded);
+        size_t bytesWritten = BuildAuthResponse(buffer,bufferSize,d->AuthSucceeded);
 
-        if (bytesWritten < 0)
+        if (0 == bytesWritten)
             return CS_ERROR;
         BufferWriteAdv(d->WriteBuffer,bytesWritten);
 

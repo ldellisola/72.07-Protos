@@ -472,9 +472,8 @@ static void handle_block_notifications(fd_selector s) {
             .Selector = s,
     };
     pthread_mutex_lock(&s->ResolutionMutex);
-    for(BlockingJob *j = s->ResolutionJobs;
-        j != NULL ;
-        j  = j->Next) {
+    BlockingJob * next;
+    for(BlockingJob *j = s->ResolutionJobs; j != NULL; j  = next) {
 
         Item *item = s->Fds + j->Fd;
         if(ITEM_USED(item)) {
@@ -482,7 +481,7 @@ static void handle_block_notifications(fd_selector s) {
             key.Data = item->Data;
             item->Handler->handle_block(&key);
         }
-
+        next = j->Next;
         free(j);
     }
     s->ResolutionJobs = 0;
@@ -490,8 +489,7 @@ static void handle_block_notifications(fd_selector s) {
 }
 
 
-SelectorStatus SelectorNotifyBlock(fd_selector  s,
-                                   const int    fd) {
+SelectorStatus SelectorNotifyBlock(fd_selector  s,const int    fd) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
 
     // TODO(juan): usar un pool

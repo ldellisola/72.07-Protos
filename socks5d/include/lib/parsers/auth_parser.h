@@ -70,7 +70,7 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c);
  * @param length Total amount of bytes to feed the parser
  * @return the number of bytes consumed
  */
-ssize_t AuthParserConsume(AuthParser* p, byte * c, ssize_t length);
+size_t AuthParserConsume(AuthParser* p, byte * c, size_t length);
 
 /**
  * It checks if the parser reached a failed state

@@ -3,9 +3,11 @@
 //
 
 #include <string.h>
-#include "socks5/socks5_server.h"
 #include "utils/utils.h"
 #include "utils/logger.h"
+#include "tcp/tcp.h"
+#include "socks5/socks5_connection.h"
+#include "socks5/socks5_server.h"
 
 void Socks5PassiveAccept(SelectorKey * key);
 

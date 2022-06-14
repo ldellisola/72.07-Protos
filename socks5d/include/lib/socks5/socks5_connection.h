@@ -11,6 +11,8 @@
 #include "socks5_connection_status.h"
 #include "fsm/fsm.h"
 #include "socks5_auth.h"
+#include "socks5_request.h"
+#include "socks5_establish_connection.h"
 
 
 typedef struct {
@@ -18,10 +20,11 @@ typedef struct {
     CONNECTION_STATE State;
     TcpConnection * ClientTcpConnection;
     TcpConnection * RemoteTcpConnection;
-    FdHandler * Handler;
+    const FdHandler * Handler;
     union {
         HelloData Hello;
         AuthData Auth;
+        RequestData Request;
     } Data;
     ArrayBuffer ReadBuffer, WriteBuffer;
 } Socks5Connection;
@@ -38,21 +41,6 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection);
  */
 void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector);
 
-/**
- * It runs through the States of a Socks5 finite state machine
- * @param connection Socks5 connection
- * @param data Input Data to consume
- * @param length Size of the Data to consume
- * @return True if the machine reached a final state
- */
-bool RunSocks5(Socks5Connection * connection, byte * data, int length);
-
-/**
- * It decides if a Socks5 finite state machine reached an invalid state
- * @param connection Socks5 connection to evaluate
- * @return True if the FSM reached an invalid state
- */
-bool Socks5ConnectionFailed(Socks5Connection * connection);
 
 
 #endif //SERVER_SOCKS_CONNECTION_H

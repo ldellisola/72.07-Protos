@@ -98,7 +98,7 @@ bool AuthParserHasFailed(AuthParserState state){
     }
 }
 
-ssize_t AuthParserConsume(AuthParser *p, byte *c, ssize_t length) {
+size_t AuthParserConsume(AuthParser *p, byte *c, size_t length) {
     LogInfo("AuthParser consuming %d bytes",length);
     if (null == p)
     {
@@ -111,7 +111,7 @@ ssize_t AuthParserConsume(AuthParser *p, byte *c, ssize_t length) {
         return 0;
     }
 
-    for (int i = 0; i < length; ++i) {
+    for (size_t i = 0; i < length; ++i) {
         AuthParserState state = AuthParserFeed(p,c[i]);
         if (AuthParserHasFinished(state))
             return i+1;

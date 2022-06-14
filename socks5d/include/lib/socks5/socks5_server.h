@@ -4,8 +4,7 @@
 
 #ifndef SERVER_SOCKS_SERVER_H
 #define SERVER_SOCKS_SERVER_H
-#include "tcp/tcp.h"
-#include "socks5_connection.h"
+
 
 /**
  * It initializes a Socks5Server
