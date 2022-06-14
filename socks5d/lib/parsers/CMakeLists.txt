@@ -8,6 +8,7 @@ set(
         auth_parser.c
         hello_parser.c
         request_parser.c
+        client_hello_parser.c
 )
 
 add_library(parsers STATIC ${SOURCES})
