@@ -35,5 +35,6 @@ HelloParserState HelloParserFeed(HelloParser *p, byte c);
 void HelloParserReset(HelloParser *p);
 ssize_t HelloParserConsume(HelloParser *p, byte *c, ssize_t length);
 bool HelloParserHasFailed(HelloParserState state);
-bool HelloParserHasFinished(HelloParserState state)
+bool HelloParserHasFinished(HelloParserState state);
 #endif //SOCKS5D_CLIENT_HELLO_PARSER_H
+
