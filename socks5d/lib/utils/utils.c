@@ -54,5 +54,17 @@ const char *GetShutdownModeName(int shutdownMode) {
     }
 }
 
+int GetAddressFamily(const char *address) {
+    struct in_addr in4Addr;
+    if (1 == inet_pton(AF_INET,address,&in4Addr))
+        return AF_INET;
+
+    struct in6_addr in6Addr;
+    if (1 == inet_pton(AF_INET6, address,&in6Addr))
+        return AF_INET6;
+
+    return AF_UNSPEC;
+}
+
 
 

@@ -23,7 +23,7 @@ CliArguments ParseCli(int argc, char **argv) {
             .SocksAddress = null,
             .EnablePasswordScanners=true,
             .LuluPort="8080",
-            .LuluAddress="localhost",
+            .LuluAddress=null,
             .UsersCount=0,
     };
 

@@ -24,5 +24,12 @@ int printSocketAddress(int fd, char *addrBuffer);
  */
 const char * GetShutdownModeName(int shutdownMode);
 
+/**
+ * It finds out the address family (IPv4 or IPv6)
+ * @param address  unknown address
+ * @return AF_INET if IPv4, AF_INET6 if IPv6 or AF_UNSPEC if unknown
+ */
+int GetAddressFamily(const char * address);
+
 
 #endif //SERVER_UTILS_H

@@ -7,11 +7,27 @@
 
 
 /**
- * It initializes a Socks5Server
+ * It initializes a Socks5Server on IPv4
  * @param port Port where the server will be listening to, in the form of a null terminated string
- * @return A TCP ClientTcpConnection
+ * @return Whether the server was started successfully
  */
-void RegisterSocks5ServerOnIPv4(const char *port);
+bool RegisterSocks5ServerOnIPv4(const char *port, const char *address);
+
+/**
+ * It initializes a Socks5Server on IPv6
+ * @param port Port where the server will be listening to, in the form of a null terminated string
+ * @return Whether the server was started successfully
+ */
+bool RegisterSocks5ServerOnIPv6(const char *port, const char *address);
+
+/**
+ * It initialized a Socks5Server. If an address value is supplied, it will start only on that interface.
+ * If no address value is provided (null), then it will listen on all interfaces
+ * @param port Port where the server will be listening to, in the form of a null terminated string
+ * @param address Address to bind the server to. It can be null
+ * @return Whether the server was started successfully
+ */
+bool RegisterSocks5Server(const char * port, const char * address);
 
 
 #endif //SERVER_SOCKS_SERVER_H

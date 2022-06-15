@@ -22,12 +22,15 @@ int main(int argc, char **argv) {
     signal(SIGINT, sigterm_handler);
 
     CliArguments arguments = ParseCli(argc, argv);
+    arguments.SocksAddress = "::1";
 
     InitTcpServer(null);
-    RegisterSocks5ServerOnIPv4(arguments.SocksPort);
 
-    RunTcpServer();
+    if (RegisterSocks5Server(arguments.SocksPort,arguments.SocksAddress))
+        RunTcpServer();
 
+
+    // TODO Handle memory
 
 }
 

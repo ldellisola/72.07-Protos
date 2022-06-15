@@ -17,14 +17,48 @@ const FdHandler socksv5 = {
         .handle_close      = NULL, // nada que liberar
 };
 
-void RegisterSocks5ServerOnIPv4(const char *port) {
-    LogInfo("Starting SOCKS5 server...");
+bool RegisterSocks5Server(const char * port, const char * address){
+    if (null == address){
+//        bool success = RegisterSocks5ServerOnIPv4(port,null);
+        bool success = RegisterSocks5ServerOnIPv6(port,null);
+        return success;
+    }
+
+    switch (GetAddressFamily(address)) {
+        case AF_INET:
+            return RegisterSocks5ServerOnIPv4(port,address);
+        case AF_INET6:
+            return RegisterSocks5ServerOnIPv6(port,address);
+        default:
+            LogError(false,"Unknown Address type");
+            return false;
+    }
+}
+
+
+
+bool RegisterSocks5ServerOnIPv4(const char *port, const char *address) {
+    LogInfo("Starting SOCKS5 server on IPv4...");
+    //TODO inspect this
     int portNum = atoi(port);
 
-    // TODO: Make address agnostic
-    IPv4ListenOnTcpPort(portNum, &socksv5);
+    if (IPv4ListenOnTcpPort(portNum, &socksv5, address) == false)
+        return false;
 
-    LogInfo("SOCKS5 server up and running!");
+    LogInfo("SOCKS5 server up and running on IPv4!");
+    return true;
+
+}
+
+bool RegisterSocks5ServerOnIPv6(const char *port, const char *address) {
+    LogInfo("Starting SOCKS5 server on IPv6...");
+    int portNum = atoi(port);
+
+    if (IPv6ListenOnTcpPort(portNum, &socksv5, address) == false)
+        return false;
+
+    LogInfo("SOCKS5 server up and running on IPv6!");
+    return true;
 }
 
 
