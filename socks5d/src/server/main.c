@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
     signal(SIGINT, sigterm_handler);
 
     CliArguments arguments = ParseCli(argc, argv);
-    arguments.SocksAddress = "::1";
 
     InitTcpServer(null);
 
