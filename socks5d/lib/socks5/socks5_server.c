@@ -19,8 +19,8 @@ const FdHandler socksv5 = {
 
 bool RegisterSocks5Server(const char * port, const char * address){
     if (null == address){
-//        bool success = RegisterSocks5ServerOnIPv4(port,null);
-        bool success = RegisterSocks5ServerOnIPv6(port,null);
+        bool success = RegisterSocks5ServerOnIPv4(port,null);
+        success &= RegisterSocks5ServerOnIPv6(port,null);
         return success;
     }
 
