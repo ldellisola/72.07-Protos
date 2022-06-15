@@ -308,8 +308,9 @@ void SelectorDestroy(fd_selector s) {
                 }
             }
             pthread_mutex_destroy(&s->ResolutionMutex);
-            for (BlockingJob *j = s->ResolutionJobs; j != NULL;
-                 j = j->Next) {
+            void * next;
+            for (BlockingJob *j = s->ResolutionJobs; j != NULL; j = next) {
+                next = j->Next;
                 free(j);
             }
             free(s->Fds);
