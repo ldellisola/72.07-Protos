@@ -23,11 +23,8 @@ int main(int argc, char **argv) {
 
     CliArguments arguments = ParseCli(argc, argv);
 
-    InitTcpServer(null);
-
-    if (RegisterSocks5Server(arguments.SocksPort,arguments.SocksAddress))
+    if (InitTcpServer(null) && RegisterSocks5Server(arguments.SocksPort,arguments.SocksAddress))
         RunTcpServer();
-
 
     // TODO Handle memory
 

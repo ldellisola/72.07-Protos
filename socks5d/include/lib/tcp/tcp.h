@@ -13,13 +13,12 @@
 #include "tcp/tcp_connection.h"
 #include <netdb.h>
 
-fd_selector GetSelect();
-
 /**
  * It initializes a TCP server and creates the internal selector
  * @param optionalOptions Optional parameter to define your own Selector options. If null it will use a default configuration
+ * @return Whether the TCP server started successfully
  */
-void InitTcpServer(const SelectorOptions *optionalOptions);
+bool InitTcpServer(const SelectorOptions *optionalOptions);
 
 /**
  * It sets up a listener socket on a given port, using an IPv4 address

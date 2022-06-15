@@ -108,8 +108,6 @@ unsigned RequestWriteRun(void *data) {
             return CS_DONE;
         }
 
-
-        // TODO ver esto
         if (
                 SELECTOR_STATUS_SUCCESS ==
                 SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ) &&

@@ -83,7 +83,6 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
             break;
         case RequestDestPortSecondByte:
             LogInfo("RequestParser port second byte %d", c);
-            // TODO: Check if its this way
             p->DestPort[1] = c;
             uint16_t port =  p->DestPort[0];
             LogInfo("RequestParser complete port %d", (port << 8) | c);

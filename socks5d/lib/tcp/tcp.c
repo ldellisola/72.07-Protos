@@ -3,7 +3,6 @@
 //
 
 #include <memory.h>
-#include <netdb.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <signal.h>
@@ -12,8 +11,7 @@
 #include "utils/logger.h"
 #include "selector/selector.h"
 #include "tcp/tcp.h"
-#include "parsers/request_parser.h"
-#include "socks5/socks5_messages.h"
+
 
 bool ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize);
 
@@ -30,19 +28,21 @@ const SelectorOptions options = {
         }
 };
 
-void InitTcpServer(const SelectorOptions *optionalOptions) {
+bool InitTcpServer(const SelectorOptions *optionalOptions) {
 
 
     if (0 != SelectorInit(null == optionalOptions ? &options : optionalOptions)) {
         LogError(false, "Cannot initialize Selector");
-        return;
+        return false;
     }
 
     selector = (struct fdselector *) SelectorNew(1024);
     if (null == selector) {
         LogError(false, "Cannot create selector");
+        return false;
     }
 
+    return true;
 }
 
 
