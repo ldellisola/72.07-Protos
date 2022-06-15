@@ -17,5 +17,12 @@ typedef uint8_t byte;
 
 int printSocketAddress(int fd, char *addrBuffer);
 
+/**
+ * It returns the name of the shutdown mode selected
+ * @param shutdownMode
+ * @return
+ */
+const char * GetShutdownModeName(int shutdownMode);
+
 
 #endif //SERVER_UTILS_H

@@ -1,10 +1,10 @@
 //
 // Created by Lucas Dell'Isola on 09/06/2022.
 //
-
+#include "tcp/tcp_connection.h"
 #include <unistd.h>
 #include <memory.h>
-#include "tcp/tcp_connection.h"
+#include <errno.h>
 #include "utils/logger.h"
 #include "utils/utils.h"
 #include "selector/selector.h"
@@ -26,7 +26,7 @@ int DisposeTcpConnection(TcpConnection *socket, fd_selector selector) {
         return ERROR;
     }
 
-    LogInfo("File descriptor %d closed successfully");
+    LogInfo("File descriptor %d closed successfully",socket->FileDescriptor);
 
     free(socket);
 
@@ -41,9 +41,11 @@ int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
         return ERROR;
     }
 
-    LogInfo("Disconnecting from TCP socket on file descriptor %d...", socket->FileDescriptor);
+    LogInfo("Disconnecting %s from TCP socket on file descriptor %d...", GetShutdownModeName(how), socket->FileDescriptor);
 
-    if (shutdown(socket->FileDescriptor, how) < 0) {
+    int shutdownResult = shutdown(socket->FileDescriptor, how);
+
+    if (shutdownResult < 0 && (errno != ENOTCONN || socket->CanWrite)) {
         LogError(true, "Cannot close TCP socket on file descriptor %d...", socket->FileDescriptor);
         return ERROR;
     }
@@ -62,7 +64,7 @@ int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
     }
 
 
-    LogInfo("Successfully disconnected from TCP socket on file descriptor %d!", socket->FileDescriptor);
+    LogInfo("Successfully disconnected %s from TCP socket on file descriptor %d!", GetShutdownModeName(how), socket->FileDescriptor);
 
     return OK;
 }
@@ -85,4 +87,24 @@ bool IsTcpConnectionDisconnected(TcpConnection *connection) {
     }
 
     return !connection->CanWrite && !connection->CanRead;
+}
+
+bool IsTcpConnectionReady(TcpConnection *connection) {
+    int error = 0;
+    socklen_t len = sizeof (error);
+    int result = getsockopt(connection->FileDescriptor,SOL_SOCKET,SO_ERROR,&error,&len);
+
+    if (result < 0)
+    {
+        LogError(false,"Cannot get Socket Options");
+        return false;
+    }
+
+    if (error != 0){
+        errno = error;
+        return false;
+    }
+
+
+    return true;
 }

@@ -37,7 +37,7 @@ CliArguments ParseCli(int argc, char **argv) {
     const char *socks5Address = GetSingleArgumentValue(argc, argv, "-l");
     if (null != socks5Address) {
         args.SocksAddress = socks5Address;
-        LogInfo("Using SOCKS5 ADDRESS %Selector", args.SocksAddress);
+        LogInfo("Using SOCKS5 ADDRESS %s", args.SocksAddress);
     } else
         LogInfo("Using SOCKS5 ADDRESS all interfaces");
 
@@ -51,26 +51,26 @@ CliArguments ParseCli(int argc, char **argv) {
 
     const char *luluAddress = GetSingleArgumentValue(argc, argv, "-L");
     if (null != luluAddress) {
-        LogInfo("Using LULU ADDRESS %Selector", luluAddress);
+        LogInfo("Using LULU ADDRESS %s", luluAddress);
         args.LuluAddress = luluAddress;
     } else
-        LogInfo("Using default LULU ADDRESS %Selector", args.LuluAddress);
+        LogInfo("Using default LULU ADDRESS %s", args.LuluAddress);
 
 
     const char *socks5Port = GetSingleArgumentValue(argc, argv, "-p");
     if (null != socks5Port) {
         args.SocksPort = socks5Port;
-        LogInfo("Using SOCKS5 PORT %Selector", args.SocksPort);
+        LogInfo("Using SOCKS5 PORT %s", args.SocksPort);
     } else
-        LogInfo("Using default SOCKS5 PORT %Selector", args.SocksPort);
+        LogInfo("Using default SOCKS5 PORT %s", args.SocksPort);
 
 
     const char *luluPort = GetSingleArgumentValue(argc, argv, "-P");
     if (null != luluPort) {
-        LogInfo("Using LULU PORT %Selector", luluPort);
+        LogInfo("Using LULU PORT %s", luluPort);
         args.LuluPort = luluPort;
     } else
-        LogInfo("Using default LULU PORT %Selector", args.LuluPort);
+        LogInfo("Using default LULU PORT %s", args.LuluPort);
 
     int start = 0;
     do {
@@ -88,7 +88,7 @@ CliArguments ParseCli(int argc, char **argv) {
         bzero(user.Password, 51);
         strncpy(user.Password, userData + dividerPos + 1, strlen(userData) - dividerPos - 1);
         args.Users[args.UsersCount++] = user;
-        LogInfo("Detecting user %Selector:%Selector", user.Username, user.Password);
+        LogInfo("Detecting user %s:%s", user.Username, user.Password);
 
     } while (start < argc - 1 && args.UsersCount < 10);
 

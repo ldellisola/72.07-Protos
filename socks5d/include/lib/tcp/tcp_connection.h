@@ -49,6 +49,14 @@ int DisconnectFromTcpConnection(TcpConnection *socket, int how);
  */
 bool IsTcpConnectionDisconnected(TcpConnection *connection);
 
+/**
+ * It checks if the Tcp connection is ready to be used. It will set the errno variable
+ * with the appropiate accept error code if the request is not ready.
+ * @param connection tcp connection to check
+ * @return True if the connection is ready to be used
+ */
+bool IsTcpConnectionReady(TcpConnection * connection);
+
 
 #endif //SOCKS5D_TCP_CONNECTION_H
 

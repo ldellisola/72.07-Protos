@@ -50,25 +50,28 @@ unsigned ClientWriteRun(void *data) {
     Socks5Connection *connection = ATTACHMENT(data);
     fd_selector selector = ((SelectorKey *) data)->Selector;
 
+    if (!BufferCanRead(&connection->WriteBuffer)){
+        // TODO handle error
+        if (connection->RemoteTcpConnection->CanRead){
+            SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ);
+            SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_READ);
+        } else{
+
+            DisconnectFromTcpConnection(connection->ClientTcpConnection, SHUT_WR);
+            SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ);
+            SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
+        }
+        return CS_CONNECTED;
+    }
+
     size_t len;
     byte *buffer = BufferReadPtr(&connection->WriteBuffer, &len);
     size_t bytes = WriteToTcpConnection(connection->ClientTcpConnection, buffer, len);
 
-    if (0 == bytes) {
-        // TODO handle error
-        DisconnectFromTcpConnection(connection->ClientTcpConnection, SHUT_WR);
-        SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
-        SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_READ);
-        return CS_CONNECTED;
-    }
-
     BufferReadAdv(&connection->WriteBuffer, bytes);
 
-    // TODO handle error
-    SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ);
-    SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_READ);
 
-    return CS_CONNECTED;
+    return CS_CLIENT_WRITE;
 
 }
 

@@ -103,6 +103,12 @@ unsigned RequestWriteRun(void *data) {
     fd_selector selector = ((SelectorKey *) data)->Selector;
 
     if (!BufferCanRead(d->WriteBuffer)) {
+
+        if (SOCKS5_REPLY_SUCCEEDED != d->Command){
+            return CS_DONE;
+        }
+
+
         // TODO ver esto
         if (
                 SELECTOR_STATUS_SUCCESS ==

@@ -72,20 +72,21 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
             p->DestAddress[p->AddressPosition++] = c;
 
             if (p->AddressLength == p->AddressPosition) {
-                LogInfo("RequestParser Address %Selector", p->DestAddress);
+//                LogInfo("RequestParser Address %s", p->DestAddress);
                 p->State = RequestDestPortFirstByte;
             }
             break;
         case RequestDestPortFirstByte:
-            LogInfo("RequestParser port first byte %x", c);
+            LogInfo("RequestParser port first byte %d", c);
             p->DestPort[0] = c;
             p->State = RequestDestPortSecondByte;
             break;
         case RequestDestPortSecondByte:
-            LogInfo("RequestParser port second byte %x", c);
+            LogInfo("RequestParser port second byte %d", c);
             // TODO: Check if its this way
             p->DestPort[1] = c;
-            LogInfo("RequestParser complete port %d", p->DestPort);
+            uint16_t port =  p->DestPort[0];
+            LogInfo("RequestParser complete port %d", (port << 8) | c);
             p->State = RequestDone;
             break;
         case RequestDone:

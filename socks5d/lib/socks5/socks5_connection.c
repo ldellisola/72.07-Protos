@@ -70,6 +70,7 @@ static StateDefinition socks5ConnectionFsm[] = {
                 .state = CS_ESTABLISH_CONNECTION,
                 .on_arrival = EstablishConnectionInit,
                 .on_write_ready = EstablishConnectionRun,
+                .on_read_ready = EstablishConnectionRun,
                 .on_departure = EstablishConnectionClose
         },
         {
@@ -124,10 +125,10 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection) {
     connection->Fsm.StatesSize = CS_ERROR;
     InitFsm(&connection->Fsm, socks5ConnectionFsm);
 
-    void *readBuffer = calloc(5000, sizeof(byte));
-    void *writeBuffer = calloc(5000, sizeof(byte));
-    BufferInit(&connection->WriteBuffer, 5000, writeBuffer);
-    BufferInit(&connection->ReadBuffer, 5000, readBuffer);
+    void *readBuffer = calloc(1000, sizeof(byte));
+    void *writeBuffer = calloc(1000, sizeof(byte));
+    BufferInit(&connection->WriteBuffer, 1000, writeBuffer);
+    BufferInit(&connection->ReadBuffer, 1000, readBuffer);
 
     LogInfo("Socks5Connection Created!");
     return connection;

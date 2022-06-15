@@ -24,13 +24,9 @@ unsigned EstablishConnectionRun(void *data) {
     Socks5Connection *connection = ATTACHMENT(data);
     RequestData *d = &connection->Data.Request;
 
-    int status = connect(
-            connection->RemoteTcpConnection->FileDescriptor,
-            (struct sockaddr *) &connection->RemoteTcpConnection->Address,
-            connection->RemoteTcpConnection->AddressLength
-    );
+    int isReady = IsTcpConnectionReady(connection->RemoteTcpConnection);
 
-    if (0 == status) {
+    if (isReady) {
         d->Command = SOCKS5_REPLY_SUCCEEDED;
         return CS_REQUEST_WRITE;
     }

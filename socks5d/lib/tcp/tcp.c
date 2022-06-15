@@ -64,7 +64,7 @@ bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler) {
     }
     setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
 
-    LogInfo("Opened passive socket for TCP server");
+    LogInfo("Opened passive socket %d for TCP server",servSock);
 
     if (bind(servSock, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
         LogError(true, "Cannot bind socket to file descriptor");

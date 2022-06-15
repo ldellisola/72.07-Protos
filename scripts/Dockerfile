@@ -23,6 +23,7 @@ RUN apt-get update \
       valgrind \
       lcov \
       pip \
+      netcat \
   && apt-get clean
 
   RUN pip install gcovr

@@ -21,7 +21,6 @@ void LogInfo(const char *message, ...) {
     fprintf(stdout, "INFO: ");
     vfprintf(stdout, message, arg);
     fprintf(stdout, "\n");
-
     va_end (arg);
 }
 

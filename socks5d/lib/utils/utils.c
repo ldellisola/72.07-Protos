@@ -45,5 +45,14 @@ int printSocketAddress(int fd, char *addrBuffer) {
     return 1;
 }
 
+const char *GetShutdownModeName(int shutdownMode) {
+    switch (shutdownMode) {
+        case SHUT_WR: return "write";
+        case SHUT_RD: return "read";
+        case SHUT_RDWR: return "read/write";
+        default: return "unknown";
+    }
+}
+
 
 

@@ -26,7 +26,7 @@ unsigned ConnectedConnectionRun(void *data) {
     }
 
 
-    if (!connection->ClientTcpConnection->CanRead && !connection->RemoteTcpConnection->CanRead) {
+    if (IsTcpConnectionDisconnected(connection->ClientTcpConnection) && IsTcpConnectionDisconnected(connection->RemoteTcpConnection)) {
         return CS_DONE;
     }
 
