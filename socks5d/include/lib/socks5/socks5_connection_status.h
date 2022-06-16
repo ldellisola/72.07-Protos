@@ -158,7 +158,7 @@ typedef enum {
      *   - CS_ESTABLISH_CONNECTION cuando se leyeron todos los bytes
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
-    //CS_DNS_READ,
+    CS_DNS_READ,
     CS_DONE,
     CS_ERROR
 

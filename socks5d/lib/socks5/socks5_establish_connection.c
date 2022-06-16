@@ -5,36 +5,98 @@
 #include <errno.h>
 #include "socks5/socks5_establish_connection.h"
 #include "socks5/socks5_connection.h"
+#include "utils/logger.h"
 
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 void EstablishConnectionInit(unsigned int state, void *data) {
-//    Socks5Connection * connection = ATTACHMENT(data);
-//    EstablishConnectionData * d = &connection->Data.EstablishConnection;
-//    d->ReadBuffer = &connection->ReadBuffer;
+    SelectorKey * key = (SelectorKey *) data;
+    Socks5Connection *connection = ATTACHMENT(data);
+    RequestData *d = &connection->Data.Request;
+
+    // This means that I'm currently connecting to an address
+    if (null == d->CurrentRemoteAddress)
+        return;
+
+
+    // If I'm reentering and reaching this stage, it means one of two things:
+    // 1. It is the first time I'm here, so this connection will be null
+    // 2. It is a reentry after the previous failed attempt. It has to dispose the previously
+    //    opened tcp connection
+    if (null != connection->RemoteTcpConnection)
+        DisposeTcpConnection(connection->RemoteTcpConnection,key->Selector);
+
+
+
+    TcpConnection *remoteConnection = null;
+
+    if (AF_INET == d->CurrentRemoteAddress->ai_family)
+        remoteConnection = ConnectToIPv4TcpServer(
+                d->CurrentRemoteAddress->ai_addr,
+                connection->Handler,
+                connection
+        );
+
+    if (AF_INET6 == d->CurrentRemoteAddress->ai_family)
+        remoteConnection = ConnectToIPv6TcpServer(
+                d->CurrentRemoteAddress->ai_addr,
+                connection->Handler,
+                connection
+        );
+
+    // free address if not dns
+    if (null == d->RemoteAddress && null != d->CurrentRemoteAddress){
+        free(d->CurrentRemoteAddress->ai_addr);
+        free(d->CurrentRemoteAddress);
+    }
+
+
+    if (null == remoteConnection) {
+        LogError(true, "Cannot connect to remote server");
+        d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
+        SelectorSetInterestKey(key,SELECTOR_OP_READ | SELECTOR_OP_WRITE);
+        return;
+    }
+
+    connection->RemoteTcpConnection = remoteConnection;
 }
 
 void EstablishConnectionClose(unsigned int state, void *data) {
-//    Socks5Connection * connection = ATTACHMENT(data);
-//    EstablishConnectionData * d = &connection->Data.EstablishConnection;
-//    BufferReset(d->ReadBuffer);
+    Socks5Connection * connection = ATTACHMENT(data);
+    RequestData * d = &connection->Data.Request;
+
+    // free dns address
+    if (null != d->RemoteAddress)
+        freeaddrinfo(d->RemoteAddress);
 }
 
 unsigned EstablishConnectionRun(void *data) {
+    SelectorKey * key = (SelectorKey *) data;
     Socks5Connection *connection = ATTACHMENT(data);
     RequestData *d = &connection->Data.Request;
+    unsigned selectorResult = 0;
+
+    if (d->Command != SOCKS5_REPLY_NOT_DECIDED){
+        // If I'm here it's because it never connected, so I don't have to dispose the remote connection
+        selectorResult = SelectorSetInterest(key->Selector, connection->ClientTcpConnection->FileDescriptor,SELECTOR_OP_WRITE);
+        return SELECTOR_STATUS_SUCCESS == selectorResult ? CS_REQUEST_WRITE : CS_ERROR;
+    }
 
     int isReady = IsTcpConnectionReady(connection->RemoteTcpConnection);
 
     if (isReady) {
         d->Command = SOCKS5_REPLY_SUCCEEDED;
-        return CS_REQUEST_WRITE;
+        selectorResult |= SelectorSetInterest(key->Selector, connection->ClientTcpConnection->FileDescriptor,SELECTOR_OP_WRITE);
+        selectorResult |= SelectorSetInterest(key->Selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
+
+        return SELECTOR_STATUS_SUCCESS == selectorResult ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
     switch (errno) {
         case EISCONN:
         case EINPROGRESS:
         case EALREADY:
+            d->CurrentRemoteAddress = null;
             return CS_ESTABLISH_CONNECTION;
         case EOPNOTSUPP:
             d->Command = SOCKS5_REPLY_CONNECTION_NOT_ALLOWED;
@@ -43,7 +105,8 @@ unsigned EstablishConnectionRun(void *data) {
             d->Command = SOCKS5_REPLY_UNREACHABLE_NETWORK;
             break;
         case EHOSTUNREACH:
-            d->Command = SOCKS5_REPLY_UNREACHABLE_HOST;
+            // If this happens, I need to try with another address
+//            d->Command = SOCKS5_REPLY_UNREACHABLE_HOST;
             break;
         case ECONNREFUSED:
             d->Command = SOCKS5_REPLY_CONNECTION_REFUSED;
@@ -56,15 +119,21 @@ unsigned EstablishConnectionRun(void *data) {
             break;
     }
 
-    if (SELECTOR_STATUS_SUCCESS !=
-        SelectorSetInterest(((SelectorKey *) data)->Selector, connection->ClientTcpConnection->FileDescriptor,
-                            SELECTOR_OP_WRITE)) {
-        return CS_ERROR;
+    if (null != d->CurrentRemoteAddress->ai_next && SOCKS5_REPLY_NOT_DECIDED == d->Command){
+        d->CurrentRemoteAddress = d->CurrentRemoteAddress->ai_next;
+        return CS_ESTABLISH_CONNECTION;
     }
 
-    if (SELECTOR_STATUS_SUCCESS != SelectorSetInterestKey(data, SELECTOR_OP_NOOP)) {
-        return CS_ERROR;
-    }
 
-    return CS_REQUEST_WRITE;
+    if (null == d->CurrentRemoteAddress->ai_next && SOCKS5_REPLY_NOT_DECIDED == d->Command)
+        // If this line is reached, then it means that all the available addresses were tried
+        // and we could not connect to any of them, so we are sending an unreachable host reply
+        d->Command = SOCKS5_REPLY_UNREACHABLE_HOST;
+
+
+    selectorResult |= SelectorSetInterest(key->Selector, connection->ClientTcpConnection->FileDescriptor,SELECTOR_OP_WRITE);
+    selectorResult |= SelectorSetInterest(key->Selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
+
+    return SELECTOR_STATUS_SUCCESS == selectorResult ? CS_REQUEST_WRITE : CS_ERROR;
+
 }

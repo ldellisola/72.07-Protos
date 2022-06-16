@@ -84,8 +84,7 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
         case RequestDestPortSecondByte:
             LogInfo("RequestParser port second byte %d", c);
             p->DestPort[1] = c;
-            uint16_t port =  p->DestPort[0];
-            LogInfo("RequestParser complete port %d", (port << 8) | c);
+            LogInfo("RequestParser complete port %d", GetPortNumberFromNetworkOrder(p->DestPort));
             p->State = RequestDone;
             break;
         case RequestDone:

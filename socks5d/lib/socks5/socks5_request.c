@@ -2,12 +2,15 @@
 // Created by Lucas Dell'Isola on 14/06/2022.
 //
 
+#include <memory.h>
+#include <pthread.h>
+#include <stdio.h>
 #include "socks5/socks5_request.h"
 #include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 #include "socks5/socks5_messages.h"
 
-unsigned WriteMessageToBuffer(void *selectorKey, RequestData *requestData, size_t bufferSize, byte *buffer, int cmd);
+void * ResolveDNS(void *data);
 
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
@@ -15,7 +18,7 @@ void RequestReadInit(unsigned int state, void *data) {
 
     Socks5Connection *connection = ATTACHMENT(data);
     RequestData *d = &connection->Data.Request;
-    d->Command = 0;
+    d->Command = SOCKS5_REPLY_NOT_DECIDED;
     d->ReadBuffer = &connection->ReadBuffer;
     d->WriteBuffer = &connection->WriteBuffer;
     RequestParserReset(&d->Parser);
@@ -53,36 +56,48 @@ unsigned RequestReadRun(void *data) {
     }
 
     if (d->Parser.AType == SOCKS5_ADDRESS_TYPE_FQDN) {
-        d->Command = SOCKS5_REPLY_ADDRESS_TYPE_NOT_SUPPORTED;
+
+        SelectorKey * allocatedKey = malloc(sizeof(SelectorKey));
+        if(null == allocatedKey)
+            d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
+        else
+        {
+//            memcpy(allocatedKey, data, sizeof(SelectorKey));
+//            if(-1 == pthread_create(&tid, 0, ResolveDNS, allocatedKey))
+//                d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
+//            else
+//                return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_DNS_READ : CS_ERROR;
+//
+        }
         return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
+//    d->UsesDns = false;
+    d->RemoteAddress = null;
+    d->CurrentRemoteAddress = calloc(1,sizeof(struct addrinfo));
+    d->CurrentRemoteAddress->ai_socktype = SOCK_STREAM;
+    d->CurrentRemoteAddress->ai_flags = AI_PASSIVE;
 
-    TcpConnection *remoteConnection = null;
+    if (SOCKS5_ADDRESS_TYPE_IPV4 == d->Parser.AType){
+        struct sockaddr_in * in = calloc(1, sizeof(struct sockaddr_in));
+        d->CurrentRemoteAddress->ai_family = AF_INET;
+        in->sin_family = AF_INET;
+        memcpy(&in->sin_addr,d->Parser.DestAddress,4);
+        memcpy(&in->sin_port,d->Parser.DestPort,2);
 
-    if (SOCKS5_ADDRESS_TYPE_IPV4 == d->Parser.AType)
-        remoteConnection = ConnectToIPv4TcpServer(
-                d->Parser.DestAddress,
-                d->Parser.DestPort,
-                connection->Handler,
-                connection
-        );
-
-    if (SOCKS5_ADDRESS_TYPE_IPV6 == d->Parser.AType)
-        remoteConnection = ConnectToIPv6TcpServer(d->Parser.DestAddress,
-            d->Parser.DestPort,
-            connection->Handler,
-            connection
-        );
-
-    if (null == remoteConnection) {
-        LogError(true, "Cannot connect to remote server");
-        d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
-        int aa= SelectorSetInterestKey(data, SELECTOR_OP_WRITE);
-        return SELECTOR_STATUS_SUCCESS ==aa ? CS_REQUEST_WRITE : CS_ERROR;
+        d->CurrentRemoteAddress->ai_addr = (struct sockaddr *) in;
     }
 
-    connection->RemoteTcpConnection = remoteConnection;
+    if (SOCKS5_ADDRESS_TYPE_IPV6 == d->Parser.AType){
+        struct sockaddr_in6 * in6 = calloc(1, sizeof(struct sockaddr_in6));
+        d->CurrentRemoteAddress->ai_family = AF_INET6;
+        in6->sin6_family = AF_INET6;
+        memcpy(&in6->sin6_addr,d->Parser.DestAddress,16);
+        memcpy(&in6->sin6_port,d->Parser.DestPort,2);
+
+        d->CurrentRemoteAddress->ai_addr = (struct sockaddr *) in6;
+    }
+
 
     return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_ESTABLISH_CONNECTION
                                                                                      : CS_ERROR;
@@ -139,5 +154,56 @@ unsigned RequestWriteRun(void *data) {
 
     return CS_REQUEST_WRITE;
 }
+
+void * ResolveDNS(void *data){
+    SelectorKey * key = (SelectorKey*) data;
+    Socks5Connection * connection = ATTACHMENT(data);
+    RequestData * d = &connection->Data.Request;
+
+    pthread_detach(pthread_self());
+
+    d->RemoteAddress = null;
+    struct addrinfo hints = {
+            .ai_family = AF_UNSPEC,
+            .ai_socktype = SOCK_STREAM,
+            .ai_flags = AI_PASSIVE,
+            .ai_protocol = 0,
+            .ai_canonname = null,
+            .ai_addr = null,
+            .ai_next = null
+    };
+
+    char buff[10];
+    snprintf(buff, sizeof(buff),"%d", ntohs(GetPortNumberFromNetworkOrder(d->Parser.DestPort)));
+
+    int result = getaddrinfo(
+            (const char *)d->Parser.DestAddress,
+                buff,
+                &hints,
+                &d->RemoteAddress
+    );
+
+    if (0 != result)
+    {
+        d->RemoteAddress = null;
+    }
+
+    SelectorNotifyBlock(key->Selector,key->Fd);
+    free(data);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 

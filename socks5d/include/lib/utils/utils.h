@@ -31,5 +31,13 @@ const char * GetShutdownModeName(int shutdownMode);
  */
 int GetAddressFamily(const char * address);
 
+/**
+ * It converts a port from network order to a single integer
+ * @param port 2 byte array
+ * @return port number
+ */
+uint16_t GetPortNumberFromNetworkOrder(const byte port[2]);
+
+
 
 #endif //SERVER_UTILS_H

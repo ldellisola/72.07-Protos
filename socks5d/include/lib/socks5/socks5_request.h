@@ -11,7 +11,8 @@
 typedef struct {
     RequestParser Parser;
     ArrayBuffer *WriteBuffer, *ReadBuffer;
-    byte Command;
+    int8_t Command;
+    struct addrinfo * RemoteAddress, * CurrentRemoteAddress;
 } RequestData;
 
 

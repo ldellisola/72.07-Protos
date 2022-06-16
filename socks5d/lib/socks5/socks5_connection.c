@@ -14,6 +14,7 @@
 #include "socks5/socks5_connected.h"
 #include "socks5/socks5_client.h"
 #include "socks5/socks5_remote.h"
+#include "socks5/socks5_dns.h"
 
 // TODO: Test
 
@@ -69,6 +70,7 @@ static StateDefinition socks5ConnectionFsm[] = {
         {
                 .state = CS_ESTABLISH_CONNECTION,
                 .on_arrival = EstablishConnectionInit,
+                .on_reentry = EstablishConnectionInit,
                 .on_write_ready = EstablishConnectionRun,
                 .on_read_ready = EstablishConnectionRun,
                 .on_departure = EstablishConnectionClose
@@ -101,6 +103,10 @@ static StateDefinition socks5ConnectionFsm[] = {
                 .on_write_ready = ClientWriteRun,
                 .on_departure = ClientWriteClose
         },
+        {
+            .state = CS_DNS_READ,
+            .on_block_ready = DnsRead
+            },
         {
                 .state = CS_DONE,
         },

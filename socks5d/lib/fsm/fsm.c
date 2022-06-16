@@ -47,6 +47,10 @@ inline static void jump(FiniteStateMachine *fsm, unsigned next, void *selectorKe
             fsm->CurrentState->on_arrival(fsm->CurrentState->state, selectorKey);
         }
     }
+    else {
+        if (fsm->CurrentState != NULL && fsm->CurrentState->on_reentry != NULL)
+            fsm->CurrentState->on_reentry(fsm->CurrentState->state,selectorKey);
+    }
 }
 
 unsigned HandleReadFsm(FiniteStateMachine *fsm, void *selectorKey) {

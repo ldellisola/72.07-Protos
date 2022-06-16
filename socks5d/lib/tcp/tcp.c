@@ -195,7 +195,19 @@ size_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t content
     return bytes;
 }
 
-TcpConnection *ConnectToIPv4TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data) {
+TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler *handler, void *data) {
+
+    if (null == address) {
+        LogError(false, "Address cannot be null");
+        return null;
+    }
+
+    if (AF_INET != address->sa_family){
+        LogError(false,"Only IPv4 addresses are supported");
+        return null;
+    }
+
+
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
 
@@ -225,31 +237,30 @@ TcpConnection *ConnectToIPv4TcpServer(byte *address, byte port[2], const FdHandl
         return null;
     }
 
-    struct sockaddr_in addr = {
-            .sin_family = AF_INET
-    };
 
-    memcpy(&(addr.sin_addr), address, 4);
-    memcpy(&(addr.sin_port), port, 2);
-
-    char buff[500];
-    memset(buff,0,500);
-    inet_ntop(AF_INET,&addr,buff,sizeof(addr));
-
-
-    LogInfo("Address: %s",buff);
-
-    int result = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
+    int result = connect(sock, address, INET_ADDRSTRLEN);
 
     if (EINPROGRESS == errno || 0 == result) {
-        return CreateTcpConnection(sock, (struct sockaddr_storage *) &addr, sizeof(addr));
+        return CreateTcpConnection(sock, (struct sockaddr_storage *) address, sizeof(*address));
     }
 
     return null;
 }
 
-TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data) {
+TcpConnection *ConnectToIPv6TcpServer(struct sockaddr * address, const FdHandler *handler, void *data) {
     LogInfo("Connecting to IPv6 server...");
+
+    if (null == address){
+        LogError(false,"Address cannot be null");
+        return null;
+    }
+
+    if (AF_INET6 != address->sa_family){
+        LogError(false,"Only IPv6 addresses are supported");
+        return null;
+    }
+
+
     int sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
     LogInfo("Remote IPv6 connection with file descriptor %d",sock);
@@ -270,14 +281,8 @@ TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandl
         return false;
     }
 
-    struct sockaddr_in6 addr = {
-            .sin6_family = AF_INET6,
-    };
-    memcpy(&addr.sin6_addr,address,16);
 
-    memcpy(&(addr.sin6_port), port, 2);
-
-    int result = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
+    int result = connect(sock, address, INET6_ADDRSTRLEN);
 
     if (EINPROGRESS == errno || 0 == result) {
         SelectorStatus status = SelectorRegister(
@@ -294,7 +299,7 @@ TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandl
             return null;
         }
         LogInfo("Remote IPv6 connection succeeded!");
-        return CreateTcpConnection(sock, (struct sockaddr_storage *) &addr, sizeof(addr));
+        return CreateTcpConnection(sock, (struct sockaddr_storage *) address, sizeof(*address));
     }
 
     return null;

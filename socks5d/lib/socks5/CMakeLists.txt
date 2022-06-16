@@ -15,6 +15,7 @@ set(
         socks5_connected.c
         socks5_client.c
         socks5_remote.c
+        socks5_dns.c
 )
 
 add_library(socks5 STATIC ${SOURCES})

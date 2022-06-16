@@ -73,9 +73,9 @@ ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t buffer
 size_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength);
 
 
-TcpConnection *ConnectToIPv4TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data);
+TcpConnection *ConnectToIPv4TcpServer(struct sockaddr *address, const FdHandler *handler, void *data);
 
-TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data);
+TcpConnection *ConnectToIPv6TcpServer(struct sockaddr *address, const FdHandler *handler, void *data);
 
 
 #endif //SERVER_TCP_H

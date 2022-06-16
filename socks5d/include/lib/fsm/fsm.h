@@ -38,6 +38,9 @@ typedef struct {
     /** ejecutado al arribar al estado */
     void (*on_arrival)(const unsigned state, void *selectorKey);
 
+    /** ejecutado cada vez que se reentra al mismo estado */
+    void (*on_reentry)(const unsigned state, void *selectorKey);
+
     /** ejecutado al salir del estado */
     void (*on_departure)(const unsigned state, void *selectorKey);
 
