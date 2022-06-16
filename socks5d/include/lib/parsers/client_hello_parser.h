@@ -10,36 +10,38 @@
 #include <stdbool.h>
 
 #define CR 0x0D
-#define LF 0x0A
 
 typedef enum {
     Hello,
     HelloUsername,
     HelloPassword,
+    HelloCRLF,
     HelloFinished,
     HelloInvalidState
 
-} HelloParserState;
+} ClientHelloParserState;
 
 typedef struct {
-    HelloParserState State;
+    ClientHelloParserState State;
+    ClientHelloParserState PrevState;
     //TODO: checkear que cuando termina la palabra que este en 0
     char UName[51];
     char Passwd[51];
+    char Hello[5];
     uint8_t index;
-    char *word;
+    char* word;
 
-} HelloParser;
+} ClientHelloParser;
 
-HelloParserState HelloParserFeed(HelloParser *p, byte c);
+ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c);
 
-void HelloParserReset(HelloParser *p);
+void ClientHelloParserReset(ClientHelloParser *p);
 
-ssize_t HelloParserConsume(HelloParser *p, byte *c, ssize_t length);
+ssize_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, ssize_t length);
 
-bool HelloParserHasFailed(HelloParserState state);
+bool ClientHelloParserHasFailed(ClientHelloParserState state);
 
-bool HelloParserHasFinished(HelloParserState state);
+bool ClientHelloParserHasFinished(ClientHelloParserState state);
 
 #endif //SOCKS5D_CLIENT_HELLO_PARSER_H
 
