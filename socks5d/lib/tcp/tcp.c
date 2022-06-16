@@ -278,17 +278,18 @@ TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandl
         return null;
     }
 
-    char buffer[100];
-    memset(buffer,0,100);
-    struct in6_addr in6Addr;
-    memcpy(&in6Addr,address,16);
+//    char buffer[100];
+//    memset(buffer,0,100);
+//    struct in6_addr in6Addr;
 
     struct sockaddr_in6 addr = {
             .sin6_family = AF_INET6,
     };
-    const char * aaa = inet_ntop(AF_INET6,&in6Addr,buffer,INET6_ADDRSTRLEN);
+    memcpy(&addr.sin6_addr,address,16);
 
-    inet_pton(AF_INET6, aaa, &addr.sin6_addr);
+//    const char * aaa = inet_ntop(AF_INET6,&in6Addr,buffer,INET6_ADDRSTRLEN);
+
+//    inet_pton(AF_INET6, aaa, &addr.sin6_addr);
 
     memcpy(&(addr.sin6_port), port, 2);
 
