@@ -161,7 +161,7 @@ Suite *RegisterClientHelloParserTestSuit() {
     tcase_add_test(tc, Feed_HELLOUsername_Succeeds);
     tcase_add_test(tc, Feed_HELLO_Succeeds);
     tcase_add_test(tc, Feed_HELLO_CR_COMPLETE_Succeeds);
-    tcase_add_test(tc, Feed_HELLO_CRLF_COMPLETE_Fails);
+    tcase_add_test(tc, Feed_HELLO_CRLF_Username_COMPLETE_Fails);
     suite_add_tcase(s, tc);
 
     return s;

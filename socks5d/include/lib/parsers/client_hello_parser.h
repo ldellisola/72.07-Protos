@@ -5,6 +5,7 @@
 #ifndef SOCKS5D_CLIENT_HELLO_PARSER_H
 #define SOCKS5D_CLIENT_HELLO_PARSER_H
 
+#include <unistd.h>
 #include "utils/utils.h"
 #include <string.h>
 #include <stdbool.h>
@@ -24,7 +25,6 @@ typedef enum {
 typedef struct {
     ClientHelloParserState State;
     ClientHelloParserState PrevState;
-    //TODO: checkear que cuando termina la palabra que este en 0
     char UName[51];
     char Passwd[51];
     char Hello[5];
@@ -37,7 +37,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c);
 
 void ClientHelloParserReset(ClientHelloParser *p);
 
-ssize_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, ssize_t length);
+size_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, size_t length);
 
 bool ClientHelloParserHasFailed(ClientHelloParserState state);
 

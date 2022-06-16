@@ -9,6 +9,7 @@ set(
         hello_parser.c
         request_parser.c
         client_hello_parser.c
+        client_goodbye_parser.c
 )
 
 add_library(parsers STATIC ${SOURCES})

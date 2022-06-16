@@ -2,7 +2,6 @@
 // Created by tluci on 14/6/2022.
 //
 
-#include <unistd.h>
 #include "parsers/client_hello_parser.h"
 #include "utils/logger.h"
 
@@ -108,7 +107,7 @@ bool ClientHelloParserHasFailed(ClientHelloParserState state) {
     return state == HelloInvalidState ? true : false;
 }
 
-ssize_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, ssize_t length) {
+size_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, size_t length) {
     LogInfo("AuthParser consuming %d bytes", length);
     if (null == p) {
         LogError(false, "Cannot consume if HelloParser is NULL");
@@ -120,7 +119,7 @@ ssize_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, ssize_t length) 
         return 0;
     }
 
-    for (int i = 0; i < length; ++i) {
+    for (size_t i = 0; i < length; ++i) {
         ClientHelloParserState state = ClientHelloParserFeed(p, c[i]);
         if (ClientHelloParserHasFinished(state))
             return i + 1;

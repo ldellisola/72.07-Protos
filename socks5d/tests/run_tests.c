@@ -10,6 +10,7 @@
 #include "src/server/cli_test.h"
 #include "lib/socks5/socks5_messages_test.h"
 #include "parsers/client_hello_parser_test.h"
+#include "parsers/client_goodbye_parser_test.h"
 
 
 int main(void) {
@@ -21,6 +22,7 @@ int main(void) {
             RegisterCliTestSuit(),
             RegisterSocks5MessagesTestSuit(),
             RegisterClientHelloParserTestSuit(),
+            RegisterClientGoodbyeParserTestSuit(),
             NULL
     };
     int failedTests = 0;
