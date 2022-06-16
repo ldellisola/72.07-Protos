@@ -52,20 +52,31 @@ unsigned RequestReadRun(void *data) {
         return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
-    if (d->Parser.AType != SOCKS5_ADDRESS_TYPE_IPV4) {
+    if (d->Parser.AType == SOCKS5_ADDRESS_TYPE_FQDN) {
         d->Command = SOCKS5_REPLY_ADDRESS_TYPE_NOT_SUPPORTED;
         return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
-    TcpConnection *remoteConnection = ConnectToIPv4TcpServer(
-            d->Parser.DestAddress,
+
+    TcpConnection *remoteConnection = null;
+
+    if (SOCKS5_ADDRESS_TYPE_IPV4 == d->Parser.AType)
+        remoteConnection = ConnectToIPv4TcpServer(
+                d->Parser.DestAddress,
+                d->Parser.DestPort,
+                connection->Handler,
+                connection
+        );
+
+    if (SOCKS5_ADDRESS_TYPE_IPV6 == d->Parser.AType)
+        remoteConnection = ConnectToIPv6TcpServer(d->Parser.DestAddress,
             d->Parser.DestPort,
             connection->Handler,
             connection
-    );
+        );
 
     if (null == remoteConnection) {
-        LogError(false, "Cannot connect to remote server");
+        LogError(true, "Cannot connect to remote server");
         d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
         return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
     }

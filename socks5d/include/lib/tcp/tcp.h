@@ -75,5 +75,7 @@ size_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t content
 
 TcpConnection *ConnectToIPv4TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data);
 
+TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data);
+
 
 #endif //SERVER_TCP_H
