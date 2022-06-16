@@ -3,3 +3,7 @@
 //
 
 #include "lulu/lulu.h"
+
+void foo(){
+
+}
