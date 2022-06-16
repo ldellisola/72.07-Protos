@@ -249,7 +249,11 @@ TcpConnection *ConnectToIPv4TcpServer(byte *address, byte port[2], const FdHandl
 }
 
 TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandler *handler, void *data) {
+    LogInfo("Connecting to IPv6 server...");
     int sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
+
+    LogInfo("Remote IPv6 connection with file descriptor %d",sock);
+
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
 
     if (-1 == SelectorFdSetNio(sock)) {
@@ -258,57 +262,38 @@ TcpConnection *ConnectToIPv6TcpServer(byte *address, byte port[2], const FdHandl
         return false;
     }
 
+    LogInfo("Sock with file descriptor %d is non-blocking",sock);
+
     if (null == selector) {
         LogError(false, "Selector not created!");
         close(sock);
         return false;
     }
 
-    SelectorStatus status = SelectorRegister(
-            selector,
-            sock,
-            handler,
-            SELECTOR_OP_WRITE | SELECTOR_OP_READ,
-            data
-    );
-
-    if (status != SELECTOR_STATUS_SUCCESS) {
-        LogError(false, "Cannot register TCP socket on selector");
-        close(sock);
-        return null;
-    }
-
-//    char buffer[100];
-//    memset(buffer,0,100);
-//    struct in6_addr in6Addr;
-
     struct sockaddr_in6 addr = {
             .sin6_family = AF_INET6,
     };
     memcpy(&addr.sin6_addr,address,16);
 
-//    const char * aaa = inet_ntop(AF_INET6,&in6Addr,buffer,INET6_ADDRSTRLEN);
-
-//    inet_pton(AF_INET6, aaa, &addr.sin6_addr);
-
     memcpy(&(addr.sin6_port), port, 2);
-
-//
-//    for(int i = 0 ; i <8; i++){
-//        byte a = buff[i];
-//        buff[i] = buff[15-i];
-//        buff[15-i] = a;
-//    }
-
-//    LogInfo("Address: %s",aaa);
-
-
-//    const char * other = "2800:3f0:4001:81f::2003";
-
 
     int result = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
 
     if (EINPROGRESS == errno || 0 == result) {
+        SelectorStatus status = SelectorRegister(
+                selector,
+                sock,
+                handler,
+                SELECTOR_OP_WRITE | SELECTOR_OP_READ,
+                data
+        );
+
+        if (status != SELECTOR_STATUS_SUCCESS) {
+            LogError(false, "Cannot register TCP socket on selector");
+            close(sock);
+            return null;
+        }
+        LogInfo("Remote IPv6 connection succeeded!");
         return CreateTcpConnection(sock, (struct sockaddr_storage *) &addr, sizeof(addr));
     }
 

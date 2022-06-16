@@ -78,7 +78,8 @@ unsigned RequestReadRun(void *data) {
     if (null == remoteConnection) {
         LogError(true, "Cannot connect to remote server");
         d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
-        return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
+        int aa= SelectorSetInterestKey(data, SELECTOR_OP_WRITE);
+        return SELECTOR_STATUS_SUCCESS ==aa ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
     connection->RemoteTcpConnection = remoteConnection;
