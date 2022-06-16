@@ -88,7 +88,7 @@ CliArguments ParseCli(int argc, char **argv) {
         bzero(user.Password, 51);
         strncpy(user.Password, userData + dividerPos + 1, strlen(userData) - dividerPos - 1);
         args.Users[args.UsersCount++] = user;
-        LogInfo("Detecting user %s:%s", user.Username, user.Password);
+        LogInfo("Detected user %s:%s", user.Username, user.Password);
 
     } while (start < argc - 1 && args.UsersCount < 10);
 

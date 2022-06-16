@@ -24,6 +24,7 @@ RUN apt-get update \
       lcov \
       pip \
       netcat \
+      curl \
   && apt-get clean
 
   RUN pip install gcovr
