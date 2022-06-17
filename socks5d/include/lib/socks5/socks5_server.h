@@ -5,7 +5,7 @@
 #ifndef SERVER_SOCKS_SERVER_H
 #define SERVER_SOCKS_SERVER_H
 #include <stdbool.h>
-
+#include <time.h>
 /**
  * It initializes a Socks5Server on IPv4
  * @param port Port where the server will be listening to, in the form of a null terminated string
@@ -27,13 +27,13 @@ bool RegisterSocks5ServerOnIPv6(const char *port, const char *address);
  * @param address Address to bind the server to. It can be null
  * @return Whether the server was started successfully
  */
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize);
-
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout);
 
 /**
  * It safely disposes all the allocated memory by the socks5 server
  */
 void DisposeSocks5Server();
+
 
 
 #endif //SERVER_SOCKS_SERVER_H

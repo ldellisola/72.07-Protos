@@ -73,9 +73,10 @@ const char *SelectorError(SelectorStatus status);
 typedef struct {
     /** señal a utilizar para notificaciones internas */
     const int Signal;
-
     /** tiempo máximo de bloqueo durante `selector_iteratate' */
     struct timespec SelectTimeout;
+    void (*OnTimeout)(fd_selector fdSelector);
+    void (*OnConnectionCall)(void * data);
 } SelectorOptions;
 
 /** inicializa la librería */

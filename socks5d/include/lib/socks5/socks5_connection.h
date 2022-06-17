@@ -16,6 +16,7 @@
 
 
 typedef struct {
+    time_t LastConnectionOn;
     FiniteStateMachine Fsm;
     TcpConnection *ClientTcpConnection;
     TcpConnection *RemoteTcpConnection;
@@ -50,6 +51,26 @@ void CreateSocks5ConnectionPool(int initialSize);
  * It disposes all Socks5 connections
  */
 void CleanSocks5ConnectionPool();
+
+/**
+ * It will check all current active socks5 connections and see if they are currently timed out
+ * @param seconds
+ * @param nanoseconds
+ */
+void CheckForTimeoutInSocks5Connections(fd_selector fdSelector);
+
+/**
+ * It updates the LastConnectionOn field
+ * @param data pointer to Socks5Connection
+ */
+void NotifySocks5ConnectionAccess(void * data);
+
+/**
+ * It sets the time it takes for a connection to timeout
+ * @param timeout Time in seconds. If its 0 or negative, then connections will never timeout
+ */
+void SetConnectionTimeout(time_t timeout);
+
 
 
 #endif //SERVER_SOCKS_CONNECTION_H

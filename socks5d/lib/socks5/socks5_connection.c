@@ -4,6 +4,7 @@
 #include "socks5/socks5_connection.h"
 #include <string.h>
 #include <assert.h>
+#include <time.h>
 #include "socks5/socks5_hello.h"
 #include "utils/logger.h"
 #include "parsers/auth_parser.h"
@@ -123,6 +124,7 @@ typedef struct PooledSocks5Connection_{
 }PooledSocks5Connection;
 
 PooledSocks5Connection * socks5Pool;
+time_t socksMaxTimeout = 100;
 
 Socks5Connection * GetSocks5Connection();
 void DestroySocks5Connection(Socks5Connection * connection);
@@ -207,6 +209,48 @@ void CleanSocks5ConnectionPool() {
         next = conn->Next;
         free(conn);
     }
+}
+
+void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
+    if (null == socks5Pool) {
+        LogError(false, "SOCKS5 pool was not initialized");
+    }
+    if (socksMaxTimeout <= 0)
+        return;
+
+    time_t currentTime = time(null);
+    if ((time_t) -1 == currentTime)
+    {
+        LogError(true,"Cannot get current time");
+        return;
+    }
+
+    for (PooledSocks5Connection * temp = socks5Pool; temp != null ; temp = temp->Next){
+        if (PooledSocks5ConnectionEmpty == temp->Status)
+            continue;
+
+        if (currentTime - temp->Connection.LastConnectionOn >= socksMaxTimeout) {
+            LogInfo("Connection with client file descriptor %d and remote file descriptor %d timed out after %ld seconds",
+                    temp->Connection.ClientTcpConnection->FileDescriptor,
+                    temp->Connection.RemoteTcpConnection->FileDescriptor,
+                    currentTime - temp->Connection.LastConnectionOn
+                    );
+            DisposeSocks5Connection(&temp->Connection, fdSelector);
+        }
+    }
+}
+
+void NotifySocks5ConnectionAccess(void *data) {
+    Socks5Connection * connection = data;
+    if (null == connection)
+        return;
+
+    connection->LastConnectionOn = time(null);
+
+}
+
+void SetConnectionTimeout(time_t timeout) {
+    socksMaxTimeout = timeout;
 }
 
 Socks5Connection *GetSocks5Connection() {

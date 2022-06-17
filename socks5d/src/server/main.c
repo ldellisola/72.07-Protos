@@ -5,6 +5,7 @@
 #include "server/cli.h"
 #include "tcp/tcp.h"
 #include "socks5/socks5_server.h"
+#include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 
 
@@ -21,14 +22,26 @@ int main(int argc, char **argv) {
 
     signal(SIGTERM, sigterm_handler);
     signal(SIGINT, sigterm_handler);
+    signal(SIGALRM, sigterm_handler);
 
     CliArguments arguments = ParseCli(argc, argv);
 
+    SelectorOptions options = {
+            .Signal = SIGALRM,
+            .SelectTimeout = {
+                    .tv_sec = 1,
+                    .tv_nsec = 0,
+            },
+            .OnTimeout = CheckForTimeoutInSocks5Connections,
+            .OnConnectionCall = NotifySocks5ConnectionAccess
+
+    };
     int socks5PoolSize = 50;
+    time_t socks5Timeout = 500;
 
     bool startServer = true;
-    startServer &= InitTcpServer(null, socks5PoolSize * 2);
-    startServer &= RegisterSocks5Server(arguments.SocksPort, arguments.SocksAddress, socks5PoolSize);
+    startServer &= InitTcpServer(&options, socks5PoolSize * 2);
+    startServer &= RegisterSocks5Server(arguments.SocksPort, arguments.SocksAddress, socks5PoolSize, socks5Timeout);
 
     if (startServer)
         RunTcpServer();

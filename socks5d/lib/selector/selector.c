@@ -22,7 +22,6 @@
 #include "selector/selector.h"
 
 
-#define N(x) (sizeof(x)/sizeof((x)[0]))
 
 #define ERROR_DEFAULT_MSG "something failed"
 
@@ -445,6 +444,10 @@ static void handle_iteration(fd_selector s) {
         if (ITEM_USED(item)) {
             key.Fd = item->Fd;
             key.Data = item->Data;
+
+            if (NULL != conf.OnConnectionCall && NULL != key.Data)
+                conf.OnConnectionCall(key.Data);
+
             if (FD_ISSET(item->Fd, &s->SlaveRead)) {
                 if (SELECTOR_OP_READ & item->Interest) {
                     if (0 == item->Handler->handle_read) {
@@ -548,7 +551,14 @@ SelectorStatus SelectorSelect(fd_selector s) {
                 goto finally;
 
         }
-    } else {
+    }
+    else if (0 == fds)
+    {
+        if (NULL != s && NULL != conf.OnTimeout)
+            conf.OnTimeout(s);
+    }
+    else
+    {
         handle_iteration(s);
     }
     if (ret == SELECTOR_STATUS_SUCCESS) {

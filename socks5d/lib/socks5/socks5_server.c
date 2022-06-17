@@ -19,9 +19,9 @@ const FdHandler socksv5 = {
         .handle_close      = NULL, // nada que liberar
 };
 
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize) {
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout) {
     CreateSocks5ConnectionPool(poolSize);
-
+    SetConnectionTimeout(timeout);
     if (null == address){
         bool success = RegisterSocks5ServerOnIPv4(port,null);
         success &= RegisterSocks5ServerOnIPv6(port,null);
