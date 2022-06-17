@@ -229,6 +229,22 @@ START_TEST(Feed_Password_CR_Succeeds)
         ck_assert_int_eq(state, UserFinished);
     }
 END_TEST
+START_TEST(Feed_Username_CR_Succeeds)
+    {
+
+        // Arrange
+        ClientSetUserParserReset(&parser);
+        byte message[] = {'S', 'E','T','|','U','S','E','R','|','\r','|','\r','\r','\n'};
+        ClientSetUserParserState state;
+        // Act
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != UserInvalidState; i++ ){
+            state = ClientSetUserParserFeed(&parser, message[i]);
+        }
+
+        // Assert
+        ck_assert_int_eq(state, UserFinished);
+    }
+END_TEST
 
 Suite *RegisterClientSetUserParserTestSuit() {
     Suite *s = suite_create("SetUserClientParser");
@@ -246,6 +262,7 @@ Suite *RegisterClientSetUserParserTestSuit() {
     tcase_add_test(tc, Feed_UserName_Empty_Fails);
     tcase_add_test(tc, Feed_Password_Empty_Fails);
     tcase_add_test(tc, Feed_Password_CR_Succeeds);
+    tcase_add_test(tc, Feed_Username_CR_Succeeds);
     suite_add_tcase(s, tc);
 
     return s;

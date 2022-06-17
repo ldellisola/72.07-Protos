@@ -138,6 +138,23 @@ ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c)
                 p->Index++;
                 break;
             }
+            if(c == '|'){
+                if(p->PrevState == UserName){
+                    if(p->Index == MAXLONG+1){
+                        LogError(false, "Username can have max 255 characters");
+                        p->State = UserInvalidState;
+                        break;
+                    }
+                    p->Word[p->Index] = '\r';
+                    p->Word = p->Passwd;
+                    p->Index = 0;
+                    p->State = UserPassword;
+                    break;
+                }
+                LogError(false, "Too many arguments");
+                p->State = UserInvalidState;
+                break;
+            }
             p->Word[p->Index] = '\r';
             p->Index++;
             p->Word[p->Index] = (char)c;
