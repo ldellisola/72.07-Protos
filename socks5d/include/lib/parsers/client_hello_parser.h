@@ -11,7 +11,7 @@
 #include <stdbool.h>
 
 #define CR 0x0D
-
+#define MAXLONG 255
 typedef enum {
     Hello,
     HelloUsername,
@@ -25,10 +25,11 @@ typedef enum {
 typedef struct {
     ClientHelloParserState State;
     ClientHelloParserState PrevState;
-    char UName[51];
-    char Passwd[51];
-    char Hello[5];
-    uint8_t Index;
+    char UName[MAXLONG];
+    char Passwd[MAXLONG];
+    //TODO: ponerle 0 al final
+    char Hello[6];
+    uint16_t Index;
     char* Word;
 
 } ClientHelloParser;

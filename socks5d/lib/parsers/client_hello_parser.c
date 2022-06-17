@@ -8,7 +8,7 @@
 ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloParserState nextState, char *nextWord) {
 //    LogError(false, "char c = %c", c);
     if(p->State == Hello){
-        if (p->Index == strlen(p->Word)-1) {
+        if (p->Index == strlen(p->Word)) {
             if (c == '|') {
                 p->Index = 0;
                 p->Word = nextWord;
@@ -49,8 +49,12 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
         p->PrevState = p->State;
         return HelloCRLF;
     }
+    if(p->Index == MAXLONG+1){
+        LogError(false, "Username or Password too long, max 255 char");
+        return HelloInvalidState;
+    }
     p->Word[p->Index] = (char)c;
-
+    p->Index++;
     return p->State;
 
 }
@@ -65,13 +69,14 @@ void ClientHelloParserReset(ClientHelloParser *p) {
     p->State = Hello;
     p->Index = 0;
 
-    memset(p->UName, 0, 51);
-    memset(p->Passwd, 0, 51);
+    memset(p->UName, 0, MAXLONG);
+    memset(p->Passwd, 0, MAXLONG);
     p->Hello[0] = 'H';
     p->Hello[1] = 'E';
     p->Hello[2] = 'L';
     p->Hello[3] = 'L';
     p->Hello[4] = 'O';
+    p->Hello[5] = 0;
     p->Word = p->Hello;
     LogInfo("HelloParser reset!");
 }
