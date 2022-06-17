@@ -30,7 +30,7 @@ const SelectorOptions options = {
 
 bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
 
-    InitTcpConnectionPool(poolSize);
+    CreateTcpConnectionPool(poolSize);
 
     if (SELECTOR_STATUS_SUCCESS != SelectorInit(null == optionalOptions ? &options : optionalOptions)) {
         LogError(false, "Cannot initialize Selector");
@@ -120,6 +120,13 @@ bool RunTcpServer() {
 
 void StopTcpServer() {
     isRunning = false;
+}
+
+void DisposeTcpServer() {
+    SelectorClose();
+    SelectorDestroy(selector);
+    CleanTcpConnectionPool();
+
 }
 
 
@@ -305,6 +312,8 @@ TcpConnection *ConnectToIPv6TcpServer(struct sockaddr * address, const FdHandler
 
     return null;
 }
+
+
 
 
 bool ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize) {

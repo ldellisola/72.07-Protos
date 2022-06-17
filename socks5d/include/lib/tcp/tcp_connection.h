@@ -66,7 +66,7 @@ void CleanTcpConnectionPool();
  * It initializes the TCP connection tcpPool with a given size
  * @param initialSize initial size of the tcp tcpPool
  */
-void InitTcpConnectionPool(int initialSize);
+void CreateTcpConnectionPool(int initialSize);
 
 
 #endif //SOCKS5D_TCP_CONNECTION_H

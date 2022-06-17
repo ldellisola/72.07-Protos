@@ -24,12 +24,17 @@ int main(int argc, char **argv) {
 
     CliArguments arguments = ParseCli(argc, argv);
 
-    if (InitTcpServer(null, 0) && RegisterSocks5Server(arguments.SocksPort, arguments.SocksAddress))
+    int socks5PoolSize = 50;
+
+    bool startServer = true;
+    startServer &= InitTcpServer(null, socks5PoolSize * 2);
+    startServer &= RegisterSocks5Server(arguments.SocksPort, arguments.SocksAddress, socks5PoolSize);
+
+    if (startServer)
         RunTcpServer();
 
-    CleanTcpConnectionPool();
-
-    // TODO Handle memory
+    DisposeSocks5Server();
+    DisposeTcpServer();
 
 }
 

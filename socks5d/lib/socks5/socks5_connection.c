@@ -1,9 +1,9 @@
 //
 // Created by Lucas Dell'Isola on 06/06/2022.
 //
-
-#include <string.h>
 #include "socks5/socks5_connection.h"
+#include <string.h>
+#include <assert.h>
 #include "socks5/socks5_hello.h"
 #include "utils/logger.h"
 #include "parsers/auth_parser.h"
@@ -111,16 +111,31 @@ static StateDefinition socks5ConnectionFsm[] = {
         },
 };
 
+typedef enum {
+    PooledSocks5ConnectionEmpty,
+    PooledSocks5ConnectionInUse
+} PooledSocks5ConnectionStatus;
 
-Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection) {
+typedef struct PooledSocks5Connection_{
+    struct PooledSocks5Connection_ * Next;
+    Socks5Connection Connection;
+    PooledSocks5ConnectionStatus Status;
+}PooledSocks5Connection;
+
+PooledSocks5Connection * socks5Pool;
+
+Socks5Connection * GetSocks5Connection();
+void DestroySocks5Connection(Socks5Connection * connection);
+
+
+Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     LogInfo("Creating Socks5Connection.");
 
-    Socks5Connection *connection = calloc(1, sizeof(Socks5Connection));
+    Socks5Connection *connection = GetSocks5Connection();
 
     if (null == tcpConnection)
         LogError(false, "Cannot allocate space for Socks5Connection");
 
-    connection->State = CS_HELLO_READ;
     connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &socks5ConnectionHandler;
     connection->Fsm.InitialState = CS_HELLO_READ;
@@ -137,7 +152,7 @@ Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection) {
 }
 
 
-void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector) {
+void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector) {
     LogInfo("Disposing Socks5Connection...");
     if (null == connection) {
         LogError(false, "Cannot destroy NULL Socks5Connection");
@@ -156,8 +171,87 @@ void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector)
     if (null != connection->WriteBuffer.Data)
         free(connection->WriteBuffer.Data);
 
-    free(connection);
+    DestroySocks5Connection(connection);
     LogInfo("Socks5Connection disposed!");
+}
+
+
+
+void CreateSocks5ConnectionPool(int initialSize) {
+    LogInfo("Initializing SOCKS5 Pool");
+    if (initialSize < 1) {
+        LogInfo("Invalid initial pool size %d, using default value 1", initialSize);
+        initialSize = 1;
+    }
+
+    socks5Pool = calloc(1, sizeof(PooledSocks5Connection));
+    socks5Pool->Status = PooledSocks5ConnectionEmpty;
+    PooledSocks5Connection *current = socks5Pool;
+
+    while (--initialSize > 0) {
+        current->Next = calloc(1, sizeof(PooledSocks5Connection));
+        current = current->Next;
+        current->Status = PooledSocks5ConnectionEmpty;
+    }
+}
+
+void CleanSocks5ConnectionPool() {
+    LogInfo("Clening SOCKS5 connection pool");
+    if (null == socks5Pool) {
+        LogError(false, "TCP pool was not initialized. Cannot clean it");
+        return;
+    }
+
+    PooledSocks5Connection * next;
+    for (PooledSocks5Connection * conn = socks5Pool; conn != null ; conn = next) {
+        next = conn->Next;
+        free(conn);
+    }
+}
+
+Socks5Connection *GetSocks5Connection() {
+    if (null == socks5Pool) {
+        LogError(false, "SOCKS5 pool was not initialized");
+        return null;
+    }
+
+    PooledSocks5Connection * temp;
+    for ( temp = socks5Pool; temp != null ; temp = temp->Next) {
+        if (PooledSocks5ConnectionEmpty == temp->Status) {
+            temp->Status = PooledSocks5ConnectionInUse;
+            return &temp->Connection;
+        }
+
+        if (null == temp->Next)
+            break;
+    }
+
+    temp->Next = calloc(1, sizeof(PooledSocks5Connection));
+    temp = temp->Next;
+    temp->Status = PooledSocks5ConnectionInUse;
+
+    return &temp->Connection;
+}
+
+void DestroySocks5Connection(Socks5Connection *connection) {
+    if (null == socks5Pool) {
+        LogError(false, "TCP pool was not initialized");
+        return;
+    }
+
+    memset(connection,0, sizeof(Socks5Connection));
+
+    PooledSocks5Connection * temp;
+    for (temp = socks5Pool; temp != null && &temp->Connection != connection ; temp = temp->Next);
+
+    if (null == temp)
+    {
+        LogError(false,"Error while destroying connection!");
+        return;
+    }
+    assert(&temp->Connection == connection);
+    temp->Status = PooledSocks5ConnectionEmpty;
+
 }
 
 
@@ -168,7 +262,7 @@ void Socks5ConnectionRead(SelectorKey *key) {
     CONNECTION_STATE st = HandleReadFsm(fsm, key);
 
     if (CS_ERROR == st || CS_DONE == st) {
-        Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
+        DisposeSocks5Connection(ATTACHMENT(key), key->Selector);
     }
 }
 
@@ -177,7 +271,7 @@ void Socks5ConnectionWrite(SelectorKey *key) {
     CONNECTION_STATE st = HandleWriteFsm(fsm, key);
 
     if (CS_ERROR == st || CS_DONE == st) {
-        Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
+        DisposeSocks5Connection(ATTACHMENT(key), key->Selector);
     }
 }
 
@@ -186,9 +280,13 @@ void Socks5ConnectionBlock(SelectorKey *key) {
     CONNECTION_STATE st = HandleBlockFsm(fsm, key);
 
     if (CS_ERROR == st || CS_DONE == st) {
-        Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
+        DisposeSocks5Connection(ATTACHMENT(key), key->Selector);
     }
 }
+
+
+
+
 
 
 

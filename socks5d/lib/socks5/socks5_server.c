@@ -1,13 +1,12 @@
 //
 // Created by Lucas Dell'Isola on 30/05/2022.
 //
-
+#include "socks5/socks5_server.h"
 #include <string.h>
 #include "utils/utils.h"
 #include "utils/logger.h"
 #include "tcp/tcp.h"
 #include "socks5/socks5_connection.h"
-#include "socks5/socks5_server.h"
 
 void Socks5PassiveAccept(SelectorKey *key);
 
@@ -17,7 +16,9 @@ const FdHandler socksv5 = {
         .handle_close      = NULL, // nada que liberar
 };
 
-bool RegisterSocks5Server(const char * port, const char * address){
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize) {
+    CreateSocks5ConnectionPool(poolSize);
+
     if (null == address){
         bool success = RegisterSocks5ServerOnIPv4(port,null);
         success &= RegisterSocks5ServerOnIPv6(port,null);
@@ -39,7 +40,7 @@ bool RegisterSocks5Server(const char * port, const char * address){
 
 bool RegisterSocks5ServerOnIPv4(const char *port, const char *address) {
     LogInfo("Starting SOCKS5 server on IPv4...");
-    //TODO inspect this
+    // TODO inspect this
     int portNum = atoi(port);
 
     if (IPv4ListenOnTcpPort(portNum, &socksv5, address) == false)
@@ -61,6 +62,10 @@ bool RegisterSocks5ServerOnIPv6(const char *port, const char *address) {
     return true;
 }
 
+void DisposeSocks5Server() {
+    CleanTcpConnectionPool();
+}
+
 
 void Socks5PassiveAccept(SelectorKey *key) {
 
@@ -71,7 +76,7 @@ void Socks5PassiveAccept(SelectorKey *key) {
         return;
     }
 
-    Socks5Connection *connection = Socks5ConnectionInit(client);
+    Socks5Connection *connection = CreateSocks5Connection(client);
 
     if (null == connection) {
         LogError(false, "Cannot create connection");
@@ -87,7 +92,7 @@ void Socks5PassiveAccept(SelectorKey *key) {
     );
 
     if (SELECTOR_STATUS_SUCCESS != status) {
-        Socks5ConnectionDestroy(connection, NULL);
+        DisposeSocks5Connection(connection, NULL);
         LogError(false, "Cannot register new SOCKS5 connection to the selector");
     }
 }

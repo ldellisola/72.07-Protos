@@ -11,13 +11,14 @@
 #include "selector/selector.h"
 
 typedef enum {
-    PooledConnectionEmpty,
-    PooledConnectionInUse
-} PooledConnectionStatus;
+    PooledTcpConnectionEmpty,
+    PooledTcpConnectionInUse
+} PooledTcpConnectionStatus;
+
 
 typedef struct PooledTcpConnection_ {
     TcpConnection Connection;
-    PooledConnectionStatus Status;
+    PooledTcpConnectionStatus Status;
     struct PooledTcpConnection_ *Next;
 } PooledTcpConnection;
 
@@ -151,7 +152,7 @@ void DestroyTcpConnection(TcpConnection * connection){
         return;
     }
     assert(&temp->Connection == connection);
-    temp->Status = PooledConnectionEmpty;
+    temp->Status = PooledTcpConnectionEmpty;
 }
 
 
@@ -164,8 +165,8 @@ TcpConnection *GetTcpConnection() {
     PooledTcpConnection * temp;
 
     for ( temp = tcpPool; temp != null ; temp = temp->Next) {
-        if (PooledConnectionEmpty == temp->Status) {
-            temp->Status = PooledConnectionInUse;
+        if (PooledTcpConnectionEmpty == temp->Status) {
+            temp->Status = PooledTcpConnectionInUse;
             return &temp->Connection;
         }
 
@@ -175,7 +176,7 @@ TcpConnection *GetTcpConnection() {
 
     temp->Next = calloc(1, sizeof(PooledTcpConnection));
     temp = temp->Next;
-    temp->Status = PooledConnectionInUse;
+    temp->Status = PooledTcpConnectionInUse;
 
     return &temp->Connection;
 
@@ -192,11 +193,14 @@ void CleanTcpConnectionPool() {
     PooledTcpConnection * next;
     for (PooledTcpConnection * conn = tcpPool; conn != null ; conn = next) {
         next = conn->Next;
+        if (PooledTcpConnectionInUse == conn->Status){
+            close(conn->Connection.FileDescriptor);
+        }
         free(conn);
     }
 }
 
-void InitTcpConnectionPool(int initialSize) {
+void CreateTcpConnectionPool(int initialSize) {
     LogInfo("Initializing TCP Pool");
     if (initialSize < 1) {
         LogInfo("Invalid initial pool size %d, using default value 1", initialSize);
@@ -204,13 +208,13 @@ void InitTcpConnectionPool(int initialSize) {
     }
 
     tcpPool = calloc(1, sizeof(PooledTcpConnection));
-    tcpPool->Status = PooledConnectionEmpty;
+    tcpPool->Status = PooledTcpConnectionEmpty;
     PooledTcpConnection *current = tcpPool;
 
     while (--initialSize > 0) {
         current->Next = calloc(1, sizeof(PooledTcpConnection));
         current = current->Next;
-        current->Status = PooledConnectionEmpty;
+        current->Status = PooledTcpConnectionEmpty;
     }
 
 }

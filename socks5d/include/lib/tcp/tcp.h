@@ -48,6 +48,11 @@ bool RunTcpServer();
 void StopTcpServer();
 
 /**
+ * It safely disposes all memory allocated by the TCP server
+ */
+void DisposeTcpServer();
+
+/**
  * It blocks the main thread while waiting for a new tcp connection
  * @param fd file descriptor to listen to
  * @return A new tcp socket

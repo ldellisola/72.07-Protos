@@ -17,7 +17,6 @@
 
 typedef struct {
     FiniteStateMachine Fsm;
-    CONNECTION_STATE State;
     TcpConnection *ClientTcpConnection;
     TcpConnection *RemoteTcpConnection;
     const FdHandler *Handler;
@@ -33,13 +32,24 @@ typedef struct {
 * It creates a Socks5 tcpConnection from a given TCP tcpConnection
  * @param tcpConnection File descriptor for the socks tcpConnection
 */
-Socks5Connection *Socks5ConnectionInit(TcpConnection *tcpConnection);
+Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection);
 
 /**
  * It safely disposes a Socks5 connection
  * @param connection Socks5 connection to dispose
  */
-void Socks5ConnectionDestroy(Socks5Connection *connection, fd_selector selector);
+void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector);
+
+/**
+ * It initializes the socks5 connection pool with a given size preallocated
+ * @param initialSize initial size of the pool
+ */
+void CreateSocks5ConnectionPool(int initialSize);
+
+/**
+ * It disposes all Socks5 connections
+ */
+void CleanSocks5ConnectionPool();
 
 
 #endif //SERVER_SOCKS_CONNECTION_H
