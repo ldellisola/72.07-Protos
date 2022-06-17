@@ -19,16 +19,12 @@
 // TODO: Test
 
 static void Socks5ConnectionRead(SelectorKey *key);
-
 static void Socks5ConnectionWrite(SelectorKey *key);
-
 static void Socks5ConnectionBlock(SelectorKey *key);
-//static void Socks5ConnectionClose(SelectorKey *key);
 
 const FdHandler socks5ConnectionHandler = {
         .handle_read   = Socks5ConnectionRead,
         .handle_write  = Socks5ConnectionWrite,
-//        .handle_close  = Socks5ConnectionClose,
         .handle_block  = Socks5ConnectionBlock,
 };
 
@@ -194,9 +190,6 @@ void Socks5ConnectionBlock(SelectorKey *key) {
     }
 }
 
-//void Socks5ConnectionClose(SelectorKey *key) {
-//    Socks5ConnectionDestroy(ATTACHMENT(key), key->Selector);
-//}
 
 
 

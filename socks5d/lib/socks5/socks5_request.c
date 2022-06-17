@@ -62,17 +62,17 @@ unsigned RequestReadRun(void *data) {
             d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
         else
         {
-//            memcpy(allocatedKey, data, sizeof(SelectorKey));
-//            if(-1 == pthread_create(&tid, 0, ResolveDNS, allocatedKey))
-//                d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
-//            else
-//                return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_DNS_READ : CS_ERROR;
-//
+            pthread_t tid;
+            memcpy(allocatedKey, data, sizeof(SelectorKey));
+            if(-1 == pthread_create(&tid, 0, ResolveDNS, allocatedKey))
+                d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
+            else
+                return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_DNS_READ : CS_ERROR;
+
         }
         return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
-//    d->UsesDns = false;
     d->RemoteAddress = null;
     d->CurrentRemoteAddress = calloc(1,sizeof(struct addrinfo));
     d->CurrentRemoteAddress->ai_socktype = SOCK_STREAM;
@@ -135,15 +135,11 @@ unsigned RequestWriteRun(void *data) {
             return CS_DONE;
         }
 
-        if (
-                SELECTOR_STATUS_SUCCESS ==
-                SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ) &&
-                SELECTOR_STATUS_SUCCESS ==
-                SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_READ)
-                ) {
-            return CS_CONNECTED;
-        }
-        return CS_ERROR;
+        unsigned selectorResult = 0;
+        selectorResult |= SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ);
+        selectorResult |= SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_READ);
+
+        return SELECTOR_STATUS_SUCCESS == selectorResult ? CS_CONNECTED : CS_ERROR;
     }
 
     size_t size;
@@ -174,7 +170,7 @@ void * ResolveDNS(void *data){
     };
 
     char buff[10];
-    snprintf(buff, sizeof(buff),"%d", ntohs(GetPortNumberFromNetworkOrder(d->Parser.DestPort)));
+    snprintf(buff, sizeof(buff),"%d",GetPortNumberFromNetworkOrder(d->Parser.DestPort));
 
     int result = getaddrinfo(
             (const char *)d->Parser.DestAddress,

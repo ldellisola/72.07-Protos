@@ -19,6 +19,7 @@ unsigned DnsRead(void *data) {
         return SELECTOR_STATUS_SUCCESS == selectorResult ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
+    d->CurrentRemoteAddress = d->RemoteAddress;
 
-    return 0;
+    return CS_ESTABLISH_CONNECTION;
 }
