@@ -7,10 +7,10 @@
 
 ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, byte c, ClientGetTimeoutParserState nextState, char *nextWord) {
 
-    if(strlen(p->word) == p->index){
+    if(strlen(p->Word) == p->Index){
         if((c == '|' && p->State == TimeoutGet) ||(c == '\r' && p->State == Timeout)){
-            p->word = nextWord;
-            p->index = 0;
+            p->Word = nextWord;
+            p->Index = 0;
             return nextState;
         }
         LogError(false, "The word has finished and character given isnt a terminating character");
@@ -18,11 +18,11 @@ ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, by
 
     }
 
-    if(c == p->word[p->index]){
-        p->index++;
+    if(c == p->Word[p->Index]){
+        p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->word);
+    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
     return TimeoutInvalidState;
 }
 
@@ -34,7 +34,7 @@ void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
     }
 
     p->State = TimeoutGet;
-    p->index = 0;
+    p->Index = 0;
 
     p->Timeout[0] = 'T';
     p->Timeout[1] = 'I';
@@ -49,7 +49,7 @@ void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
     p->Get[1] = 'E';
     p->Get[2] = 'T';
     p->Get[3] = 0;
-    p->word = p->Get;
+    p->Word = p->Get;
 
     LogInfo("TimeoutParser reset!");
 }
@@ -75,7 +75,12 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
 
         case TimeoutCRLF:
 //            LogError(false, "TimeoutCRLF");
-            p->State = c == '\n'? TimeoutFinished: TimeoutInvalidState;
+            if( c == '\n'){
+                p->State = TimeoutFinished;
+                break;
+            }
+            LogError(false, "There is a CR but no LF");
+            p->State =  TimeoutInvalidState;
             break;
         case TimeoutFinished:
 //            LogError(false, "TimeoutFinished");

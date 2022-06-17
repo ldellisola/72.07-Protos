@@ -20,13 +20,13 @@ START_TEST(Reset_Succeeds)
             ck_assert_int_eq(parser.Passwd[i], 0);
             ck_assert_int_eq(parser.UName[i], 0);
         }
-        ck_assert_int_eq(parser.word[0], 'H');
-        ck_assert_int_eq(parser.word[1], 'E');
-        ck_assert_int_eq(parser.word[2], 'L');
-        ck_assert_int_eq(parser.word[3], 'L');
-        ck_assert_int_eq(parser.word[4], 'O');
+        ck_assert_int_eq(parser.Word[0], 'H');
+        ck_assert_int_eq(parser.Word[1], 'E');
+        ck_assert_int_eq(parser.Word[2], 'L');
+        ck_assert_int_eq(parser.Word[3], 'L');
+        ck_assert_int_eq(parser.Word[4], 'O');
         ck_assert_int_eq(parser.State, Hello);
-        ck_assert_int_eq(parser.index, 0);
+        ck_assert_int_eq(parser.Index, 0);
     }
 END_TEST
 /**************************************************************************

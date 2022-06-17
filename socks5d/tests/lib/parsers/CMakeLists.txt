@@ -11,7 +11,9 @@ set(
         client_hello_parser_test.c
         client_goodbye_parser_test.c
         client_timeout_parser_test.c
-)
+        client_get_timeout_parser_test.c
+        client_set_buffersize_parser_test.c
+        client_get_buffersize_parser_test.c)
 
 add_library(parsers_test STATIC ${SOURCES})
 target_link_libraries(parsers_test PUBLIC parsers)

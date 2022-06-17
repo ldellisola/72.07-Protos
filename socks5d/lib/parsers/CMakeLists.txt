@@ -12,6 +12,8 @@ set(
         client_goodbye_parser.c
         client_timeout_parser.c
         client_get_timeout_parser.c
+        client_set_buffersize_parser.c
+        client_get_buffersize_parser.c
 )
 
 add_library(parsers STATIC ${SOURCES})

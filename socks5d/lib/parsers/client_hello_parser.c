@@ -8,10 +8,10 @@
 ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloParserState nextState, char *nextWord) {
 //    LogError(false, "char c = %c", c);
     if(p->State == Hello){
-        if (p->index == strlen(p->word)-1) {
+        if (p->Index == strlen(p->Word)-1) {
             if (c == '|') {
-                p->index = 0;
-                p->word = nextWord;
+                p->Index = 0;
+                p->Word = nextWord;
                 return nextState;
             }
             LogError(false, "Im in the last letter of the word and there is no pipe");
@@ -19,11 +19,11 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
         }
 
         // CASO SEGUIR: el caracter es parte de la palabra, seguir
-        if (c == p->word[p->index]) {
-            p->index++;
+        if (c == p->Word[p->Index]) {
+            p->Index++;
             return p->State;
         }
-        LogError(false, "wrong character for HELLO, i was waiting for %c and got %c", p->word[p->index], c);
+        LogError(false, "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
         return HelloInvalidState;
     }
     if(p->State == HelloCRLF){
@@ -35,21 +35,21 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
             return HelloInvalidState;
         }
         p->State = p->PrevState;
-        p->word[p->index] = '\r';
-        p->index ++;
-        p->word[p->index] = (char)c;
+        p->Word[p->Index] = '\r';
+        p->Index ++;
+        p->Word[p->Index] = (char)c;
     }
 
     if(c == '|'){
-        p->index = 0;
-        p->word = nextWord;
+        p->Index = 0;
+        p->Word = nextWord;
         return nextState;
     }
     if(c == '\r'){
         p->PrevState = p->State;
         return HelloCRLF;
     }
-    p->word[p->index] = (char)c;
+    p->Word[p->Index] = (char)c;
 
     return p->State;
 
@@ -63,7 +63,7 @@ void ClientHelloParserReset(ClientHelloParser *p) {
     }
 
     p->State = Hello;
-    p->index = 0;
+    p->Index = 0;
 
     memset(p->UName, 0, 51);
     memset(p->Passwd, 0, 51);
@@ -72,7 +72,7 @@ void ClientHelloParserReset(ClientHelloParser *p) {
     p->Hello[2] = 'L';
     p->Hello[3] = 'L';
     p->Hello[4] = 'O';
-    p->word = p->Hello;
+    p->Word = p->Hello;
     LogInfo("HelloParser reset!");
 }
 

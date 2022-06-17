@@ -14,7 +14,7 @@ void ClientGoodbyeParserReset(ClientGoodbyeParser *p) {
     }
 
     p->State = Goodbye;
-    p->index = 0;
+    p->Index = 0;
 
     p->Goodbye[0] = 'G';
     p->Goodbye[1] = 'O';
@@ -30,7 +30,7 @@ void ClientGoodbyeParserReset(ClientGoodbyeParser *p) {
 ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, ClientGoodbyeParserState nextState) {
 //    LogError(false, "char c = %c", c);
 
-    if (p->index == strlen(p->Goodbye)-1) {
+    if (p->Index == strlen(p->Goodbye)-1) {
         if (c == '\r') {
             return nextState;
         }
@@ -38,11 +38,11 @@ ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, Cli
         return GoodbyeInvalidState;
     }
 
-    if (c == p->Goodbye[p->index]) {
-        p->index++;
+    if (c == p->Goodbye[p->Index]) {
+        p->Index++;
         return p->State;
     }
-    LogError(false, "wrong character for GOODBYE, i was waiting for %c and got %c", p->Goodbye[p->index], c);
+    LogError(false, "wrong character for GOODBYE, i was waiting for %c and got %c", p->Goodbye[p->Index], c);
     return GoodbyeInvalidState;
 
 }

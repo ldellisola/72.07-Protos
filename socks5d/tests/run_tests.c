@@ -12,6 +12,9 @@
 #include "parsers/client_hello_parser_test.h"
 #include "parsers/client_goodbye_parser_test.h"
 #include "parsers/client_timeout_parser_test.h"
+#include "parsers/client_get_timeout_parser_test.h"
+#include "parsers/client_set_buffersize_parser_test.h"
+#include "parsers/client_get_buffersize_parser_test.h"
 
 
 int main(void) {
@@ -24,7 +27,10 @@ int main(void) {
             RegisterSocks5MessagesTestSuit(),
             RegisterClientHelloParserTestSuit(),
             RegisterClientGoodbyeParserTestSuit(),
-            RegisterClientHiParserTestSuit(),
+            RegisterClientTimeoutParserTestSuit(),
+            RegisterClientGetTimeoutParserTestSuit(),
+            RegisterClientSetBufferSizeParserTestSuit(),
+            RegisterClientGetBufferSizeParserTestSuit(),
             NULL
     };
     int failedTests = 0;

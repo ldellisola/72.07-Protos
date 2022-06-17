@@ -18,7 +18,7 @@ typedef enum {
 typedef struct {
     ClientGoodbyeParserState State;
     char Goodbye[7];
-    uint8_t index;
+    uint8_t Index;
 
 } ClientGoodbyeParser;
 bool ClientGoodbyeParserHasFinished(ClientGoodbyeParserState state);

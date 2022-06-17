@@ -17,12 +17,13 @@ typedef enum {
     TimeoutInvalidState
 
 } ClientGetTimeoutParserState;
+
 typedef struct {
     ClientGetTimeoutParserState State;
     char Timeout[8];
     char Get[4];
-    uint8_t index;
-    char* word;
+    uint8_t Index;
+    char* Word;
 
 } ClientGetTimeoutParser;
 bool ClientGetTimeoutParserHasFinished(ClientGetTimeoutParserState state);
