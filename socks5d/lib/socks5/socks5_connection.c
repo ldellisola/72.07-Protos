@@ -140,6 +140,7 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
 
     connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &socks5ConnectionHandler;
+    connection->User = null;
     connection->Fsm.InitialState = CS_HELLO_READ;
     connection->Fsm.StatesSize = CS_ERROR;
     InitFsm(&connection->Fsm, socks5ConnectionFsm);
@@ -172,6 +173,9 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
 
     if (null != connection->WriteBuffer.Data)
         free(connection->WriteBuffer.Data);
+
+    if (null != connection->User)
+        LogOutSocks5User(connection->User);
 
     DestroySocks5Connection(connection);
     LogInfo("Socks5Connection disposed!");

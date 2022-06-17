@@ -13,13 +13,14 @@
 #include "socks5_auth.h"
 #include "socks5_request.h"
 #include "socks5_establish_connection.h"
-
+#include "socks5_users.h"
 
 typedef struct {
     time_t LastConnectionOn;
     FiniteStateMachine Fsm;
     TcpConnection *ClientTcpConnection;
     TcpConnection *RemoteTcpConnection;
+    struct Socks5User * User;
     const FdHandler *Handler;
     union {
         HelloData Hello;
@@ -54,8 +55,7 @@ void CleanSocks5ConnectionPool();
 
 /**
  * It will check all current active socks5 connections and see if they are currently timed out
- * @param seconds
- * @param nanoseconds
+ * @param fdSelector Selector
  */
 void CheckForTimeoutInSocks5Connections(fd_selector fdSelector);
 

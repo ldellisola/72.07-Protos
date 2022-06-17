@@ -46,7 +46,7 @@ AuthParserState AuthParserFeed(AuthParser *p, byte c) {
 
     switch (p->State) {
         case AuthVersion:
-            p->State = 0x05 == c ? AuthULen : AuthInvalidProtocol;
+            p->State = 0x01 == c ? AuthULen : AuthInvalidProtocol;
             LogInfo("AuthParser socks5 protocol version: %d", c);
             break;
         case AuthULen:

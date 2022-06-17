@@ -138,9 +138,8 @@ void DestroyTcpConnection(TcpConnection * connection){
         return;
     }
 
+    memset(connection,0, sizeof(TcpConnection));
     connection->FileDescriptor = -1;
-    memset(&connection->Address,0,connection->AddressLength);
-    connection->AddressLength = 0;
 
     PooledTcpConnection * temp;
 

@@ -10,8 +10,6 @@
 
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
-bool LogInUser(char name[256], char passwd[256]);
-
 void AuthReadInit(unsigned int state, void *data) {
     Socks5Connection *connection = ATTACHMENT(data);
     AuthData *d = &connection->Data.Auth;
@@ -50,7 +48,8 @@ unsigned AuthReadRun(void *data) {
 
     if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
 
-        d->AuthSucceeded = LogInUser(d->Parser.UName, d->Parser.Passwd);
+        connection->User = LogInSocks5User(d->Parser.UName, d->Parser.Passwd);
+        d->AuthSucceeded = null != connection->User;
 
         buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
         size_t bytesWritten = BuildAuthResponse(buffer, bufferSize, d->AuthSucceeded);
@@ -75,9 +74,12 @@ void AuthWriteClose(unsigned int state, void *data) {
 
 unsigned AuthWriteRun(void *data) {
     Socks5Connection *connection = ATTACHMENT(data);
-    HelloData *d = &connection->Data.Hello;
+    AuthData *d = &connection->Data.Auth;
 
     if (!BufferCanRead(d->WriteBuffer)) {
+        if (!d->AuthSucceeded)
+            return CS_DONE;
+
         if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_READ)) {
             return CS_REQUEST_READ;
         }
@@ -93,10 +95,5 @@ unsigned AuthWriteRun(void *data) {
     return CS_AUTH_WRITE;
 }
 
-#define SOCKS5_DEFAULT_USER "admin"
-#define SOCKS5_DEFAULT_PASSWORD "admin"
 
-bool LogInUser(char name[256], char passwd[256]) {
 
-    return 0 == strncmp(name, SOCKS5_DEFAULT_USER, 5) && 0 == strncmp(passwd, SOCKS5_DEFAULT_PASSWORD, 5);
-}

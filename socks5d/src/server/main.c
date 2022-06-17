@@ -41,7 +41,14 @@ int main(int argc, char **argv) {
 
     bool startServer = true;
     startServer &= InitTcpServer(&options, socks5PoolSize * 2);
-    startServer &= RegisterSocks5Server(arguments.SocksPort, arguments.SocksAddress, socks5PoolSize, socks5Timeout);
+    startServer &= RegisterSocks5Server(
+            arguments.SocksPort,
+            arguments.SocksAddress,
+            socks5PoolSize,
+            socks5Timeout,
+            arguments.Users,
+            arguments.UsersCount
+    );
 
     if (startServer)
         RunTcpServer();

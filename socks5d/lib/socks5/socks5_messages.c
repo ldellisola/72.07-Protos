@@ -25,7 +25,7 @@ size_t BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceed
         return 0;
     }
 
-    buffer[0] = SOCKS5_PROTOCOL_VERSION;
+    buffer[0] = SOCKS5_AUTH_NEGOTIATION_VERSION;
     buffer[1] = authenticationSucceeded ? SOCKS5_AUTH_SUCCESS : SOCKS5_AUTH_FAILED;
     return 2;
 }

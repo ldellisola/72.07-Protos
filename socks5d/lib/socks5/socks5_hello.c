@@ -64,7 +64,7 @@ unsigned HelloReadRun(void *data) {
 
 
         buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
-        int bytesWritten = BuildHelloResponse(buffer, bufferSize, d->AuthenticationMethod);
+        size_t bytesWritten = BuildHelloResponse(buffer, bufferSize, d->AuthenticationMethod);
         if (0 == bytesWritten)
             return CS_ERROR;
         BufferWriteAdv(d->WriteBuffer, bytesWritten);
@@ -76,7 +76,7 @@ unsigned HelloReadRun(void *data) {
 }
 
 SOCKS5_AUTH SelectAuthenticationMethod(byte *methods, int methodLength) {
-    for (int i = 0; i < methodLength; i++)
+    for (int i = methodLength-1; i >=0 ; i--)
         if (SOCKS5_AUTH_USER_PASS == methods[i] || SOCKS5_AUTH_NO_AUTH == methods[i])
             return methods[i];
 

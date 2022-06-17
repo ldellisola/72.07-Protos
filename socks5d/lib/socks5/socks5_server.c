@@ -11,7 +11,10 @@
 int ipv4Socket = -1;
 int ipv6Socket = -1;
 
+
+
 void Socks5PassiveAccept(SelectorKey *key);
+
 
 const FdHandler socksv5 = {
         .handle_read       = Socks5PassiveAccept,
@@ -19,9 +22,11 @@ const FdHandler socksv5 = {
         .handle_close      = NULL, // nada que liberar
 };
 
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout) {
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, User * users, int userCount) {
     CreateSocks5ConnectionPool(poolSize);
     SetConnectionTimeout(timeout);
+    LoadSocks5Users(users,userCount);
+
     if (null == address){
         bool success = RegisterSocks5ServerOnIPv4(port,null);
         success &= RegisterSocks5ServerOnIPv6(port,null);

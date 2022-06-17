@@ -6,6 +6,7 @@
 #define SERVER_SOCKS_SERVER_H
 #include <stdbool.h>
 #include <time.h>
+#include "socks5.h"
 /**
  * It initializes a Socks5Server on IPv4
  * @param port Port where the server will be listening to, in the form of a null terminated string
@@ -25,9 +26,13 @@ bool RegisterSocks5ServerOnIPv6(const char *port, const char *address);
  * If no address value is provided (null), then it will listen on all interfaces
  * @param port Port where the server will be listening to, in the form of a null terminated string
  * @param address Address to bind the server to. It can be null
+ * @param poolSize Initial size of the Socks5Connection pool
+ * @param timeout Value, in seconds, of the maximum time before connections timeout
+ * @param users Initial set of users allowed to connect with the authorization flow
+ * @param userCount Number of users indicated in the previous parameter
  * @return Whether the server was started successfully
  */
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout);
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, User * users, int userCount);
 
 /**
  * It safely disposes all the allocated memory by the socks5 server

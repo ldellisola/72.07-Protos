@@ -6,11 +6,8 @@
 #define SERVER_CLI_H
 
 #include <stdbool.h>
+#include "socks5/socks5.h"
 
-typedef struct {
-    char Username[51];
-    char Password[51];
-} User;
 
 typedef struct {
     const char *SocksPort;
