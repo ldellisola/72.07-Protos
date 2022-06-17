@@ -75,7 +75,12 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
 
         case TimeoutCRLF:
 //            LogError(false, "TimeoutCRLF");
-            p->State = c == '\n'? TimeoutFinished: TimeoutInvalidState;
+            if( c == '\n'){
+                p->State = TimeoutFinished;
+                break;
+            }
+            LogError(false, "There is a CR but no LF");
+            p->State =  TimeoutInvalidState;
             break;
         case TimeoutFinished:
 //            LogError(false, "TimeoutFinished");

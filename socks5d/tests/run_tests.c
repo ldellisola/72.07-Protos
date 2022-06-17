@@ -12,6 +12,7 @@
 #include "parsers/client_hello_parser_test.h"
 #include "parsers/client_goodbye_parser_test.h"
 #include "parsers/client_timeout_parser_test.h"
+#include "parsers/client_get_timeout_parser_test.h"
 
 
 int main(void) {
@@ -25,6 +26,7 @@ int main(void) {
             RegisterClientHelloParserTestSuit(),
             RegisterClientGoodbyeParserTestSuit(),
             RegisterClientHiParserTestSuit(),
+            RegisterClientGetTimeoutParserTestSuit(),
             NULL
     };
     int failedTests = 0;

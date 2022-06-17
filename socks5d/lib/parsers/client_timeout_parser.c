@@ -7,10 +7,15 @@
 
 ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, ClientTimeoutParserState nextState, char *nextWord) {
 
-    if(strlen(p->word) == p->index && c == '|' ){
-        p->word = nextWord;
-        p->index = 0;
-        return nextState;
+    if(strlen(p->word) == p->index){
+        if(c == '|'){
+            p->word = nextWord;
+            p->index = 0;
+            return nextState;
+        }
+        LogError(false, "The word has finished and character given isnt a terminating character");
+        return TimeoutInvalidState;
+
     }
 
     if(c == p->word[p->index]){
