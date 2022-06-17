@@ -16,6 +16,7 @@ static void sigterm_handler(const int signal) {
 int main(int argc, char **argv) {
     close(0);
     setvbuf(stdout, NULL, _IONBF, 0);
+    setvbuf(stderr, NULL, _IONBF, 0);
     SetLogLevel(LOG_INFO);
 
     signal(SIGTERM, sigterm_handler);
@@ -23,8 +24,10 @@ int main(int argc, char **argv) {
 
     CliArguments arguments = ParseCli(argc, argv);
 
-    if (InitTcpServer(null) && RegisterSocks5Server(arguments.SocksPort,arguments.SocksAddress))
+    if (InitTcpServer(null, 0) && RegisterSocks5Server(arguments.SocksPort, arguments.SocksAddress))
         RunTcpServer();
+
+    CleanTcpConnectionPool();
 
     // TODO Handle memory
 

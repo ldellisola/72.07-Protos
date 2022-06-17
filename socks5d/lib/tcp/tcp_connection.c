@@ -5,32 +5,50 @@
 #include <unistd.h>
 #include <memory.h>
 #include <errno.h>
+#include <assert.h>
 #include "utils/logger.h"
 #include "utils/utils.h"
 #include "selector/selector.h"
 
-int DisposeTcpConnection(TcpConnection *socket, fd_selector selector) {
-    if (socket == null) {
-        LogError(false, "Failed to dispose TCP socket. Cannot be null");
+typedef enum {
+    PooledConnectionEmpty,
+    PooledConnectionInUse
+} PooledConnectionStatus;
+
+typedef struct PooledTcpConnection_ {
+    TcpConnection Connection;
+    PooledConnectionStatus Status;
+    struct PooledTcpConnection_ *Next;
+} PooledTcpConnection;
+
+PooledTcpConnection *tcpPool = null;
+
+TcpConnection * GetTcpConnection();
+void DestroyTcpConnection(TcpConnection * connection);
+
+
+int DisposeTcpConnection(TcpConnection *tcpConnection, fd_selector selector) {
+    if (tcpConnection == null) {
+        LogError(false, "Failed to dispose TCP tcpConnection. Cannot be null");
         return ERROR;
     }
 
-    LogInfo("Disposing TCP socket on file descriptor %d", socket->FileDescriptor);
+    LogInfo("Disposing TCP tcpConnection on file descriptor %d", tcpConnection->FileDescriptor);
 
-    if (SELECTOR_STATUS_SUCCESS != SelectorUnregisterFd(selector, socket->FileDescriptor)) {
+    if (SELECTOR_STATUS_SUCCESS != SelectorUnregisterFd(selector, tcpConnection->FileDescriptor)) {
         LogError(false, "Cannot unregister file descriptor");
     }
 
-    if (close(socket->FileDescriptor) < 0) {
-        LogError(true, "Cannot close file descriptor %d", socket->FileDescriptor);
+    if (close(tcpConnection->FileDescriptor) < 0) {
+        LogError(true, "Cannot close file descriptor %d", tcpConnection->FileDescriptor);
         return ERROR;
     }
 
-    LogInfo("File descriptor %d closed successfully",socket->FileDescriptor);
+    LogInfo("File descriptor %d closed successfully", tcpConnection->FileDescriptor);
 
-    free(socket);
+    DestroyTcpConnection(tcpConnection);
 
-    LogInfo("TCP socket disposed successfully");
+    LogInfo("TCP tcpConnection disposed successfully");
 
     return OK;
 }
@@ -41,7 +59,8 @@ int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
         return ERROR;
     }
 
-    LogInfo("Disconnecting %s from TCP socket on file descriptor %d...", GetShutdownModeName(how), socket->FileDescriptor);
+    LogInfo("Disconnecting %s from TCP socket on file descriptor %d...", GetShutdownModeName(how),
+            socket->FileDescriptor);
 
     int shutdownResult = shutdown(socket->FileDescriptor, how);
 
@@ -64,13 +83,15 @@ int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
     }
 
 
-    LogInfo("Successfully disconnected %s from TCP socket on file descriptor %d!", GetShutdownModeName(how), socket->FileDescriptor);
+    LogInfo("Successfully disconnected %s from TCP socket on file descriptor %d!", GetShutdownModeName(how),
+            socket->FileDescriptor);
 
     return OK;
 }
 
 TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, socklen_t addrSize) {
-    TcpConnection *tcpSocket = calloc(1, sizeof(TcpConnection));
+
+    TcpConnection *tcpSocket = GetTcpConnection();
 
     memcpy(&tcpSocket->Address, addr, addrSize);
     tcpSocket->AddressLength = addrSize;
@@ -91,16 +112,15 @@ bool IsTcpConnectionDisconnected(TcpConnection *connection) {
 
 bool IsTcpConnectionReady(TcpConnection *connection) {
     int error = 0;
-    socklen_t len = sizeof (error);
-    int result = getsockopt(connection->FileDescriptor,SOL_SOCKET,SO_ERROR,&error,&len);
+    socklen_t len = sizeof(error);
+    int result = getsockopt(connection->FileDescriptor, SOL_SOCKET, SO_ERROR, &error, &len);
 
-    if (result < 0)
-    {
-        LogError(false,"Cannot get Socket Options");
+    if (result < 0) {
+        LogError(false, "Cannot get Socket Options");
         return false;
     }
 
-    if (error != 0){
+    if (error != 0) {
         errno = error;
         return false;
     }
@@ -108,3 +128,107 @@ bool IsTcpConnectionReady(TcpConnection *connection) {
 
     return true;
 }
+
+
+
+void DestroyTcpConnection(TcpConnection * connection){
+    if (null == tcpPool) {
+        LogError(false, "TCP pool was not initialized");
+        return;
+    }
+
+    connection->FileDescriptor = -1;
+    memset(&connection->Address,0,connection->AddressLength);
+    connection->AddressLength = 0;
+
+    PooledTcpConnection * temp;
+
+    for (temp = tcpPool; temp != null && &temp->Connection != connection ; temp = temp->Next);
+
+    if (null == temp)
+    {
+        LogError(false,"Error while destroying connection!");
+        return;
+    }
+    assert(&temp->Connection == connection);
+    temp->Status = PooledConnectionEmpty;
+}
+
+
+TcpConnection *GetTcpConnection() {
+    if (null == tcpPool) {
+        LogError(false, "TCP pool was not initialized");
+        return null;
+    }
+
+    PooledTcpConnection * temp;
+
+    for ( temp = tcpPool; temp != null ; temp = temp->Next) {
+        if (PooledConnectionEmpty == temp->Status) {
+            temp->Status = PooledConnectionInUse;
+            return &temp->Connection;
+        }
+
+        if (null == temp->Next)
+            break;
+    }
+
+    temp->Next = calloc(1, sizeof(PooledTcpConnection));
+    temp = temp->Next;
+    temp->Status = PooledConnectionInUse;
+
+    return &temp->Connection;
+
+}
+
+
+void CleanTcpConnectionPool() {
+    LogInfo("Clening Tcp connection pool");
+    if (null == tcpPool) {
+        LogError(false, "TCP pool was not initialized. Cannot clean it");
+        return;
+    }
+
+    PooledTcpConnection * next;
+    for (PooledTcpConnection * conn = tcpPool; conn != null ; conn = next) {
+        next = conn->Next;
+        free(conn);
+    }
+}
+
+void InitTcpConnectionPool(int initialSize) {
+    LogInfo("Initializing TCP Pool");
+    if (initialSize < 1) {
+        LogInfo("Invalid initial pool size %d, using default value 1", initialSize);
+        initialSize = 1;
+    }
+
+    tcpPool = calloc(1, sizeof(PooledTcpConnection));
+    tcpPool->Status = PooledConnectionEmpty;
+    PooledTcpConnection *current = tcpPool;
+
+    while (--initialSize > 0) {
+        current->Next = calloc(1, sizeof(PooledTcpConnection));
+        current = current->Next;
+        current->Status = PooledConnectionEmpty;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

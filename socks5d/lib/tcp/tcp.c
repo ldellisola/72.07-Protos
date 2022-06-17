@@ -28,15 +28,16 @@ const SelectorOptions options = {
         }
 };
 
-bool InitTcpServer(const SelectorOptions *optionalOptions) {
+bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
 
+    InitTcpConnectionPool(poolSize);
 
-    if (0 != SelectorInit(null == optionalOptions ? &options : optionalOptions)) {
+    if (SELECTOR_STATUS_SUCCESS != SelectorInit(null == optionalOptions ? &options : optionalOptions)) {
         LogError(false, "Cannot initialize Selector");
         return false;
     }
 
-    selector = (struct fdselector *) SelectorNew(1024);
+    selector = SelectorNew(1024);
     if (null == selector) {
         LogError(false, "Cannot create selector");
         return false;
@@ -135,13 +136,13 @@ TcpConnection *AcceptNewTcpConnection(int fd) {
     }
 
     if (-1 == SelectorFdSetNio(client)) {
-        LogError(false, "Cannot set client socket non-blocking in fd %d", fd);
+        LogError(false, "Cannot set client socket non-blocking in fd %d", client);
         return null;
     }
 
     TcpConnection *tcpConnection = CreateTcpConnection(client, &clientAddr, clientAddrLen);
 
-    LogInfo("New TCP connection up and running on file descriptor %d", clientAddr);
+    LogInfo("New TCP connection up and running on file descriptor %d", tcpConnection->FileDescriptor);
 
     return tcpConnection;
 }

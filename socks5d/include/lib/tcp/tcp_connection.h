@@ -28,11 +28,11 @@ typedef struct {
 TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, socklen_t addrSize);
 
 /**
- * It safely disposes a tcp socket
- * @param socket socket to be disposed
+ * It safely disposes a tcp tcpConnection
+ * @param tcpConnection tcpConnection to be disposed
  * @return OK or ERROR whether there were any errors.
  */
-int DisposeTcpConnection(TcpConnection *socket, fd_selector selector);
+int DisposeTcpConnection(TcpConnection *tcpConnection, fd_selector selector);
 
 /**
  * It disconnects from a Tcp socket but it does not dispose it
@@ -56,6 +56,17 @@ bool IsTcpConnectionDisconnected(TcpConnection *connection);
  * @return True if the connection is ready to be used
  */
 bool IsTcpConnectionReady(TcpConnection * connection);
+
+/**
+ * It disposes all Tcp connections
+ */
+void CleanTcpConnectionPool();
+
+/**
+ * It initializes the TCP connection tcpPool with a given size
+ * @param initialSize initial size of the tcp tcpPool
+ */
+void InitTcpConnectionPool(int initialSize);
 
 
 #endif //SOCKS5D_TCP_CONNECTION_H
