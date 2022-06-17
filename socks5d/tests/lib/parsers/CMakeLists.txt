@@ -10,6 +10,7 @@ set(
         request_parser_test.c
         client_hello_parser_test.c
         client_goodbye_parser_test.c
+        client_timeout_parser_test.c
 )
 
 add_library(parsers_test STATIC ${SOURCES})
