@@ -20,14 +20,9 @@ RUN apt-get update \
       python \
       python-dev \
       check \
-      valgrind \
-      lcov \
-      pip \
       netcat \
       curl \
   && apt-get clean
-
-  RUN pip install gcovr
 
   ARG UID=1000
   RUN useradd -m -u ${UID} -s /bin/bash builder

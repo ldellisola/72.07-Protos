@@ -10,9 +10,6 @@ set(CMAKE_C_STANDARD 11)
 # Enable debugging
 set(CMAKE_BUILD_TYPE Debug)
 
-# Enable Coverage Tests
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage -O0")
-
 # Show all warning messages
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Werror -Wno-unused-parameter -Wno-implicit-fallthrough -pedantic -pedantic-errors")
 
@@ -24,3 +21,9 @@ add_subdirectory(src)
 enable_testing()
 
 add_subdirectory(tests)
+
+add_custom_target(graphviz ALL
+        COMMAND ${CMAKE_COMMAND} "--graphviz=foo.dot" .
+        COMMAND dot -Tpng foo.dot -o foo.png
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
