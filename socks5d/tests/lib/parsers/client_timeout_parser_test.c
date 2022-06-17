@@ -2,7 +2,7 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "hello.h"
+#include "client_timeout_parser_test.h"
 #include "parsers/client_timeout_parser.h"
 ClientTimeoutParser parser;
 
