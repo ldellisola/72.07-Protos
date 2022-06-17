@@ -11,4 +11,4 @@ set(
 add_executable(server ${SOURCES})
 add_library(server_lib ${SOURCES})
 
-target_link_libraries(server PUBLIC parsers socks5 tcp utils fsm selector)
+target_link_libraries(server PUBLIC  socks5 tcp utils selector)

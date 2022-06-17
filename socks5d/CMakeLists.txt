@@ -21,6 +21,12 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_POSIX_C_SOURCE=200112L ")
 add_subdirectory(lib)
 add_subdirectory(src)
 
-enable_testing()
+#enable_testing()
 
-add_subdirectory(tests)
+#add_subdirectory(tests)
+
+add_custom_target(graphviz ALL
+        COMMAND ${CMAKE_COMMAND} "--graphviz=foo.dot" .
+        COMMAND dot -Tpng foo.dot -o foo.png
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
+        )
