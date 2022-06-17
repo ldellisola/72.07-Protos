@@ -3,7 +3,7 @@
 //
 
 #include <errno.h>
-#include "socks5/socks5_establish_connection.h"
+#include "socks5/fsm_handlers/socks5_establish_connection.h"
 #include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 

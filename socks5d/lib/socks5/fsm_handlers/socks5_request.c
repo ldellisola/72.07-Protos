@@ -5,7 +5,7 @@
 #include <memory.h>
 #include <pthread.h>
 #include <stdio.h>
-#include "socks5/socks5_request.h"
+#include "socks5/fsm_handlers/socks5_request.h"
 #include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 #include "socks5/socks5_messages.h"

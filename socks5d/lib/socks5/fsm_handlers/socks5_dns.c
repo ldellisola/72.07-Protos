@@ -2,7 +2,7 @@
 // Created by Lucas Dell'Isola on 16/06/2022.
 //
 
-#include "socks5/socks5_dns.h"
+#include "socks5/fsm_handlers/socks5_dns.h"
 #include "socks5/socks5_connection.h"
 
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)

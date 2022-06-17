@@ -6,13 +6,13 @@
 #define SERVER_SOCKS_CONNECTION_H
 
 #include "tcp/tcp.h"
-#include "socks5/socks5_hello.h"
+#include "socks5/fsm_handlers/socks5_hello.h"
 #include "utils/buffer.h"
 #include "socks5_connection_status.h"
 #include "fsm/fsm.h"
-#include "socks5_auth.h"
-#include "socks5_request.h"
-#include "socks5_establish_connection.h"
+#include "socks5/fsm_handlers/socks5_auth.h"
+#include "socks5/fsm_handlers/socks5_request.h"
+#include "socks5/fsm_handlers/socks5_establish_connection.h"
 #include "socks5_users.h"
 
 typedef struct {

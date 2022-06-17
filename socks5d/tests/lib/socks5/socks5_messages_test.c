@@ -40,7 +40,7 @@ START_TEST(BuildAuth_LoggedIn_Success)
         size_t size = BuildAuthResponse(buffer, bufferSize, authenticationSucceeded);
         // Assert
         ck_assert_int_eq(size, 2);
-        ck_assert_int_eq(buffer[0], SOCKS5_PROTOCOL_VERSION);
+        ck_assert_int_eq(buffer[0], SOCKS5_AUTH_NEGOTIATION_VERSION);
         ck_assert_int_eq(buffer[1], SOCKS5_AUTH_SUCCESS);
     }
 END_TEST
@@ -53,7 +53,7 @@ START_TEST(BuildAuth_InvalidUser_Success)
         size_t size = BuildAuthResponse(buffer, bufferSize, authenticationSucceeded);
         // Assert
         ck_assert_int_eq(size, 2);
-        ck_assert_int_eq(buffer[0], SOCKS5_PROTOCOL_VERSION);
+        ck_assert_int_eq(buffer[0], SOCKS5_AUTH_NEGOTIATION_VERSION);
         ck_assert_int_eq(buffer[1], SOCKS5_AUTH_FAILED);
     }
 END_TEST

@@ -8,14 +8,14 @@ set(
         socks5_connection.c
         socks5_server.c
         socks5_messages.c
-        socks5_hello.c
-        socks5_auth.c
-        socks5_request.c
-        socks5_establish_connection.c
-        socks5_connected.c
-        socks5_client.c
-        socks5_remote.c
-        socks5_dns.c
+        fsm_handlers/socks5_hello.c
+        fsm_handlers/socks5_auth.c
+        fsm_handlers/socks5_request.c
+        fsm_handlers/socks5_establish_connection.c
+        fsm_handlers/socks5_connected.c
+        fsm_handlers/socks5_client.c
+        fsm_handlers/socks5_remote.c
+        fsm_handlers/socks5_dns.c
         socks5_users.c
 )
 

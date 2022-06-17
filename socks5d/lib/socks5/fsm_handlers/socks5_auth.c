@@ -3,7 +3,7 @@
 //
 
 #include <string.h>
-#include "socks5/socks5_auth.h"
+#include "socks5/fsm_handlers/socks5_auth.h"
 #include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 #include "socks5/socks5_messages.h"

@@ -5,17 +5,17 @@
 #include <string.h>
 #include <assert.h>
 #include <time.h>
-#include "socks5/socks5_hello.h"
+#include "socks5/fsm_handlers/socks5_hello.h"
 #include "utils/logger.h"
 #include "parsers/auth_parser.h"
 #include "fsm/fsm.h"
-#include "socks5/socks5_auth.h"
-#include "socks5/socks5_request.h"
-#include "socks5/socks5_establish_connection.h"
-#include "socks5/socks5_connected.h"
-#include "socks5/socks5_client.h"
-#include "socks5/socks5_remote.h"
-#include "socks5/socks5_dns.h"
+#include "socks5/fsm_handlers/socks5_auth.h"
+#include "socks5/fsm_handlers/socks5_request.h"
+#include "socks5/fsm_handlers/socks5_establish_connection.h"
+#include "socks5/fsm_handlers/socks5_connected.h"
+#include "socks5/fsm_handlers/socks5_client.h"
+#include "socks5/fsm_handlers/socks5_remote.h"
+#include "socks5/fsm_handlers/socks5_dns.h"
 
 // TODO: Test
 

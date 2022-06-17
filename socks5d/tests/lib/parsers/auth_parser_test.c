@@ -48,7 +48,7 @@ END_TEST
 START_TEST(Feed_CorrectSocksVersion_Succeeds)
     {
         // Arrange
-        byte socksVersion = 0x05;
+        byte socksVersion = 0x01;
         // Act
         AuthParserState state = AuthParserFeed(&parser, socksVersion);
         // Assert
@@ -189,7 +189,7 @@ START_TEST(Consume_CompleteMessage_Succeeds)
         int messageLength = 9;
         byte uLen = 0x03;
         byte pLen = 0x03;
-        byte message[] = {0x05, uLen, 'p', 'r', 'o', pLen, 't', 'o', 's'};
+        byte message[] = {0x01, uLen, 'p', 'r', 'o', pLen, 't', 'o', 's'};
         // Act
         int consumedBytes = AuthParserConsume(&parser, message, messageLength);
         // Assert
@@ -209,7 +209,7 @@ START_TEST(Consume_CompleteMessageWithExtraLength_Succeeds)
         int messageLength = 12;
         byte uLen = 0x03;
         byte pLen = 0x03;
-        byte message[] = {0x05, uLen, 'p', 'r', 'o', pLen, 't', 'o', 's', 0, 0, 0};
+        byte message[] = {0x01, uLen, 'p', 'r', 'o', pLen, 't', 'o', 's', 0, 0, 0};
         // Act
         int consumedBytes = AuthParserConsume(&parser, message, messageLength);
         // Assert
@@ -227,7 +227,7 @@ START_TEST(Consume_IncompleteMessage_Succeeds)
         // Arrange
         int messageLength = 5;
         byte uLen = 0x03;
-        byte message[] = {0x05, uLen, 'p', 'r', 'o'};
+        byte message[] = {0x01, uLen, 'p', 'r', 'o'};
         // Act
         int consumedBytes = AuthParserConsume(&parser, message, messageLength);
         // Assert
@@ -244,7 +244,7 @@ START_TEST(Consume_NullParser_Fails)
         AuthParser *nullParser = null;
         int messageLength = 5;
         byte uLen = 0x03;
-        byte message[] = {0x05, uLen, 'p', 'r', 'o'};
+        byte message[] = {0x01, uLen, 'p', 'r', 'o'};
         // Act
         int consumedBytes = AuthParserConsume(nullParser, message, messageLength);
         // Assert

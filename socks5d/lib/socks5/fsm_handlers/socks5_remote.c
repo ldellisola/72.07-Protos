@@ -2,7 +2,7 @@
 // Created by Lucas Dell'Isola on 14/06/2022.
 //
 
-#include "socks5/socks5_remote.h"
+#include "socks5/fsm_handlers/socks5_remote.h"
 #include "socks5/socks5_connection.h"
 
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)

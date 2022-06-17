@@ -9,7 +9,7 @@
 #include "socks5/socks5_connection_status.h"
 #include "socks5/socks5_messages.h"
 
-#include "socks5/socks5_hello.h"
+#include "socks5/fsm_handlers/socks5_hello.h"
 
 typedef enum {
     SOCKS5_AUTH_NO_AUTH = 0,
