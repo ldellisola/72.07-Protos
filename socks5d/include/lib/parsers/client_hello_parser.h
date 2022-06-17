@@ -28,8 +28,8 @@ typedef struct {
     char UName[51];
     char Passwd[51];
     char Hello[5];
-    uint8_t index;
-    char* word;
+    uint8_t Index;
+    char* Word;
 
 } ClientHelloParser;
 

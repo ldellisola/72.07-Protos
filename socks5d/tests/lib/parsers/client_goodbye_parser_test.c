@@ -25,7 +25,7 @@ START_TEST(Reset_Succeeds)
         ck_assert_int_eq(parser.Goodbye[5], 'Y');
         ck_assert_int_eq(parser.Goodbye[6], 'E');
         ck_assert_int_eq(parser.State, Goodbye);
-        ck_assert_int_eq(parser.index, 0);
+        ck_assert_int_eq(parser.Index, 0);
     }
 END_TEST
 /**************************************************************************

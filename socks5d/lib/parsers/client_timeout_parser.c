@@ -7,10 +7,10 @@
 
 ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, ClientTimeoutParserState nextState, char *nextWord) {
 
-    if(strlen(p->word) == p->index){
+    if(strlen(p->Word) == p->Index){
         if(c == '|'){
-            p->word = nextWord;
-            p->index = 0;
+            p->Word = nextWord;
+            p->Index = 0;
             return nextState;
         }
         LogError(false, "The word has finished and character given isnt a terminating character");
@@ -18,11 +18,11 @@ ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, Cli
 
     }
 
-    if(c == p->word[p->index]){
-        p->index++;
+    if(c == p->Word[p->Index]){
+        p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->word);
+    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
     return TimeoutInvalidState;
 }
 
@@ -34,7 +34,7 @@ void ClientTimeoutParserReset(ClientTimeoutParser *p) {
     }
 
     p->State = TimeoutSet;
-    p->index = 0;
+    p->Index = 0;
     p->Value = 0;
 
     p->Timeout[0] = 'T';
@@ -50,7 +50,7 @@ void ClientTimeoutParserReset(ClientTimeoutParser *p) {
     p->Set[1] = 'E';
     p->Set[2] = 'T';
     p->Set[3] = 0;
-    p->word = p->Set;
+    p->Word = p->Set;
 
     LogInfo("TimeoutParser reset!");
 }
@@ -83,7 +83,7 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
                 p->State = TimeoutCRLF;
                 break;
             }
-            LogError(false, "Character is not a digit");
+            LogError(false, "Character\"%c\" is not a digit", c);
             p->State =TimeoutInvalidState;
             break;
         case TimeoutCRLF:

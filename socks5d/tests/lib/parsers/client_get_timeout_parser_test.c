@@ -28,7 +28,7 @@ START_TEST(Reset_Succeeds)
         ck_assert_int_eq(parser.Get[2], 'T');
         ck_assert_int_eq(parser.Get[3], 0);
         ck_assert_int_eq(parser.State, TimeoutGet);
-        ck_assert_int_eq(parser.index, 0);
+        ck_assert_int_eq(parser.Index, 0);
         }
 END_TEST
 ///**************************************************************************

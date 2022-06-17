@@ -5,5 +5,5 @@
 #ifndef SOCKS5D_CLIENT_TIMEOUT_PARSER_TEST_H
 #define SOCKS5D_CLIENT_TIMEOUT_PARSER_TEST_H
 #include <check.h>
-Suite *RegisterClientHiParserTestSuit();
+Suite *RegisterClientTimeoutParserTestSuit();
 #endif //SOCKS5D_CLIENT_TIMEOUT_PARSER_TEST_H

@@ -24,9 +24,9 @@ typedef struct {
     ClientTimeoutParserState State;
     char Timeout[8];
     char Set[4];
-    uint8_t Value;
-    uint8_t index;
-    char* word;
+    uint64_t Value;
+    uint8_t Index;
+    char* Word;
 
 } ClientTimeoutParser;
 bool ClientTimeoutParserHasFinished(ClientTimeoutParserState state);

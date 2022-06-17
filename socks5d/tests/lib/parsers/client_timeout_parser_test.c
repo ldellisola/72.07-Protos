@@ -27,7 +27,7 @@ START_TEST(Reset_Succeeds)
         ck_assert_int_eq(parser.Set[1], 'E');
         ck_assert_int_eq(parser.Set[2], 'T');
         ck_assert_int_eq(parser.State, TimeoutSet);
-        ck_assert_int_eq(parser.index, 0);
+        ck_assert_int_eq(parser.Index, 0);
         ck_assert_int_eq(parser.Value, 0);
         }
 END_TEST
@@ -165,10 +165,10 @@ START_TEST(Feed_Value_Succeeds)
 END_TEST
 
 
-Suite *RegisterClientHiParserTestSuit() {
-    Suite *s = suite_create("HiClientParser");
+Suite *RegisterClientTimeoutParserTestSuit() {
+    Suite *s = suite_create("TimeoutClientParser");
 
-    TCase *tc = tcase_create("HiClientParser");
+    TCase *tc = tcase_create("TimeoutClientParser");
     tcase_add_test(tc, Reset_Succeeds);
     tcase_add_test(tc, Feed_NullParser_Fails);
     tcase_add_test(tc, Feed_Complete_ExtraChar_Succeeds );
