@@ -10,6 +10,7 @@ set(
         request_parser.c
         client_hello_parser.c
         client_goodbye_parser.c
+        client_timeout_parser.c
 )
 
 add_library(parsers STATIC ${SOURCES})
