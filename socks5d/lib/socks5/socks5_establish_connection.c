@@ -77,6 +77,12 @@ unsigned EstablishConnectionRun(void *data) {
     unsigned selectorResult = 0;
 
     if (d->Command != SOCKS5_REPLY_NOT_DECIDED){
+        // If there are more addresses to try, I will reset the error and look for the next one
+        if (null != d->CurrentRemoteAddress->ai_next){
+            d->Command = SOCKS5_REPLY_NOT_DECIDED;
+            d->CurrentRemoteAddress = d->CurrentRemoteAddress->ai_next;
+            return CS_ESTABLISH_CONNECTION;
+        }
         // If I'm here it's because it never connected, so I don't have to dispose the remote connection
         selectorResult = SelectorSetInterest(key->Selector, connection->ClientTcpConnection->FileDescriptor,SELECTOR_OP_WRITE);
         return SELECTOR_STATUS_SUCCESS == selectorResult ? CS_REQUEST_WRITE : CS_ERROR;
@@ -105,8 +111,7 @@ unsigned EstablishConnectionRun(void *data) {
             d->Command = SOCKS5_REPLY_UNREACHABLE_NETWORK;
             break;
         case EHOSTUNREACH:
-            // If this happens, I need to try with another address
-//            d->Command = SOCKS5_REPLY_UNREACHABLE_HOST;
+            d->Command = SOCKS5_REPLY_UNREACHABLE_HOST;
             break;
         case ECONNREFUSED:
             d->Command = SOCKS5_REPLY_CONNECTION_REFUSED;
@@ -119,17 +124,12 @@ unsigned EstablishConnectionRun(void *data) {
             break;
     }
 
-    if (null != d->CurrentRemoteAddress->ai_next && SOCKS5_REPLY_NOT_DECIDED == d->Command){
+    // If there are more addresses to try, I will reset the error and look for the next one
+    if (null != d->CurrentRemoteAddress->ai_next){
+        d->Command = SOCKS5_REPLY_NOT_DECIDED;
         d->CurrentRemoteAddress = d->CurrentRemoteAddress->ai_next;
         return CS_ESTABLISH_CONNECTION;
     }
-
-
-    if (null == d->CurrentRemoteAddress->ai_next && SOCKS5_REPLY_NOT_DECIDED == d->Command)
-        // If this line is reached, then it means that all the available addresses were tried
-        // and we could not connect to any of them, so we are sending an unreachable host reply
-        d->Command = SOCKS5_REPLY_UNREACHABLE_HOST;
-
 
     selectorResult |= SelectorSetInterest(key->Selector, connection->ClientTcpConnection->FileDescriptor,SELECTOR_OP_WRITE);
     selectorResult |= SelectorSetInterest(key->Selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
