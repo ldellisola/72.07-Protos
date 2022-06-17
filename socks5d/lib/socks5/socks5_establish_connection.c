@@ -55,13 +55,14 @@ void EstablishConnectionInit(unsigned int state, void *data) {
         LogError(true, "Cannot connect to remote server");
         d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
         SelectorSetInterestKey(key,SELECTOR_OP_READ | SELECTOR_OP_WRITE);
-        return;
+//        return;
     }
 
     connection->RemoteTcpConnection = remoteConnection;
 }
 
 void EstablishConnectionClose(unsigned int state, void *data) {
+
     Socks5Connection * connection = ATTACHMENT(data);
     RequestData * d = &connection->Data.Request;
 
