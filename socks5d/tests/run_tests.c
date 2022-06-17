@@ -15,6 +15,7 @@
 #include "parsers/client_get_timeout_parser_test.h"
 #include "parsers/client_set_buffersize_parser_test.h"
 #include "parsers/client_get_buffersize_parser_test.h"
+#include "parsers/client_metrics_parser_test.h"
 
 
 int main(void) {
@@ -31,6 +32,7 @@ int main(void) {
             RegisterClientGetTimeoutParserTestSuit(),
             RegisterClientSetBufferSizeParserTestSuit(),
             RegisterClientGetBufferSizeParserTestSuit(),
+            RegisterClientMetricsParserTestSuit(),
             NULL
     };
     int failedTests = 0;
