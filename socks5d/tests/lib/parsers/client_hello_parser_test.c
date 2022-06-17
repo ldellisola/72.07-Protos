@@ -16,7 +16,7 @@ START_TEST(Reset_Succeeds)
         // Act
         ClientHelloParserReset(&parser);
         // Assert
-        for (int i = 0; i < 51; ++i) {
+        for (int i = 0; i < MAXLONG; ++i) {
             ck_assert_int_eq(parser.Passwd[i], 0);
             ck_assert_int_eq(parser.UName[i], 0);
         }
@@ -58,6 +58,10 @@ START_TEST(Feed_HELLO_CR_COMPLETE_Succeeds)
 
         // Assert
         ck_assert_int_eq(state, HelloFinished);
+        ck_assert_str_eq(parser.UName, "user\r1");
+        ck_assert_str_eq(parser.Passwd, "pass");
+
+
     }
 END_TEST
 
@@ -75,6 +79,7 @@ START_TEST(Feed_HELLO_CRLF_Username_COMPLETE_Fails)
 
         // Assert
         ck_assert_int_eq(state, HelloInvalidState);
+        ck_assert_str_eq(parser.UName, "user");
     }
 END_TEST
 
@@ -92,6 +97,8 @@ START_TEST(Feed_HELLO_COMPLETE_Succeeds)
 
         // Assert
         ck_assert_int_eq(state, HelloFinished);
+        ck_assert_str_eq(parser.UName, "user1");
+        ck_assert_str_eq(parser.Passwd, "pass");
     }
 END_TEST
 START_TEST(Feed_HELLOCRLF_Fails)
@@ -108,6 +115,9 @@ START_TEST(Feed_HELLOCRLF_Fails)
 
         // Assert
         ck_assert_int_eq(state, HelloPassword);
+
+        ck_assert_str_eq(parser.UName, "user1");
+        ck_assert_str_eq(parser.Passwd, "pass");
     }
 END_TEST
 
@@ -144,6 +154,7 @@ START_TEST(Feed_HELLOUsername_Succeeds)
 
         // Assert
         ck_assert_int_eq(state, HelloPassword);
+        ck_assert_str_eq(parser.UName, "user1");
     }
 END_TEST
 
