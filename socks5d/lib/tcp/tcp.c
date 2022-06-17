@@ -13,7 +13,8 @@
 #include "tcp/tcp.h"
 
 
-bool ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize);
+int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize,
+                 unsigned concurrentConnections);
 
 
 
@@ -47,7 +48,7 @@ bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
 }
 
 
-bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address) {
+int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections) {
     LogInfo("Staring TCP server on IPv4...");
 
     struct sockaddr_in addr;
@@ -65,19 +66,19 @@ bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char
                 break;
             case 0:
                 LogError(true, "Address %s cannot be parsed into an IPv4", address);
-                return false;
+                return -1;
             default:
                 LogError(true, "Unknown error parsing IPv4");
-                return false;
+                return -1;
         }
 
         addr.sin_addr = in4Addr;
     }
 
-    return ListenOnTcp(port, handler, (struct sockaddr *) &addr, sizeof(addr));
+    return ListenOnTcp(port, handler, (struct sockaddr *) &addr, sizeof(addr), concurrentConnections);
 }
 
-bool IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address) {
+int IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections) {
     LogInfo("Staring TCP server on IPv6...");
 
     struct sockaddr_in6 addr;
@@ -94,15 +95,15 @@ bool IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char
                 break;
             case 0:
                 LogError(true, "Address %s cannot be parsed into an IPv6", address);
-                return false;
+                return -1;
             default:
                 LogError(true, "Unknown error parsing IPv6");
-                return false;
+                return -1;
         }
         addr.sin6_addr = in6Addr;
     }
 
-    return ListenOnTcp(port, handler, (struct sockaddr *) &addr, sizeof(addr));
+    return ListenOnTcp(port, handler, (struct sockaddr *) &addr, sizeof(addr), concurrentConnections);
 
 }
 
@@ -314,25 +315,29 @@ TcpConnection *ConnectToIPv6TcpServer(struct sockaddr * address, const FdHandler
 }
 
 
-
-
-bool ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize) {
+int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize,
+                 unsigned concurrentConnections) {
 
     if (port > 65535 || port <= 0) {
         LogError(false, "Invalid port. Cannot be null");
-        return false;
+        return -1;
     }
 
     if (null == address){
         LogError(false,"Address cannot be null");
-        return false;
+        return -1;
+    }
+
+    if (null == selector) {
+        LogError(false, "Selector not created!");
+        return -1;
     }
 
     int servSock = socket(address->sa_family, SOCK_STREAM, IPPROTO_TCP);
 
     if (servSock < 0) {
         LogError(true, "Cannot open passive socket");
-        return false;
+        return -1;
     }
 
     setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
@@ -345,28 +350,23 @@ bool ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *a
     if (bind(servSock, address, addressSize) < 0) {
         LogError(true, "Cannot bind socket to file descriptor");
         close(servSock);
-        return false;
+        return -1;
     }
 
     LogInfo("Bound TCP server socket to file descriptor");
 
-    if (listen(servSock, 10) < 0) {
+    if (listen(servSock, concurrentConnections) < 0) {
         LogError(true, "Cannot set passive socket to listen");
         close(servSock);
-        return false;
+        return -1;
     }
-    LogInfo("Set TCP server socket to listen");
+
+    LogInfo("Set TCP server socket %d to listen", servSock);
 
     if (-1 == SelectorFdSetNio(servSock)) {
         LogError(false, "Cannot set server socket flags");
         close(servSock);
-        return false;
-    }
-
-    if (null == selector) {
-        LogError(false, "Selector not created!");
-        close(servSock);
-        return false;
+        return -1;
     }
 
     SelectorStatus status = SelectorRegister((fd_selector) selector, servSock, handler, SELECTOR_OP_READ, null);
@@ -374,10 +374,10 @@ bool ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *a
     if (status != SELECTOR_STATUS_SUCCESS) {
         LogError(false, "Cannot register TCP socket on selector");
         close(servSock);
-        return false;
+        return -1;
     }
 
-    return true;
+    return servSock;
 
 }
 

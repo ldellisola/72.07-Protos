@@ -26,7 +26,8 @@ bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize);
  * @param handler A set of callbacks to execute on ReadHead, WriteHead and close
  * @return Whether the operation was a success or not
  */
-bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address);
+int
+IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections);
 
 /**
  * It sets up a listener socket on a given port, using an IPv6 address
@@ -34,7 +35,8 @@ bool IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char
  * @param handler A set of callbacks to execute on ReadHead, WriteHead and close
  * @return Whether the operation was a success or not
  */
-bool IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address);
+int
+IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections);
 
 /**
  * It runs the TCP server until it's stopped

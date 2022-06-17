@@ -66,7 +66,7 @@ int GetAddressFamily(const char *address) {
     return AF_UNSPEC;
 }
 
-uint16_t GetPortNumberFromNetworkOrder(const byte *port) {
+uint16_t GetPortNumberFromNetworkOrder(const byte port[2]) {
     uint16_t n =  port[0];
     return (n << 8) | port[1];
 }

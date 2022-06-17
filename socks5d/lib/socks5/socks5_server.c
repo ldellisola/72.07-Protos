@@ -8,6 +8,9 @@
 #include "tcp/tcp.h"
 #include "socks5/socks5_connection.h"
 
+int ipv4Socket = -1;
+int ipv6Socket = -1;
+
 void Socks5PassiveAccept(SelectorKey *key);
 
 const FdHandler socksv5 = {
@@ -43,7 +46,9 @@ bool RegisterSocks5ServerOnIPv4(const char *port, const char *address) {
     // TODO inspect this
     int portNum = atoi(port);
 
-    if (IPv4ListenOnTcpPort(portNum, &socksv5, address) == false)
+    ipv4Socket = IPv4ListenOnTcpPort(portNum, &socksv5, address, 50);
+
+    if ( -1 == ipv4Socket)
         return false;
 
     LogInfo("SOCKS5 server up and running on IPv4!");
@@ -55,7 +60,8 @@ bool RegisterSocks5ServerOnIPv6(const char *port, const char *address) {
     LogInfo("Starting SOCKS5 server on IPv6...");
     int portNum = atoi(port);
 
-    if (IPv6ListenOnTcpPort(portNum, &socksv5, address) == false)
+    ipv6Socket = IPv6ListenOnTcpPort(portNum, &socksv5, address, 50);
+    if (-1 == ipv6Socket)
         return false;
 
     LogInfo("SOCKS5 server up and running on IPv6!");
@@ -63,7 +69,13 @@ bool RegisterSocks5ServerOnIPv6(const char *port, const char *address) {
 }
 
 void DisposeSocks5Server() {
-    CleanTcpConnectionPool();
+    if (-1 != ipv6Socket)
+        close(ipv6Socket);
+
+    if (-1 != ipv4Socket)
+        close(ipv4Socket);
+
+    CleanSocks5ConnectionPool();
 }
 
 
