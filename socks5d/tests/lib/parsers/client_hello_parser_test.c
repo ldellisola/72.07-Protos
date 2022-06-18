@@ -43,7 +43,7 @@ START_TEST(Feed_NullParser_Fails)
         ck_assert_int_eq(state, HelloInvalidState);
     }
 END_TEST
-
+//
 START_TEST(Feed_HELLO_CR_COMPLETE_Succeeds)
     {
 
@@ -89,7 +89,7 @@ START_TEST(Feed_Password_Empty_Fails)
 
         // Arrange
         ClientHelloParserReset(&parser);
-        byte message[] = {'H', 'E', 'L','L', 'O', '|', 'a',  '|', '\r', '\n'};
+        byte message[] = {'H', 'E', 'L','L', 'O', '|', '\r',  '|', '\r', '\n'};
         ClientHelloParserState state;
         // Act
         for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
