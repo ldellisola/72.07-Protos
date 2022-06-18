@@ -18,6 +18,7 @@
 #include "parsers/client_metrics_parser_test.h"
 #include "parsers/client_set_user_parser_test.h"
 #include "parsers/client_list_users_parser_test.h"
+#include "parsers/client_del_user_parser_test.h"
 
 
 int main(void) {
@@ -37,6 +38,7 @@ int main(void) {
             RegisterClientMetricsParserTestSuit(),
             RegisterClientSetUserParserTestSuit(),
             RegisterClientListUsersParserTestSuit(),
+            RegisterClientDelUserParserTestSuit(),
             NULL
     };
     int failedTests = 0;

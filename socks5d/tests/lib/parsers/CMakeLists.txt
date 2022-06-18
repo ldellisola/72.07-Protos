@@ -16,7 +16,8 @@ set(
         client_get_buffersize_parser_test.c
         client_metrics_parser_test.c
         client_set_user_parser_test.c
-        client_list_users_parser_test.c)
+        client_list_users_parser_test.c
+        client_del_user_parser_test.c)
 
 add_library(parsers_test STATIC ${SOURCES})
 target_link_libraries(parsers_test PUBLIC parsers)
