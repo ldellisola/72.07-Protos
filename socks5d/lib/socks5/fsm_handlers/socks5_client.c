@@ -4,6 +4,7 @@
 
 #include "socks5/fsm_handlers/socks5_client.h"
 #include "socks5/socks5_connection.h"
+#include "socks5/socks5_metrics.h"
 
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
@@ -29,8 +30,8 @@ unsigned ClientReadRun(void *data) {
         return CS_REMOTE_WRITE;
     }
 
-
     BufferWriteAdv(&connection->WriteBuffer, bytes);
+    RegisterBytesTransferredInSocks5Metrics(bytes);
 
     // TODO Handle error
     SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);

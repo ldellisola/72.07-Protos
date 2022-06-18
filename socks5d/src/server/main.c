@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <memory.h>
 #include <unistd.h>
 #include <signal.h>
 #include "server/cli.h"
@@ -22,7 +21,6 @@ int main(int argc, char **argv) {
 
     signal(SIGTERM, sigterm_handler);
     signal(SIGINT, sigterm_handler);
-    signal(SIGALRM, sigterm_handler);
 
     CliArguments arguments = ParseCli(argc, argv);
 

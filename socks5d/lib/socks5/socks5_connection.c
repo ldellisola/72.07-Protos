@@ -16,6 +16,7 @@
 #include "socks5/fsm_handlers/socks5_client.h"
 #include "socks5/fsm_handlers/socks5_remote.h"
 #include "socks5/fsm_handlers/socks5_dns.h"
+#include "socks5/socks5_metrics.h"
 
 // TODO: Test
 
@@ -150,6 +151,8 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     BufferInit(&connection->WriteBuffer, 1000, writeBuffer);
     BufferInit(&connection->ReadBuffer, 1000, readBuffer);
 
+    RegisterConnectionInSocks5Metrics();
+
     LogInfo("Socks5Connection Created!");
     return connection;
 }
@@ -161,6 +164,8 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
         LogError(false, "Cannot destroy NULL Socks5Connection");
         return;
     }
+
+    RegisterDisconnectionInSocks5Metrics();
 
     if (null != connection->ClientTcpConnection)
         DisposeTcpConnection(connection->ClientTcpConnection, selector);
