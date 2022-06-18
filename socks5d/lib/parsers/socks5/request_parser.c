@@ -2,7 +2,7 @@
 
 #include <memory.h>
 #include "utils/logger.h"
-#include "parsers/request_parser.h"
+#include "parsers/socks5/request_parser.h"
 
 RequestParser RequestParserInit() {
     LogInfo("Creating RequestParser...");

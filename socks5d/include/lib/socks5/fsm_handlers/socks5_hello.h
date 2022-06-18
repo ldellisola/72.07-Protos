@@ -5,7 +5,7 @@
 #ifndef SOCKS5D_SOCKS5_HELLO_H
 #define SOCKS5D_SOCKS5_HELLO_H
 
-#include "parsers/hello_parser.h"
+#include "parsers/socks5/hello_parser.h"
 #include "utils/buffer.h"
 
 typedef struct {

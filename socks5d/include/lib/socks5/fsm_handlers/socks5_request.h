@@ -5,7 +5,7 @@
 #ifndef SOCKS5D_SOCKS5_REQUEST_H
 #define SOCKS5D_SOCKS5_REQUEST_H
 
-#include "parsers/request_parser.h"
+#include "parsers/socks5/request_parser.h"
 #include "utils/buffer.h"
 
 typedef struct {

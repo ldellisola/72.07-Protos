@@ -8,6 +8,7 @@
 #include "tcp/tcp.h"
 #include "socks5/socks5_connection.h"
 #include "socks5/socks5_metrics.h"
+#include "socks5/socks5_password_dissector.h"
 
 int ipv4Socket = -1;
 int ipv6Socket = -1;
@@ -23,11 +24,12 @@ const FdHandler socksv5 = {
         .handle_close      = NULL, // nada que liberar
 };
 
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, User * users, int userCount) {
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, User * users, int userCount, bool passwordDissectors) {
     CreateSocks5ConnectionPool(poolSize);
     SetConnectionTimeout(timeout);
     LoadSocks5Users(users,userCount);
     InitSocks5Metrics();
+    EnablePasswordDissector(passwordDissectors);
 
     if (null == address){
         bool success = RegisterSocks5ServerOnIPv4(port,null);

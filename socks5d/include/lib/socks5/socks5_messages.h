@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <netinet/in.h>
 #include "utils/utils.h"
-#include "parsers/request_parser.h"
+#include "parsers/socks5/request_parser.h"
 
 /**
  * It writes the HelloResponse message to a buffer
@@ -29,55 +29,6 @@ size_t BuildHelloResponse(byte *buffer, size_t length, int authenticationMethod)
 size_t BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceeded);
 
 /**
- * It writes the RequestResponse with an IPv4 address
- * @param buffer buffer to WriteHead to
- * @param length length of the buffer
- * @param replyCommand replyCommand command
- * @param address destination IPv4 address composed of 4 bytes
- * @param port byte array of two elements with the port'Selector bytes in network order
- * @return the length of the message, -1 if the buffer is to small
- */
-size_t
-BuildRequestResponseWithIPv4(byte *buffer, size_t length, int replyCommand, const byte *address, const byte *port);
-
-/**
- * It writes the RequestResponse with an IPv6 address
- * @param buffer buffer to WriteHead to
- * @param length length of the buffer
- * @param replyCommand replyCommand command
- * @param address destination IPv6 address composed of 16 bytes
- * @param port byte array of two elements with the port'Selector bytes in network order
- * @return the length of the message, -1 if the buffer is to small
- */
-size_t
-BuildRequestResponseWithIPv6(byte *buffer, size_t length, int replyCommand, const byte *address, const byte *port);
-
-/**
- * It writes the RequestResponse with an FQDN address
- * @param buffer buffer to WriteHead to
- * @param length length of the buffer
- * @param replyCommand reply command
- * @param address destination FQDN as a null-terminated string
- * @param port byte array of two elements with the port'Selector bytes in network order
- * @return the length of the message, -1 if the buffer is to small
- */
-size_t
-BuildRequestResponseWithFQDN(byte *buffer, size_t length, int replyCommand, const char *address, const byte *port);
-
-/**
- * It writes the RequestResponse
- * @param buffer buffer to WriteHead to
- * @param length length of the buffer
- * @param replyCommand reply command
- * @param addressType IPv4, IPv6 or FQDN
- * @param address destination address. It can be a FQDN as a null-terminated string, a IPv4 address as a 4 byte array or a IPv6 address as a 16 byte array
- * @param port byte array of two elements with the port'Selector bytes in network order
- * @return the length of the message, -1 if the buffer is to small
- */
-size_t
-BuildRequestResponse(byte *buffer, size_t length, int replyCommand, int addressType, void *address, const byte *port);
-
-/**
  * It writes the RequestResponse
  * @param buffer buffer to WriteHead to
  * @param length length of the buffer
@@ -85,7 +36,7 @@ BuildRequestResponse(byte *buffer, size_t length, int replyCommand, int addressT
  * @param parser RequestParser user to recieve the Data
  * @return the length of the message, -1 if the buffer is to small
  */
-size_t BuildRequestResponseFromParser(byte *buffer, size_t length, int replyCommand, RequestParser *parser);
+size_t BuildRequestResponse(byte *buffer, size_t length, int replyCommand);
 
 
 #endif //SOCKS5D_SOCKS5_MESSAGES_H

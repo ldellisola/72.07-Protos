@@ -20,7 +20,7 @@ unsigned RemoteReadRun(void *data) {
 
     size_t len;
     byte *buffer = BufferWritePtr(&connection->WriteBuffer, &len);
-    size_t bytes = ReadFromTcpConnection(connection->RemoteTcpConnection, buffer, len);
+    ssize_t bytes = ReadFromTcpConnection(connection->RemoteTcpConnection, buffer, len);
 
     if (0 == bytes) {
         // TODO Handle error
@@ -28,6 +28,10 @@ unsigned RemoteReadRun(void *data) {
         SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
         SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_WRITE);
         return CS_CLIENT_WRITE;
+    }
+
+    if (ERROR == bytes){
+        return CS_ERROR;
     }
 
     BufferWriteAdv(&connection->WriteBuffer, bytes);
@@ -70,8 +74,11 @@ unsigned RemoteWriteRun(void *data) {
     size_t len;
     byte *buffer = BufferReadPtr(&connection->WriteBuffer, &len);
 
-    size_t bytes = WriteToTcpConnection(connection->RemoteTcpConnection, buffer, len);
+    ssize_t bytes = WriteToTcpConnection(connection->RemoteTcpConnection, buffer, len);
 
+    if (ERROR == bytes){
+        return CS_ERROR;
+    }
 
     BufferReadAdv(&connection->WriteBuffer, bytes);
 

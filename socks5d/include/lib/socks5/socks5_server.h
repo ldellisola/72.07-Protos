@@ -32,7 +32,8 @@ bool RegisterSocks5ServerOnIPv6(const char *port, const char *address);
  * @param userCount Number of users indicated in the previous parameter
  * @return Whether the server was started successfully
  */
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, User * users, int userCount);
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, User *users, int userCount,
+                     bool passwordDissector);
 
 /**
  * It safely disposes all the allocated memory by the socks5 server

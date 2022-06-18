@@ -5,10 +5,9 @@
 #ifndef SOCKS5D_SOCKS5_CONNECTED_H
 #define SOCKS5D_SOCKS5_CONNECTED_H
 
-//.on_arrival = ConnectedConnectionInit,
-//.on_read_ready = ConnectedConnectionRun,
-//.on_departure = ConnectedConnectionClose
 
+void ConnectedConnectionInit(unsigned int state, void *data);
+void ConnectedConnectionClose(unsigned int state, void *data);
 
 unsigned ConnectedConnectionRun(void *data);
 

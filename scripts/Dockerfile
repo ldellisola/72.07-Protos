@@ -22,6 +22,7 @@ RUN apt-get update \
       check \
       netcat \
       curl \
+      dovecot-pop3d \
   && apt-get clean
 
   ARG UID=1000

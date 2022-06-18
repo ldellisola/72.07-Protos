@@ -171,7 +171,7 @@ ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t buffer
     long bytes = recv(socket->FileDescriptor, buffer, bufferLength, 0);
 
     if (bytes < 0) {
-        LogError(true, "Could not ReadHead from TCP socket on file descriptor %d", socket->FileDescriptor);
+        LogError(true, "Could not read from TCP socket on file descriptor %d", socket->FileDescriptor);
         return ERROR;
     }
 
@@ -179,7 +179,7 @@ ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t buffer
     return bytes;
 }
 
-size_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength) {
+ssize_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength) {
     if (socket == null) {
         LogError(false, "Cannot WriteHead to null TCP socket");
         return ERROR;

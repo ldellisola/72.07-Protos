@@ -15,9 +15,6 @@
 
 typedef uint8_t byte;
 
-
-int printSocketAddress(int fd, char *addrBuffer);
-
 /**
  * It obtains the string representation of an IP address
  * @param address IP address
@@ -30,13 +27,17 @@ const char * GetIPFromAddress(struct sockaddr_storage *address, char * buffer, s
 /**
  * It obtains the string representations of a port
  * @param address Address where the port is stored
- * @param buffer buffer to store the port
- * @param bufferSize max size of the buffer
- * @return Pointer to the string
+ * @return port number
  */
-const char *GetPortFromAddress(struct sockaddr_storage *address, char * buffer, size_t bufferSize);
+in_port_t GetPortFromAddress(struct sockaddr_storage *address);
 
-void PrintAccessLog(const char * username, struct sockaddr_storage * src,byte * destAddress,int destAddressType,byte destPort[2],int command);
+
+void PrintAccessLog(const char *username, const char *srcAddress, in_port_t srcPort, const char *destAddress,int destAddressType,
+                    in_port_t destPort, int command);
+
+void
+PrintPasswordLog(const char *username, char *destAddress, in_port_t destPort, const char *popUser,
+                 const char *popPassword);
 
 /**
  * It returns the name of the shutdown mode selected

@@ -16,6 +16,8 @@ typedef struct {
     socklen_t AddressLength;
     bool CanWrite;
     bool CanRead;
+    char AddressString[INET6_ADDRSTRLEN+1];
+    in_port_t Port;
 } TcpConnection;
 
 /**

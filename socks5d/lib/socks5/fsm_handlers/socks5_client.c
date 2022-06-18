@@ -5,6 +5,7 @@
 #include "socks5/fsm_handlers/socks5_client.h"
 #include "socks5/socks5_connection.h"
 #include "socks5/socks5_metrics.h"
+#include "socks5/socks5_password_dissector.h"
 
 #define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
@@ -20,7 +21,7 @@ unsigned ClientReadRun(void *data) {
 
     size_t len;
     byte *buffer = BufferWritePtr(&connection->WriteBuffer, &len);
-    size_t bytes = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, len);
+    ssize_t bytes = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, len);
 
     if (0 == bytes) {
         // TODO Handle error
@@ -30,8 +31,29 @@ unsigned ClientReadRun(void *data) {
         return CS_REMOTE_WRITE;
     }
 
+    if (ERROR == bytes){
+        return CS_ERROR;
+    }
+
     BufferWriteAdv(&connection->WriteBuffer, bytes);
     RegisterBytesTransferredInSocks5Metrics(bytes);
+
+    if (CanDetectPasswords(connection))
+    {
+        char * password, * user;
+        bool hasPassword = ScanForPOP3Passwords(buffer, bytes, &connection->Data.Pop3Parser, &user, &password);
+        if (hasPassword) {
+            PrintPasswordLog(
+                    null == connection->User ? null : connection->User->Username,
+                    connection->RemoteAddressString,
+                    connection->RemotePort,
+                    user,
+                    password);
+            ResetPop3AuthParser(&connection->Data.Pop3Parser);
+        }
+
+
+    }
 
     // TODO Handle error
     SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
@@ -67,7 +89,10 @@ unsigned ClientWriteRun(void *data) {
 
     size_t len;
     byte *buffer = BufferReadPtr(&connection->WriteBuffer, &len);
-    size_t bytes = WriteToTcpConnection(connection->ClientTcpConnection, buffer, len);
+    ssize_t bytes = WriteToTcpConnection(connection->ClientTcpConnection, buffer, len);
+
+    if (ERROR == bytes)
+        return CS_ERROR;
 
     BufferReadAdv(&connection->WriteBuffer, bytes);
 

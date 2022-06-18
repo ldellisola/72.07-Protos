@@ -18,6 +18,7 @@ set(
         fsm_handlers/socks5_dns.c
         socks5_users.c
         socks5_metrics.c
+        socks5_password_dissector.c
 )
 
 add_library(socks5 STATIC ${SOURCES})

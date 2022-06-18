@@ -45,8 +45,8 @@ int main(int argc, char **argv) {
             socks5PoolSize,
             socks5Timeout,
             arguments.Users,
-            arguments.UsersCount
-    );
+            arguments.UsersCount,
+            arguments.EnablePasswordScanners);
 
     if (startServer)
         RunTcpServer();

@@ -100,6 +100,9 @@ TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, sockle
     tcpSocket->CanRead = true;
     tcpSocket->CanWrite = true;
 
+    GetIPFromAddress(addr,tcpSocket->AddressString, sizeof(tcpSocket->AddressString));
+    tcpSocket->Port = GetPortFromAddress(addr);
+
     return tcpSocket;
 }
 

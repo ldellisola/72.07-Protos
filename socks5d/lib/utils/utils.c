@@ -11,44 +11,8 @@
 #include "utils/utils.h"
 
 
-int printSocketAddress(int fd, char *addrBuffer) {
 
-    struct sockaddr localAddr;
-    socklen_t addrSize = sizeof(localAddr);
-
-    if (getsockname(fd, (struct sockaddr *) &localAddr, &addrSize) < 0) {
-        return -1;
-    }
-
-    void *numericAddress;
-
-    in_port_t port;
-
-    switch (localAddr.sa_family) {
-        case AF_INET:
-            numericAddress = &((struct sockaddr_in *) &localAddr)->sin_addr;
-            port = ntohs(((struct sockaddr_in *) &localAddr)->sin_port);
-            break;
-        case AF_INET6:
-            numericAddress = &((struct sockaddr_in6 *) &localAddr)->sin6_addr;
-            port = ntohs(((struct sockaddr_in6 *) &localAddr)->sin6_port);
-            break;
-        default:
-            strcpy(addrBuffer, "[unknown type]");    // Unhandled type
-            return 0;
-    }
-    // Convert binary to printable address
-    if (inet_ntop(localAddr.sa_family, numericAddress, addrBuffer, INET6_ADDRSTRLEN) == NULL)
-        strcpy(addrBuffer, "[invalid address]");
-    else {
-        if (port != 0)
-            sprintf(addrBuffer + strlen(addrBuffer), ":%u", port);
-    }
-    return 1;
-}
-
-
-const char *GetPortFromAddress(struct sockaddr_storage *address, char * buffer, size_t bufferSize){
+in_port_t GetPortFromAddress(struct sockaddr_storage *address){
     in_port_t port;
     switch (address->ss_family) {
         case AF_INET:
@@ -58,11 +22,9 @@ const char *GetPortFromAddress(struct sockaddr_storage *address, char * buffer, 
             port = ntohs(((struct sockaddr_in6 *) &address)->sin6_port);
             break;
         default:
-            return "Unknown";
+            return 0;
     }
-
-    snprintf(buffer, bufferSize,"%u", port);
-    return buffer;
+    return port;
 }
 
 const char *GetIPFromAddress(struct sockaddr_storage *address, char * buffer, size_t bufferSize) {
@@ -111,7 +73,8 @@ uint16_t GetPortNumberFromNetworkOrder(const byte port[2]) {
     return (n << 8) | port[1];
 }
 
-void PrintAccessLog(const char * username, struct sockaddr_storage * src,byte * destAddress,int destAddressType,byte destPort[2],int command) {
+void PrintAccessLog(const char *username, const char *srcAddress, in_port_t srcPort, const char * destAddress,
+                    int destAddressType,in_port_t destPort, int command) {
     char timestamp[] = "YYYY-MM-ddTHH:mm:ssz";
     struct timeval tv;
     struct tm tm;
@@ -122,24 +85,45 @@ void PrintAccessLog(const char * username, struct sockaddr_storage * src,byte * 
     if (null == username)
         username = "unknown";
 
-    char srcAddress[INET6_ADDRSTRLEN + 1],srcPort[10];
-    GetIPFromAddress(src, srcAddress, sizeof(srcAddress));
-    GetPortFromAddress(src, srcPort, sizeof(srcPort));
 
     char destAddressBuffer[INET6_ADDRSTRLEN +1];
     if (AF_UNSPEC != destAddressType)
-        destAddress = (byte *) inet_ntop(destAddressType,destAddress,destAddressBuffer,INET6_ADDRSTRLEN);
+        destAddress = inet_ntop(destAddressType,destAddress,destAddressBuffer,INET6_ADDRSTRLEN);
 
-    printf("%s\t%s\tA\t%s\t%s\t%s\t%d\t%d\n",
+    printf("%s\t%s\tA\t%s\t%u\t%s\t%u\t%d\n",
            timestamp,
            username,
            srcAddress,
            srcPort,
            destAddress,
-           GetPortNumberFromNetworkOrder(destPort),
+           destPort,
            command
     );
 
+}
+
+void
+PrintPasswordLog(const char *username, char *destAddress, in_port_t destPort, const char *popUser,
+                 const char *popPassword) {
+    char timestamp[] = "YYYY-MM-ddTHH:mm:ssz";
+    struct timeval tv;
+    struct tm tm;
+    gettimeofday(&tv, NULL);
+    localtime_r(&tv.tv_sec, &tm);
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%Sz", &tm);
+
+    if (null == username)
+        username = "unknown";
+
+    printf("%s\t%s\tP\t%s\t%s\t%u\t%s\t%s\n",
+           timestamp,
+           username,
+           "POP3",
+           destAddress,
+           destPort,
+           popUser,
+           popPassword
+    );
 }
 
 

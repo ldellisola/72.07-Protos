@@ -4,9 +4,9 @@
 
 #include <check.h>
 #include <stdlib.h>
-#include "parsers/hello_parser_test.h"
-#include "parsers/auth_parser_test.h"
-#include "parsers/request_parser_test.h"
+#include "parsers/socks5/hello_parser_test.h"
+#include "parsers/socks5/auth_parser_test.h"
+#include "parsers/socks5/request_parser_test.h"
 #include "src/server/cli_test.h"
 #include "lib/socks5/socks5_messages_test.h"
 #include "parsers/client_hello_parser_test.h"
@@ -19,6 +19,7 @@
 #include "parsers/client_set_user_parser_test.h"
 #include "parsers/client_list_users_parser_test.h"
 #include "parsers/client_del_user_parser_test.h"
+#include "parsers/pop3/pop3_auth_parser_test.h"
 
 
 int main(void) {
@@ -39,6 +40,7 @@ int main(void) {
             RegisterClientSetUserParserTestSuit(),
             RegisterClientListUsersParserTestSuit(),
             RegisterClientDelUserParserTestSuit(),
+            RegisterPop3AuthParserTests(),
             NULL
     };
     int failedTests = 0;

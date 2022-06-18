@@ -5,7 +5,7 @@
 #ifndef SOCKS5D_SOCKS5_AUTH_H
 #define SOCKS5D_SOCKS5_AUTH_H
 
-#include "parsers/auth_parser.h"
+#include "parsers/socks5/auth_parser.h"
 #include "utils/buffer.h"
 
 typedef struct {

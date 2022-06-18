@@ -14,7 +14,7 @@ unsigned DnsRead(void *data) {
     RequestData * d = &connection->Data.Request;
 
     if (null == d->RemoteAddress) {
-        d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
+        d->Command = SOCKS5_REPLY_UNREACHABLE_HOST;
         int selectorResult = SelectorSetInterest(key->Selector, connection->ClientTcpConnection->FileDescriptor,SELECTOR_OP_WRITE);
         return SELECTOR_STATUS_SUCCESS == selectorResult ? CS_REQUEST_WRITE : CS_ERROR;
     }

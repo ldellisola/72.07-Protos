@@ -7,7 +7,7 @@
 #include <time.h>
 #include "socks5/fsm_handlers/socks5_hello.h"
 #include "utils/logger.h"
-#include "parsers/auth_parser.h"
+#include "parsers/socks5/auth_parser.h"
 #include "fsm/fsm.h"
 #include "socks5/fsm_handlers/socks5_auth.h"
 #include "socks5/fsm_handlers/socks5_request.h"
@@ -75,7 +75,9 @@ static StateDefinition socks5ConnectionFsm[] = {
         },
         {
                 .state = CS_CONNECTED,
+                .on_arrival = ConnectedConnectionInit,
                 .on_read_ready = ConnectedConnectionRun,
+                .on_departure = ConnectedConnectionClose
         },
         {
                 .state = CS_CLIENT_READ,
@@ -142,6 +144,7 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &socks5ConnectionHandler;
     connection->User = null;
+    connection->RemoteAddressString = null;
     connection->Fsm.InitialState = CS_HELLO_READ;
     connection->Fsm.StatesSize = CS_ERROR;
     InitFsm(&connection->Fsm, socks5ConnectionFsm);
@@ -181,6 +184,9 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
 
     if (null != connection->User)
         LogOutSocks5User(connection->User);
+
+    if (null != connection->RemoteAddressString)
+        free(connection->RemoteAddressString);
 
     DestroySocks5Connection(connection);
     LogInfo("Socks5Connection disposed!");

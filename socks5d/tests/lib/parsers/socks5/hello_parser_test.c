@@ -5,7 +5,7 @@
 #include <check.h>
 #include <stdio.h>
 #include "hello_parser_test.h"
-#include "parsers/hello_parser.h"
+#include "parsers/socks5/hello_parser.h"
 
 HelloParser parser;
 

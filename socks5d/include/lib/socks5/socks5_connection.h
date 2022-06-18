@@ -13,6 +13,7 @@
 #include "socks5/fsm_handlers/socks5_auth.h"
 #include "socks5/fsm_handlers/socks5_request.h"
 #include "socks5/fsm_handlers/socks5_establish_connection.h"
+#include "parsers/pop3/pop3_auth_parser.h"
 #include "socks5_users.h"
 
 typedef struct {
@@ -20,12 +21,17 @@ typedef struct {
     FiniteStateMachine Fsm;
     TcpConnection *ClientTcpConnection;
     TcpConnection *RemoteTcpConnection;
+    // Remote address and port are not guaranteed to exist anywhere else
+    char * RemoteAddressString;
+    in_port_t RemotePort;
+
     struct Socks5User * User;
     const FdHandler *Handler;
     union {
         HelloData Hello;
         AuthData Auth;
         RequestData Request;
+        Pop3AuthParser Pop3Parser;
     } Data;
     ArrayBuffer ReadBuffer, WriteBuffer;
 } Socks5Connection;

@@ -9,6 +9,7 @@
 #include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 #include "socks5/socks5_messages.h"
+#include "socks5/socks5_password_dissector.h"
 
 void * ResolveDNS(void *data);
 
@@ -66,8 +67,14 @@ unsigned RequestReadRun(void *data) {
             memcpy(allocatedKey, data, sizeof(SelectorKey));
             if(-1 == pthread_create(&tid, 0, ResolveDNS, allocatedKey))
                 d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
-            else
-                return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_DNS_READ : CS_ERROR;
+            else {
+                connection->RemotePort = GetPortNumberFromNetworkOrder(d->Parser.DestPort);
+                connection->RemoteAddressString = calloc(d->Parser.AddressLength+1, sizeof(char));
+                memcpy(connection->RemoteAddressString,d->Parser.DestAddress,d->Parser.AddressLength);
+
+                return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_DNS_READ
+                                                                                                 : CS_ERROR;
+            }
 
         }
         return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
@@ -84,8 +91,11 @@ unsigned RequestReadRun(void *data) {
         in->sin_family = AF_INET;
         memcpy(&in->sin_addr,d->Parser.DestAddress,4);
         memcpy(&in->sin_port,d->Parser.DestPort,2);
-
         d->CurrentRemoteAddress->ai_addr = (struct sockaddr *) in;
+
+        connection->RemoteAddressString = calloc(INET_ADDRSTRLEN +1, sizeof(char));
+        GetIPFromAddress((struct sockaddr_storage *) in, connection->RemoteAddressString,INET_ADDRSTRLEN +1);
+
     }
 
     if (SOCKS5_ADDRESS_TYPE_IPV6 == d->Parser.AType){
@@ -96,8 +106,12 @@ unsigned RequestReadRun(void *data) {
         memcpy(&in6->sin6_port,d->Parser.DestPort,2);
 
         d->CurrentRemoteAddress->ai_addr = (struct sockaddr *) in6;
+        connection->RemoteAddressString = calloc(INET6_ADDRSTRLEN +1, sizeof(char));
+        GetIPFromAddress((struct sockaddr_storage *) in6, connection->RemoteAddressString,INET6_ADDRSTRLEN +1);
     }
 
+
+    connection->RemotePort = GetPortNumberFromNetworkOrder(d->Parser.DestPort);
 
     return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_ESTABLISH_CONNECTION
                                                                                      : CS_ERROR;
@@ -109,6 +123,13 @@ void RequestWriteClose(unsigned int state, void *data) {
 
     BufferReset(d->WriteBuffer);
     BufferReset(d->ReadBuffer);
+
+    if (CanDetectPasswords(connection)) {
+        Pop3AuthParser * pop = &connection->Data.Pop3Parser;
+        pop->User = null;
+        pop->Password = null;
+        ResetPop3AuthParser(pop);
+    }
 }
 
 void RequestWriteInit(unsigned int state, void *data) {
@@ -119,7 +140,7 @@ void RequestWriteInit(unsigned int state, void *data) {
 
     size_t size;
     byte *buffer = BufferWritePtr(d->WriteBuffer, &size);
-    size_t messageSize = BuildRequestResponseFromParser(buffer, size, d->Command, &d->Parser);
+    size_t messageSize = BuildRequestResponse(buffer, size, d->Command);
     BufferWriteAdv(d->WriteBuffer, messageSize);
 
     int destAddressType;
@@ -137,10 +158,11 @@ void RequestWriteInit(unsigned int state, void *data) {
 
     PrintAccessLog(
             null == connection->User ? null : connection->User->Username,
-            &connection->ClientTcpConnection->Address,
-            connection->Data.Request.Parser.DestAddress,
+            connection->ClientTcpConnection->AddressString,
+            connection->ClientTcpConnection->Port,
+            (char *) connection->Data.Request.Parser.DestAddress,
             destAddressType,
-            connection->Data.Request.Parser.DestPort,
+            GetPortNumberFromNetworkOrder(connection->Data.Request.Parser.DestPort),
             connection->Data.Request.Command
     );
 

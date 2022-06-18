@@ -4,7 +4,7 @@
 
 #include <memory.h>
 #include <monetary.h>
-#include "parsers/auth_parser.h"
+#include "parsers/socks5/auth_parser.h"
 #include "utils/logger.h"
 
 //AuthParser AuthParserInit() {

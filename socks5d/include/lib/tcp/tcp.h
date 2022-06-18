@@ -77,7 +77,7 @@ ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t buffer
  * @param contentLength Content length to WriteHead
  * @return The size of the content written
  */
-size_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength);
+ssize_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength);
 
 
 TcpConnection *ConnectToIPv4TcpServer(struct sockaddr *address, const FdHandler *handler, void *data);

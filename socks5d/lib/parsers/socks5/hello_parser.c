@@ -2,7 +2,7 @@
 
 #include <monetary.h>
 #include <memory.h>
-#include "parsers/hello_parser.h"
+#include "parsers/socks5/hello_parser.h"
 #include "utils/logger.h"
 #include "utils/utils.h"
 
