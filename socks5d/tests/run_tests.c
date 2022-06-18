@@ -17,6 +17,7 @@
 #include "parsers/client_get_buffersize_parser_test.h"
 #include "parsers/client_metrics_parser_test.h"
 #include "parsers/client_set_user_parser_test.h"
+#include "parsers/client_list_users_parser_test.h"
 
 
 int main(void) {
@@ -35,6 +36,7 @@ int main(void) {
             RegisterClientGetBufferSizeParserTestSuit(),
             RegisterClientMetricsParserTestSuit(),
             RegisterClientSetUserParserTestSuit(),
+            RegisterClientListUsersParserTestSuit(),
             NULL
     };
     int failedTests = 0;
