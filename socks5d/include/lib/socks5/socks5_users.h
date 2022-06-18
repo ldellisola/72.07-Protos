@@ -8,7 +8,13 @@
 #include <stdbool.h>
 #include "socks5.h"
 
-struct Socks5User;
+typedef struct Socks5User{
+    struct Socks5User * Next;
+    char * Username;
+    char * Password;
+    bool InUse;
+    bool IsLoggedIn;
+}Socks5User;
 
 /**
  * It loads to memory a set of users
@@ -23,7 +29,7 @@ void LoadSocks5Users(User* users, int length);
  * @param password password of the user
  * @return the user if it is authorized, else null
  */
-struct Socks5User * LogInSocks5User(const char * username, const char * password);
+Socks5User * LogInSocks5User(const char * username, const char * password);
 
 /**
  * It logs out a user from the socks5 server

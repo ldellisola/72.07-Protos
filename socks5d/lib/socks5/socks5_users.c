@@ -10,13 +10,7 @@
 #include "utils/utils.h"
 #include "utils/logger.h"
 
-typedef struct{
-    struct Socks5User * Next;
-    char * Username;
-    char * Password;
-    bool InUse;
-    bool IsLoggedIn;
-}Socks5User;
+
 
 Socks5User * currentUsers = null;
 
@@ -43,7 +37,7 @@ void LoadSocks5Users(User * users, int length) {
     }
 }
 
-struct Socks5User * LogInSocks5User(const char * username, const char * password) {
+Socks5User * LogInSocks5User(const char * username, const char * password) {
 
     if(null == username || null ==password)
     {
@@ -58,7 +52,7 @@ struct Socks5User * LogInSocks5User(const char * username, const char * password
         bool isAuthorized = 0 == strcmp(current->Username,username);
         isAuthorized &= 0 == strcmp(current->Password,password);
         if (isAuthorized)
-            return (struct Socks5User *) current;
+            return current;
     }
 
     return null;
@@ -72,7 +66,7 @@ bool DeleteSocks5User(const char *username) {
     }
 
     Socks5User * current = null;
-    for (current = currentUsers; null != current ; current = (Socks5User *) current->Next){
+    for (current = currentUsers; null != current ; current = current->Next){
         bool isUser = 0 == strcmp(current->Username,username);
         if (isUser && !current->IsLoggedIn)
         {
@@ -95,7 +89,7 @@ bool DeleteSocks5User(const char *username) {
 
 int GetAllLoggedInSocks5Users(char **usernames, int length) {
     int i = 0;
-    for (Socks5User * current = currentUsers; null != current ; current = (Socks5User *) current->Next){
+    for (Socks5User * current = currentUsers; null != current ; current = current->Next){
         if (current->InUse && current->IsLoggedIn) {
             usernames[i++] = current->Username;
             if (i == length)
@@ -115,7 +109,7 @@ void LogOutSocks5User(struct Socks5User *user) {
 
     Socks5User * current = null;
 
-    for (current = currentUsers; null != current ; current = (Socks5User *) current->Next){
+    for (current = currentUsers; null != current ; current = current->Next){
         if ((Socks5User *)user == current)
             current->IsLoggedIn = false;
     }
@@ -145,7 +139,7 @@ void DisposeAllSocks5Users() {
 
 void LoadSingleUser(User* user){
     Socks5User * current = null;
-    for (current = currentUsers; null != current ; current = (Socks5User *) current->Next){
+    for (current = currentUsers; null != current ; current = current->Next){
         if (!current->InUse)
         {
             current->InUse = true;

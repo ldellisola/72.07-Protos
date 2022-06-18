@@ -6,6 +6,8 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <time.h>
 #include "utils/utils.h"
 
 
@@ -45,6 +47,44 @@ int printSocketAddress(int fd, char *addrBuffer) {
     return 1;
 }
 
+
+const char *GetPortFromAddress(struct sockaddr_storage *address, char * buffer, size_t bufferSize){
+    in_port_t port;
+    switch (address->ss_family) {
+        case AF_INET:
+            port = ntohs(((struct sockaddr_in *) &address)->sin_port);
+            break;
+        case AF_INET6:
+            port = ntohs(((struct sockaddr_in6 *) &address)->sin6_port);
+            break;
+        default:
+            return "Unknown";
+    }
+
+    snprintf(buffer, bufferSize,"%u", port);
+    return buffer;
+}
+
+const char *GetIPFromAddress(struct sockaddr_storage *address, char * buffer, size_t bufferSize) {
+    void *numericAddress;
+
+    switch (address->ss_family) {
+        case AF_INET:
+            numericAddress = &((struct sockaddr_in *)address)->sin_addr;
+            break;
+        case AF_INET6:
+            numericAddress = &((struct sockaddr_in6 *)address)->sin6_addr;
+            break;
+        default:
+            return "Unknown";
+    }
+
+    if (inet_ntop(address->ss_family, numericAddress, buffer, bufferSize) == NULL)
+        strcpy(buffer, "[invalid address]");
+
+    return buffer;
+}
+
 const char *GetShutdownModeName(int shutdownMode) {
     switch (shutdownMode) {
         case SHUT_WR: return "write";
@@ -69,6 +109,37 @@ int GetAddressFamily(const char *address) {
 uint16_t GetPortNumberFromNetworkOrder(const byte port[2]) {
     uint16_t n =  port[0];
     return (n << 8) | port[1];
+}
+
+void PrintAccessLog(const char * username, struct sockaddr_storage * src,byte * destAddress,int destAddressType,byte destPort[2],int command) {
+    char timestamp[] = "YYYY-MM-ddTHH:mm:ssz";
+    struct timeval tv;
+    struct tm tm;
+    gettimeofday(&tv, NULL);
+    localtime_r(&tv.tv_sec, &tm);
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%dT%H:%M:%Sz", &tm);
+
+    if (null == username)
+        username = "unknown";
+
+    char srcAddress[INET6_ADDRSTRLEN + 1],srcPort[10];
+    GetIPFromAddress(src, srcAddress, sizeof(srcAddress));
+    GetPortFromAddress(src, srcPort, sizeof(srcPort));
+
+    char destAddressBuffer[INET6_ADDRSTRLEN +1];
+    if (AF_UNSPEC != destAddressType)
+        destAddress = (byte *) inet_ntop(destAddressType,destAddress,destAddressBuffer,INET6_ADDRSTRLEN);
+
+    printf("%s\t%s\tA\t%s\t%s\t%s\t%d\t%d\n",
+           timestamp,
+           username,
+           srcAddress,
+           srcPort,
+           destAddress,
+           GetPortNumberFromNetworkOrder(destPort),
+           command
+    );
+
 }
 
 

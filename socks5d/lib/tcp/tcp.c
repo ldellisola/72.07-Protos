@@ -216,7 +216,6 @@ TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler
         return null;
     }
 
-
     int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
 

@@ -122,6 +122,28 @@ void RequestWriteInit(unsigned int state, void *data) {
     size_t messageSize = BuildRequestResponseFromParser(buffer, size, d->Command, &d->Parser);
     BufferWriteAdv(d->WriteBuffer, messageSize);
 
+    int destAddressType;
+
+    switch (connection->Data.Request.Parser.AType) {
+        case SOCKS5_ADDRESS_TYPE_IPV4:
+            destAddressType = AF_INET;
+            break;
+        case SOCKS5_ADDRESS_TYPE_IPV6:
+            destAddressType = AF_INET6;
+            break;
+        default:
+            destAddressType = AF_UNSPEC;
+    }
+
+    PrintAccessLog(
+            null == connection->User ? null : connection->User->Username,
+            &connection->ClientTcpConnection->Address,
+            connection->Data.Request.Parser.DestAddress,
+            destAddressType,
+            connection->Data.Request.Parser.DestPort,
+            connection->Data.Request.Command
+    );
+
 }
 
 unsigned RequestWriteRun(void *data) {
