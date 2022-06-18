@@ -109,6 +109,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                     if(p->Index == 0){
                         p->State = HelloInvalidState;
                         LogError(false, "Password has to be at least 1 character long");
+                        break;
                     }
                     p->State = HelloFinished;
                     break;

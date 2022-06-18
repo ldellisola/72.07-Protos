@@ -15,7 +15,9 @@ set(
         client_set_buffersize_parser.c
         client_get_buffersize_parser.c
         client_metrics_parser.c
-        client_set_user_parser.c )
+        client_set_user_parser.c
+        client_list_users_parser.c
+        client_del_user_parser.c )
 
 add_library(parsers STATIC ${SOURCES})
 target_link_libraries(parsers PUBLIC utils)
