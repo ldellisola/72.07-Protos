@@ -7,55 +7,21 @@
 
 ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloParserState nextState, char *nextWord) {
 //    LogError(false, "char c = %c", c);
-    if(p->State == Hello){
-        if (p->Index == strlen(p->Word)) {
-            if (c == '|') {
-                p->Index = 0;
-                p->Word = nextWord;
-                return nextState;
-            }
-            LogError(false, "Im in the last letter of the word and there is no pipe");
-            return HelloInvalidState;
+    if(strlen(p->Word) == p->Index){
+        if(c == '|'){
+            p->Word = nextWord;
+            p->Index = 0;
+            return nextState;
         }
-
-        // CASO SEGUIR: el caracter es parte de la palabra, seguir
-        if (c == p->Word[p->Index]) {
-            p->Index++;
-            return p->State;
-        }
-        LogError(false, "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
+        LogError(false, "Im in the last letter of the word and there is no pipe");
         return HelloInvalidState;
     }
-    if(p->State == HelloCRLF){
-        if(c == '\n'){
-            if(p->PrevState == HelloPassword){
-                return nextState;
-            }
-            LogError(false, "Arguments are missing");
-            return HelloInvalidState;
-        }
-        p->State = p->PrevState;
-        p->Word[p->Index] = '\r';
-        p->Index ++;
-        p->Word[p->Index] = (char)c;
+    if (c == p->Word[p->Index]) {
+        p->Index++;
+        return p->State;
     }
-
-    if(c == '|'){
-        p->Index = 0;
-        p->Word = nextWord;
-        return nextState;
-    }
-    if(c == '\r'){
-        p->PrevState = p->State;
-        return HelloCRLF;
-    }
-    if(p->Index == MAXLONG+1){
-        LogError(false, "Username or Password too long, max 255 char");
-        return HelloInvalidState;
-    }
-    p->Word[p->Index] = (char)c;
-    p->Index++;
-    return p->State;
+    LogError(false, "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
+    return HelloInvalidState;
 
 }
 
@@ -83,6 +49,7 @@ void ClientHelloParserReset(ClientHelloParser *p) {
 
 ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
     LogInfo("Feeding %d to ClientHelloParser", c);
+//    LogError(false, "char= %c", c);
     if (null == p) {
         LogError(false, "Cannot feed HelloParser if is NULL");
         return HelloInvalidState;
@@ -93,13 +60,101 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             p->State = traverseWord(p, c, HelloUsername, p->UName);
             break;
         case HelloUsername:
-            p->State = traverseWord(p, c, HelloPassword, p->Passwd);
+            if(c == '|'){
+                if(p->Index == 0){
+                    LogError(false, "Username has to be at least 1 character long");
+                    p->State = HelloInvalidState;
+                    break;
+                }
+                p->State = HelloPassword;
+                p->Word = p->Passwd;
+                p->Index = 0;
+                break;
+            }
+            if(c == '\r'){
+                p->PrevState = HelloUsername;
+                p->State = HelloCRLF;
+                break;
+            }
+            if(p->Index == MAXLONG+1){
+                LogError(false, "Username can have max 255 characters");
+                p->State = HelloInvalidState;
+                break;
+            }
+            p->Word[p->Index] = (char)c;
+            p->Index++;
             break;
         case HelloPassword:
-            p->State = traverseWord(p, c, HelloCRLF, "\r\n");
+            if(c == '|'){
+                LogError(false, "Too many arguments");
+                p->State = HelloInvalidState;
+                break;
+            }
+            if(c == '\r'){
+                p->PrevState = HelloPassword;
+                p->State = HelloCRLF;
+                break;
+            }
+            if(p->Index == MAXLONG+1){
+                LogError(false, "Password can have max 255 characters");
+                p->State = HelloInvalidState;
+                break;
+            }
+            p->Word[p->Index] = (char)c;
+            p->Index++;
             break;
         case HelloCRLF:
-            p->State = traverseWord(p, c, HelloFinished, null);
+            if(c == '\n'){
+                if(p->PrevState == HelloPassword){
+                    if(p->Index == 0){
+                        p->State = HelloInvalidState;
+                        LogError(false, "Password has to be at least 1 character long");
+                    }
+                    p->State = HelloFinished;
+                    break;
+                }
+                LogError(false, "More arguments needed");
+                p->State = HelloInvalidState;
+                break;
+            }
+            if(c == '\r'){
+                if(p->Index == MAXLONG+1){
+                    LogError(false, "Password and Username can have max 255 characters");
+                    p->State = HelloInvalidState;
+                    break;
+                }
+                p->Word[p->Index] = '\r';
+                p->Index++;
+                break;
+            }
+            if(c == '|'){
+                if(p->PrevState == HelloUsername){
+                    if(p->Index == MAXLONG+1){
+                        LogError(false, "Username can have max 255 characters");
+                        p->State = HelloInvalidState;
+                        break;
+                    }
+                    p->Word[p->Index] = '\r';
+                    p->Word = p->Passwd;
+                    p->Index = 0;
+                    p->State = HelloPassword;
+                    break;
+                }
+                LogError(false, "Too many arguments");
+                p->State = HelloInvalidState;
+                break;
+            }
+            if(p->Index == MAXLONG){
+                LogError(false, "Username and password can have max 255 characters");
+                p->State = HelloInvalidState;
+                break;
+            }
+
+            p->Word[p->Index] = '\r';
+            p->Index++;
+            p->Word[p->Index] = (char)c;
+            p->Index++;
+            p->State = p->PrevState;
             break;
         case HelloFinished:
         case HelloInvalidState:
