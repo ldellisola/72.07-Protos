@@ -18,6 +18,6 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D_POSIX_C_SOURCE=200112L ")
 add_subdirectory(lib)
 add_subdirectory(src)
 
-enable_testing()
-
-add_subdirectory(tests)
+#enable_testing()
+#
+#add_subdirectory(tests)

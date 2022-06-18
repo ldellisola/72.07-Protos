@@ -84,6 +84,7 @@ void DisposeSocks5Server() {
     if (-1 != ipv4Socket)
         close(ipv4Socket);
 
+    DisposeAllSocks5Users();
     CleanSocks5ConnectionPool();
 }
 

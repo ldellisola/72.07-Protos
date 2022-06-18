@@ -186,7 +186,7 @@ TcpConnection *GetTcpConnection() {
 
 
 void CleanTcpConnectionPool() {
-    LogInfo("Clening Tcp connection pool");
+    LogInfo("Cleaning Tcp connection pool");
     if (null == tcpPool) {
         LogError(false, "TCP pool was not initialized. Cannot clean it");
         return;

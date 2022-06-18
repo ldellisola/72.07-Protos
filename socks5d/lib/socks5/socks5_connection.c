@@ -213,7 +213,7 @@ void CreateSocks5ConnectionPool(int initialSize) {
 }
 
 void CleanSocks5ConnectionPool() {
-    LogInfo("Clening SOCKS5 connection pool");
+    LogInfo("Cleaning SOCKS5 connection pool");
     if (null == socks5Pool) {
         LogError(false, "TCP pool was not initialized. Cannot clean it");
         return;
