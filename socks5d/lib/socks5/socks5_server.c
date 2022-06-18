@@ -24,10 +24,12 @@ const FdHandler socksv5 = {
         .handle_close      = NULL, // nada que liberar
 };
 
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, User * users, int userCount, bool passwordDissectors) {
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout,
+                          const char *usernames[],
+                          const char *passwords[], bool passwordDissectors) {
     CreateSocks5ConnectionPool(poolSize);
     SetConnectionTimeout(timeout);
-    LoadSocks5Users(users,userCount);
+    LoadSocks5Users(usernames, passwords);
     InitSocks5Metrics();
     EnablePasswordDissector(passwordDissectors);
 

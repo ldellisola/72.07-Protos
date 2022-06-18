@@ -18,10 +18,10 @@ typedef struct Socks5User{
 
 /**
  * It loads to memory a set of users
- * @param users Users to add
- * @param length Number of users
+ * @param usernames usernames to add. The last element must be null
+ * @param passwords passwords to add. The last element must be null
  */
-void LoadSocks5Users(User* users, int length);
+void LoadSocks5Users(const char *usernames[], const char *passwords[]);
 
 /**
  * It checks if a user is authorized to use the server

@@ -10,7 +10,7 @@
 
 #define null NULL
 #define OK 0
-#define ERROR -1
+#define ERROR (-1)
 
 
 typedef uint8_t byte;

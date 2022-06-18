@@ -9,4 +9,4 @@ set(
 )
 
 add_library(server_test STATIC ${SOURCES})
-target_link_libraries(server_test PUBLIC server_lib)
+target_link_libraries(server_test PUBLIC server_lib utils)

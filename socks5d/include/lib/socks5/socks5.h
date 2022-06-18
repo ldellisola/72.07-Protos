@@ -11,7 +11,7 @@
 #define SOCKS5_AUTH_SUCCESS 0x00
 #define SOCKS5_AUTH_FAILED 0xFF
 
-#define SOCKS5_REPLY_NOT_DECIDED -1
+#define SOCKS5_REPLY_NOT_DECIDED (-1)
 #define SOCKS5_REPLY_SUCCEEDED 0x00
 #define SOCKS5_REPLY_GENERAL_FAILURE 0x01
 #define SOCKS5_REPLY_CONNECTION_NOT_ALLOWED  0x02
@@ -29,12 +29,6 @@
 #define SOCKS5_ADDRESS_TYPE_IPV4  0x01
 #define SOCKS5_ADDRESS_TYPE_FQDN  0x03
 #define SOCKS5_ADDRESS_TYPE_IPV6  0x04
-
-// TOD: Where can I put this???
-typedef struct {
-    char Username[51];
-    char Password[51];
-} User;
 
 
 #endif //SOCKS5D_SOCKS5_H

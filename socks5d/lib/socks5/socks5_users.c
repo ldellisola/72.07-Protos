@@ -6,7 +6,7 @@
 
 #include <stdbool.h>
 #include <string.h>
-#include "socks5/socks5.h"
+#include <assert.h>
 #include "utils/utils.h"
 #include "utils/logger.h"
 
@@ -14,26 +14,21 @@
 
 Socks5User * currentUsers = null;
 
-void LoadSingleUser(User* user);
+void LoadSingleUser(const char *username, const char *password);
 
-void LoadSocks5Users(User * users, int length) {
-    if (null == users)
+void LoadSocks5Users(const char *usernames[], const char *passwords[]) {
+    if (null == usernames)
     {
         LogError(false,"users cannot be null");
         return;
     }
 
-    if (length <0)
-    {
-        LogError(false,"Invalid number of users: %d",length);
-        return;
-    }
 
     if (null == currentUsers)
         currentUsers = calloc(1, sizeof(Socks5User));
 
-    for (int i = 0; i < length; ++i) {
-        LoadSingleUser(&users[i]);
+    for (int i = 0; null != usernames[i]; ++i) {
+        LoadSingleUser(usernames[i], passwords[i]);
     }
 }
 
@@ -137,19 +132,19 @@ void DisposeAllSocks5Users() {
 
 }
 
-void LoadSingleUser(User* user){
+void LoadSingleUser(const char *username, const char *password) {
     Socks5User * current = null;
     for (current = currentUsers; null != current ; current = current->Next){
         if (!current->InUse)
         {
             current->InUse = true;
-            int usernameLength = strlen(user->Username);
+            int usernameLength = strlen(username);
             current->Username = calloc(usernameLength+1, sizeof(char));
-            strncpy(current->Username,user->Username,usernameLength);
+            strncpy(current->Username, username, usernameLength);
 
-            int passwordLength = strlen(user->Password);
+            int passwordLength = strlen(password);
             current->Password = calloc(passwordLength+1, sizeof(char));
-            strncpy(current->Password,user->Password,passwordLength);
+            strncpy(current->Password, password, passwordLength);
 
             return;
         }
@@ -157,17 +152,18 @@ void LoadSingleUser(User* user){
         if (null == current->Next)
             break;
     }
+    assert(current != null);
 
     current->Next = calloc(1, sizeof(Socks5User));
     current = (Socks5User *) current->Next;
 
     current->InUse = true;
-    int usernameLength = strlen(user->Username);
+    int usernameLength = strlen(username);
     current->Username = calloc(usernameLength, sizeof(char));
-    strncpy(current->Username,user->Username,usernameLength);
+    strncpy(current->Username, username, usernameLength);
 
-    int passwordLength = strlen(user->Password);
+    int passwordLength = strlen(password);
     current->Password = calloc(passwordLength, sizeof(char));
-    strncpy(current->Password,user->Password,passwordLength);
+    strncpy(current->Password, password, passwordLength);
 }
 

@@ -5,17 +5,16 @@
 #include <string.h>
 #include <stdio.h>
 #include <strings.h>
+#include <getopt.h>
 #include "server/cli.h"
 #include "utils/utils.h"
 #include "utils/logger.h"
 
-bool HasArgument(int argc, char **argv, const char *argument);
-
-const char *GetSingleArgumentValue(int argc, char **argv, const char *argument);
-
-const char *GetMultipleArgumentValue(int argc, char **argv, int *startIndex, const char *argument);
 
 void PrintVersion();
+void PrintHelp();
+
+void LoadUser(CliArguments * args,int userNum, char * user);
 
 CliArguments ParseCli(int argc, char **argv) {
     CliArguments args = {
@@ -24,83 +23,64 @@ CliArguments ParseCli(int argc, char **argv) {
             .EnablePasswordScanners=true,
             .LuluPort="8080",
             .LuluAddress=null,
-            .UsersCount=0,
     };
 
-    bool printHelp = HasArgument(argc, argv, "-h");
-    if (printHelp) {
-        LogInfo("Printing Help Command");
-        PrintHelp();
-        exit(0);
+    memset(args.Usernames,0,sizeof(args.Usernames));
+    memset(args.Passwords,0,sizeof(args.Passwords));
+
+    int numberOfUsers = 0;
+    int ch;
+    while ((ch = getopt(argc,argv,"hl:L:Np:P:u:v")) != -1){
+        switch (ch) {
+            case 'l':
+                args.SocksAddress = optarg;
+                break;
+            case 'N':
+                args.EnablePasswordScanners = false;
+                break;
+            case 'L':
+                args.LuluAddress = optarg;
+                break;
+            case 'p':
+                args.SocksPort = optarg;
+                break;
+            case 'P':
+                args.LuluPort = optarg;
+                break;
+            case 'u':
+                if (numberOfUsers < 10)
+                    LoadUser(&args, numberOfUsers++,optarg);
+                else {
+                    LogError(false,"Invalid number of users detected. Maximum is 10");
+                    exit(1);
+                }
+                break;
+            case 'v':
+                PrintVersion();
+                exit(0);
+            case 'h':
+            default:
+                PrintHelp();
+                exit(0);
+        }
+
     }
-
-    const char *socks5Address = GetSingleArgumentValue(argc, argv, "-l");
-    if (null != socks5Address) {
-        args.SocksAddress = socks5Address;
-        LogInfo("Using SOCKS5 ADDRESS %s", args.SocksAddress);
-    } else
-        LogInfo("Using SOCKS5 ADDRESS all interfaces");
-
-    bool enablePasswordScanners = !HasArgument(argc, argv, "-N");
-    if (enablePasswordScanners)
-        LogInfo("Password scanners enabled");
-    else {
-        args.EnablePasswordScanners = false;
-        LogInfo("Password scanners disabled");
-    }
-
-    const char *luluAddress = GetSingleArgumentValue(argc, argv, "-L");
-    if (null != luluAddress) {
-        LogInfo("Using LULU ADDRESS %s", luluAddress);
-        args.LuluAddress = luluAddress;
-    } else
-        LogInfo("Using default LULU ADDRESS %s", args.LuluAddress);
-
-
-    const char *socks5Port = GetSingleArgumentValue(argc, argv, "-p");
-    if (null != socks5Port) {
-        args.SocksPort = socks5Port;
-        LogInfo("Using SOCKS5 PORT %s", args.SocksPort);
-    } else
-        LogInfo("Using default SOCKS5 PORT %s", args.SocksPort);
-
-
-    const char *luluPort = GetSingleArgumentValue(argc, argv, "-P");
-    if (null != luluPort) {
-        LogInfo("Using LULU PORT %s", luluPort);
-        args.LuluPort = luluPort;
-    } else
-        LogInfo("Using default LULU PORT %s", args.LuluPort);
-
-    int start = 0;
-    do {
-        const char *userData = GetMultipleArgumentValue(argc, argv, &start, "-u");
-        if (null == userData)
-            continue;
-        char *dividerAdds = strchr(userData, ':');
-        if (null == dividerAdds)
-            continue;
-        int dividerPos = dividerAdds - userData;
-
-        User user;
-        bzero(user.Username, 51);
-        strncpy(user.Username, userData, dividerPos);
-        bzero(user.Password, 51);
-        strncpy(user.Password, userData + dividerPos + 1, strlen(userData) - dividerPos - 1);
-        args.Users[args.UsersCount++] = user;
-        LogInfo("Detected user %s:%s", user.Username, user.Password);
-
-    } while (start < argc - 1 && args.UsersCount < 10);
-
-    bool printVersion = HasArgument(argc, argv, "-v");
-    if (printVersion) {
-        LogInfo("Printing version");
-        PrintVersion();
-        exit(0);
-    }
-
 
     return args;
+}
+
+
+void LoadUser(CliArguments * args,int userNum, char * user){
+    char *p = strchr(user, ':');
+    if(null == p) {
+        LogError(false,"Password not found");
+        exit(1);
+    } else {
+        *p = 0;
+        p++;
+        args->Usernames[userNum] = user;
+        args->Passwords[userNum] = p;
+    }
 }
 
 void PrintVersion() {
@@ -121,30 +101,3 @@ void PrintHelp() {
     printf("\t-v     Imprime información sobre la versión versión y termina.\n\n");
 }
 
-void PrintCLI(CliArguments arguments) {
-
-}
-
-bool HasArgument(int argc, char **argv, const char *argument) {
-
-    for (int i = 0; i < argc; ++i) {
-        if (0 == strcmp(argument, argv[i]))
-            return true;
-    }
-
-    return false;
-}
-
-const char *GetSingleArgumentValue(int argc, char **argv, const char *argument) {
-    int start = 0;
-    return GetMultipleArgumentValue(argc, argv, &start, argument);
-}
-
-const char *GetMultipleArgumentValue(int argc, char **argv, int *startIndex, const char *argument) {
-    while (*startIndex < argc - 1) {
-        int i = (*startIndex)++;
-        if (0 == strcmp(argument, argv[i]))
-            return argv[i + 1];
-    }
-    return null;
-}
