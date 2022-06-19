@@ -3,7 +3,7 @@
 //
 
 #include "client_hello_parser_test.h"
-#include "parsers/client_hello_parser.h"
+#include "parsers/lulu/client_hello_parser.h"
 ClientHelloParser parser;
 
 /**************************************************************************
@@ -40,7 +40,7 @@ START_TEST(Feed_NullParser_Fails)
         // Act
         ClientHelloParserState state = ClientHelloParserFeed(nullParser, 0);
         // Assert
-        ck_assert_int_eq(state, HelloInvalidState);
+        ck_assert_int_eq(state, ClientHelloInvalidState);
     }
 END_TEST
 //
@@ -52,7 +52,7 @@ START_TEST(Feed_HELLO_CR_COMPLETE_Succeeds)
         byte message[] = {'H', 'E', 'L','L', 'O', '|', 'u', 's', 'e','r','\r', '1', '|', 'p', 'a', 's', 's', '\r', '\n'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
@@ -72,7 +72,7 @@ START_TEST(Feed_Password_CR_Succeeds)
         byte message[] = {'H', 'E', 'L','L', 'O', '|', '\r',  '|', '\r', '\r', '\n'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
@@ -92,12 +92,12 @@ START_TEST(Feed_Password_Empty_Fails)
         byte message[] = {'H', 'E', 'L','L', 'O', '|', '\r',  '|', '\r', '\n'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, HelloInvalidState);
+        ck_assert_int_eq(state, ClientHelloInvalidState);
         ck_assert_str_eq(parser.UName, "\r");
 
 
@@ -111,12 +111,12 @@ START_TEST(Feed_UserName_Empty_Fails)
         byte message[] = {'H', 'E', 'L','L', 'O', '|',  '|', '\r','\r', '\n'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, HelloInvalidState);
+        ck_assert_int_eq(state, ClientHelloInvalidState);
 
 
     }
@@ -130,12 +130,12 @@ START_TEST(Feed_HELLO_CRLF_Username_COMPLETE_Fails)
         byte message[] = {'H', 'E', 'L','L', 'O', '|', 'u', 's', 'e','r','\r','\n', '1', '|', 'p', 'a', 's', 's', '\r', '\n'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, HelloInvalidState);
+        ck_assert_int_eq(state, ClientHelloInvalidState);
         ck_assert_str_eq(parser.UName, "user");
     }
 END_TEST
@@ -148,7 +148,7 @@ START_TEST(Feed_HELLO_COMPLETE_Succeeds)
         byte message[] = {'H', 'E', 'L','L', 'O', '|', 'u', 's', 'e','r', '1', '|', 'p', 'a', 's', 's', '\r', '\n'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
@@ -166,7 +166,7 @@ START_TEST(Feed_HELLOCRLF_Fails)
         byte message[] = {'H', 'E', 'L','L', 'O', '|', 'u', 's', 'e','r', '1', '|', 'p', 'a', 's', 's'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
@@ -187,7 +187,7 @@ START_TEST(Feed_HELLO_Succeeds)
         byte message[] = {'H', 'E', 'L','L', 'O', '|'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 
@@ -205,7 +205,7 @@ START_TEST(Feed_HELLOUsername_Succeeds)
         byte message[] = {'H', 'E', 'L','L', 'O', '|', 'u', 's', 'e','r', '1', '|'};
         ClientHelloParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != HelloInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != ClientHelloInvalidState; i++ ){
             state = ClientHelloParserFeed(&parser, message[i]);
         }
 

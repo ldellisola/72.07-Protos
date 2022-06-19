@@ -3,7 +3,7 @@
 //
 
 #include <unistd.h>
-#include "parsers/client_goodbye_parser.h"
+#include "parsers/lulu/client_goodbye_parser.h"
 #include "utils/logger.h"
 
 void ClientGoodbyeParserReset(ClientGoodbyeParser *p) {

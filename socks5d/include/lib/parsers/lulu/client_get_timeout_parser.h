@@ -10,11 +10,11 @@
 #include <stdbool.h>
 
 typedef enum {
-    TimeoutGet,
-    Timeout,
-    TimeoutCRLF,
-    TimeoutFinished,
-    TimeoutInvalidState
+    GetTimeoutGet,
+    GetTimeout,
+    GetTimeoutCRLF,
+    GetTimeoutFinished,
+    GetTimeoutInvalidState
 
 } ClientGetTimeoutParserState;
 

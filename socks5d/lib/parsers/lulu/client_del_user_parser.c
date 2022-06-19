@@ -2,7 +2,7 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "parsers/client_del_user_parser.h"
+#include "parsers/lulu/client_del_user_parser.h"
 #include "utils/logger.h"
 
 ClientDelUserParserState traverseWordDel(ClientDelUserParser *p, byte c, ClientDelUserParserState nextState, char *nextWord) {

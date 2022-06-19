@@ -2,7 +2,7 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "parsers/client_set_buffersize_parser.h"
+#include "parsers/lulu/client_set_buffersize_parser.h"
 #include "utils/logger.h"
 
 ClientSetBufferSizeParserState traverseWordSetBufferSize(ClientSetBufferSizeParser *p, byte c, ClientSetBufferSizeParserState nextState, char *nextWord) {
@@ -13,8 +13,8 @@ ClientSetBufferSizeParserState traverseWordSetBufferSize(ClientSetBufferSizePars
             p->Index = 0;
             return nextState;
         }
-        Error( "The word has finished and character given isnt a terminating character");
-        return BufferSizeInvalidState;
+        Error("The word has finished and character given isnt a terminating character");
+        return SetBufferSizeInvalidState;
 
     }
 
@@ -22,8 +22,8 @@ ClientSetBufferSizeParserState traverseWordSetBufferSize(ClientSetBufferSizePars
         p->Index++;
         return p->State;
     }
-    LogError( "%c is not part of the word \" %s \"", c, p->Word);
-    return BufferSizeInvalidState;
+    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    return SetBufferSizeInvalidState;
 }
 
 void ClientSetBufferSizeParserReset(ClientSetBufferSizeParser *p) {
@@ -64,16 +64,16 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
 
     if (null == p) {
         Error( "Cannot feed SetBufferSizeParser if is NULL");
-        return BufferSizeInvalidState;
+        return SetBufferSizeInvalidState;
     }
 
     switch (p->State) {
         case BufferSizeSet:
-//            Error( "BufferSizeSet");
-            p->State = traverseWordSetBufferSize(p, c, BufferSize, p->BufferSize);
+//            LogError(false, "BufferSizeSet");
+            p->State = traverseWordSetBufferSize(p, c, SetBufferSize, p->BufferSize);
             break;
-        case BufferSize:
-//            Error( "BufferSize");
+        case SetBufferSize:
+//            LogError(false, "BufferSize");
             p->State = traverseWordSetBufferSize(p, c, BufferSizeValue, null);
             break;
         case BufferSizeValue:
@@ -83,31 +83,31 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
                 p->Value = (p->Value * 10) + digit;
                 if(p->Value > 10000000000){
                     LogError("BufferSize too big", p->Value, digit);
-                    p->State = BufferSizeInvalidState;
+                    p->State = SetBufferSizeInvalidState;
                 }
 //                Error( "is digit, value = %d, digit = %d", p->Value, digit);
                 break;
             }
             if(c == '\r'){
-                p->State = BufferSizeCRLF;
+                p->State = SetBufferSizeCRLF;
                 break;
             }
-            LogError("Character\"%c\" is not a digit", c);
-            p->State =BufferSizeInvalidState;
+            LogError(false, "Character\"%c\" is not a digit", c);
+            p->State =SetBufferSizeInvalidState;
             break;
-        case BufferSizeCRLF:
-//            Error( "BufferSizeCRLF");
+        case SetBufferSizeCRLF:
+//            LogError(false, "BufferSizeCRLF");
             if( c == '\n'){
-                p->State = BufferSizeFinished;
+                p->State = SetBufferSizeFinished;
                 break;
             }
-            LogError("Waiting for LF for CRLF pair and got: %c", c);
-            p->State = BufferSizeInvalidState;
+            LogError(false, "Waiting for LF for CRLF pair and got: %c", c);
+            p->State = SetBufferSizeInvalidState;
             break;
-        case BufferSizeFinished:
-//            Error( "BufferSizeFinished");
-        case BufferSizeInvalidState:
-//            Error( "BufferSizeInvalidState");
+        case SetBufferSizeFinished:
+//            LogError(false, "BufferSizeFinished");
+        case SetBufferSizeInvalidState:
+//            LogError(false, "BufferSizeInvalidState");
             break;
     }
     return p->State;
@@ -136,12 +136,12 @@ bool ClientSetBufferSizeParserHasFinished(ClientSetBufferSizeParserState state) 
     switch (state) {
         default:
         case BufferSizeSet:
-        case BufferSize:
+        case SetBufferSize:
         case BufferSizeValue:
-        case BufferSizeCRLF:
+        case SetBufferSizeCRLF:
             return false;
-        case BufferSizeFinished:
-        case BufferSizeInvalidState:
+        case SetBufferSizeFinished:
+        case SetBufferSizeInvalidState:
             return true;
     }
 }

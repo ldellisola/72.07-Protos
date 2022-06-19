@@ -2,7 +2,7 @@
 // Created by tluci on 14/6/2022.
 //
 
-#include "parsers/client_hello_parser.h"
+#include "parsers/lulu/client_hello_parser.h"
 #include "utils/logger.h"
 
 ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloParserState nextState, char *nextWord) {
@@ -13,15 +13,15 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
             p->Index = 0;
             return nextState;
         }
-        Error( "Im in the last letter of the word and there is no pipe");
-        return HelloInvalidState;
+        Error("Im in the last letter of the word and there is no pipe");
+        return ClientHelloInvalidState;
     }
     if (c == p->Word[p->Index]) {
         p->Index++;
         return p->State;
     }
-    LogError( "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
-    return HelloInvalidState;
+    LogError(false, "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
+    return ClientHelloInvalidState;
 
 }
 
@@ -51,8 +51,8 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
     LogDebug("Feeding %d to ClientHelloParser", c);
 //    Error( "char= %c", c);
     if (null == p) {
-        Error( "Cannot feed HelloParser if is NULL");
-        return HelloInvalidState;
+        Error("Cannot feed HelloParser if is NULL");
+        return ClientHelloInvalidState;
     }
 
     switch (p->State) {
@@ -62,8 +62,8 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
         case HelloUsername:
             if(c == '|'){
                 if(p->Index == 0){
-                    Error( "Username has to be at least 1 character long");
-                    p->State = HelloInvalidState;
+                    Error("Username has to be at least 1 character long");
+                    p->State = ClientHelloInvalidState;
                     break;
                 }
                 p->State = HelloPassword;
@@ -77,8 +77,8 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error( "Username can have max 255 characters");
-                p->State = HelloInvalidState;
+                Error("Username can have max 255 characters");
+                p->State = ClientHelloInvalidState;
                 break;
             }
             p->Word[p->Index] = (char)c;
@@ -86,8 +86,8 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             break;
         case HelloPassword:
             if(c == '|'){
-                Error( "Too many arguments");
-                p->State = HelloInvalidState;
+                Error("Too many arguments");
+                p->State = ClientHelloInvalidState;
                 break;
             }
             if(c == '\r'){
@@ -96,8 +96,8 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error( "Password can have max 255 characters");
-                p->State = HelloInvalidState;
+                Error("Password can have max 255 characters");
+                p->State = ClientHelloInvalidState;
                 break;
             }
             p->Word[p->Index] = (char)c;
@@ -107,21 +107,21 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             if(c == '\n'){
                 if(p->PrevState == HelloPassword){
                     if(p->Index == 0){
-                        p->State = HelloInvalidState;
-                        Error( "Password has to be at least 1 character long");
+                        p->State = ClientHelloInvalidState;
+                        Error("Password has to be at least 1 character long");
                         break;
                     }
                     p->State = HelloFinished;
                     break;
                 }
-                Error( "More arguments needed");
-                p->State = HelloInvalidState;
+                Error("More arguments needed");
+                p->State = ClientHelloInvalidState;
                 break;
             }
             if(c == '\r'){
                 if(p->Index == MAXLONG+1){
-                    Error( "Password and Username can have max 255 characters");
-                    p->State = HelloInvalidState;
+                    Error("Password and Username can have max 255 characters");
+                    p->State = ClientHelloInvalidState;
                     break;
                 }
                 p->Word[p->Index] = '\r';
@@ -131,8 +131,8 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             if(c == '|'){
                 if(p->PrevState == HelloUsername){
                     if(p->Index == MAXLONG+1){
-                        Error( "Username can have max 255 characters");
-                        p->State = HelloInvalidState;
+                        Error("Username can have max 255 characters");
+                        p->State = ClientHelloInvalidState;
                         break;
                     }
                     p->Word[p->Index] = '\r';
@@ -141,13 +141,13 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                     p->State = HelloPassword;
                     break;
                 }
-                Error( "Too many arguments");
-                p->State = HelloInvalidState;
+                Error("Too many arguments");
+                p->State = ClientHelloInvalidState;
                 break;
             }
             if(p->Index == MAXLONG){
-                Error( "Username and password can have max 255 characters");
-                p->State = HelloInvalidState;
+                Error("Username and password can have max 255 characters");
+                p->State = ClientHelloInvalidState;
                 break;
             }
 
@@ -158,14 +158,14 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             p->State = p->PrevState;
             break;
         case HelloFinished:
-        case HelloInvalidState:
+        case ClientHelloInvalidState:
             break;
     }
     return p->State;
 }
 
 bool ClientHelloParserHasFailed(ClientHelloParserState state) {
-    return state == HelloInvalidState ? true : false;
+    return state == ClientHelloInvalidState ? true : false;
 }
 
 size_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, size_t length) {
@@ -195,7 +195,7 @@ bool ClientHelloParserHasFinished(ClientHelloParserState state) {
         case HelloPassword:
         case HelloUsername:
             return false;
-        case HelloInvalidState:
+        case ClientHelloInvalidState:
         case HelloFinished:
             return true;
     }

@@ -3,7 +3,7 @@
 //
 
 #include "client_set_user_parser_test.h"
-#include "parsers/client_set_user_parser.h"
+#include "parsers/lulu/client_set_user_parser.h"
 ClientSetUserParser parser;
 
 /**************************************************************************
