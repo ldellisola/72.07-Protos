@@ -19,7 +19,6 @@ typedef enum {
 
 SOCKS5_AUTH SelectAuthenticationMethod(byte *methods, int methodLength);
 
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 
 void HelloReadInit(unsigned int state, void *data) {

@@ -18,6 +18,7 @@
 #include "socks5/fsm_handlers/socks5_dns.h"
 #include "socks5/socks5_metrics.h"
 #include "socks5/socks5_buffer.h"
+#include "utils/object_pool.h"
 
 static void Socks5ConnectionRead(SelectorKey *key);
 static void Socks5ConnectionWrite(SelectorKey *key);
@@ -28,6 +29,7 @@ const FdHandler socks5ConnectionHandler = {
         .handle_write  = Socks5ConnectionWrite,
         .handle_block  = Socks5ConnectionBlock,
 };
+
 
 static StateDefinition socks5ConnectionFsm[] = {
         {
@@ -114,28 +116,24 @@ static StateDefinition socks5ConnectionFsm[] = {
         },
 };
 
-typedef enum {
-    PooledSocks5ConnectionEmpty,
-    PooledSocks5ConnectionInUse
-} PooledSocks5ConnectionStatus;
+void delete(void * obj){
+    memset(obj,0, sizeof(Socks5Connection));
+}
 
-typedef struct PooledSocks5Connection_{
-    struct PooledSocks5Connection_ * Next;
-    Socks5Connection Connection;
-    PooledSocks5ConnectionStatus Status;
-}PooledSocks5Connection;
+static ObjectPoolHandlers poolHandlers = {
+        .OnDispose = delete,
+        .OnCreate = null
+};
 
-PooledSocks5Connection * socks5Pool;
+static ObjectPool socks5Pool;
 time_t socksMaxTimeout = 100;
 
-Socks5Connection * GetSocks5Connection();
-void DestroySocks5Connection(Socks5Connection * connection);
 
 
 Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     Debug("Creating Socks5Connection.");
 
-    Socks5Connection *connection = GetSocks5Connection();
+    Socks5Connection *connection = GetObjectFromPool(&socks5Pool);
 
     if (null == tcpConnection)
         Error("Cannot allocate space for Socks5Connection");
@@ -182,7 +180,7 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
     if (null != connection->RemoteAddressString)
         free(connection->RemoteAddressString);
 
-    DestroySocks5Connection(connection);
+    DestroyObject(&socks5Pool, connection);
     Debug("Socks5Connection disposed!");
 }
 
@@ -190,40 +188,18 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
 
 void CreateSocks5ConnectionPool(int initialSize) {
     Debug("Initializing SOCKS5 Pool");
-    if (initialSize < 1) {
-        LogInfo("Invalid initial pool size %d, using default value 1", initialSize);
-        initialSize = 1;
-    }
-
-    socks5Pool = calloc(1, sizeof(PooledSocks5Connection));
-    socks5Pool->Status = PooledSocks5ConnectionEmpty;
-    PooledSocks5Connection *current = socks5Pool;
-
-    while (--initialSize > 0) {
-        current->Next = calloc(1, sizeof(PooledSocks5Connection));
-        current = current->Next;
-        current->Status = PooledSocks5ConnectionEmpty;
-    }
+    InitObjectPool(&socks5Pool, &poolHandlers, initialSize, sizeof(Socks5Connection));
 }
 
 void CleanSocks5ConnectionPool() {
-    Debug("Cleaning SOCKS5 connection pool");
-    if (null == socks5Pool) {
-        Error( "TCP pool was not initialized. Cannot clean it");
-        return;
-    }
-
-    PooledSocks5Connection * next;
-    for (PooledSocks5Connection * conn = socks5Pool; conn != null ; conn = next) {
-        next = conn->Next;
-        free(conn);
-    }
+    Debug("Cleaning SOCKS5 connection socks5Pool");
+    CleanObjectPool(&socks5Pool);
 }
 
-void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
-    if (null == socks5Pool) {
-        Error( "SOCKS5 pool was not initialized");
-    }
+void CheckForTimeoutInSingleConnection(void * obj, void * data){
+    Socks5Connection * connection = obj;
+    fd_selector fdSelector = data;
+
     if (socksMaxTimeout <= 0)
         return;
 
@@ -234,28 +210,31 @@ void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
         return;
     }
 
-    for (PooledSocks5Connection * temp = socks5Pool; temp != null ; temp = temp->Next){
-        if (PooledSocks5ConnectionEmpty == temp->Status)
-            continue;
-
-        if (currentTime - temp->Connection.LastConnectionOn >= socksMaxTimeout) {
-            if (null == temp->Connection.RemoteAddressString) {
-                LogInfo("Connection with client file descriptor %d and remote file descriptor %d timed out after %ld seconds",
-                        temp->Connection.ClientTcpConnection->FileDescriptor,
-                        temp->Connection.RemoteTcpConnection->FileDescriptor,
-                        currentTime - temp->Connection.LastConnectionOn
-                );
-            }
-            else{
-                LogInfo("Connection to %s:%d timed out after %d seconds",
-                        temp->Connection.RemoteAddressString,
-                        temp->Connection.RemotePort,
-                        currentTime - temp->Connection.LastConnectionOn
-                );
-            }
-            DisposeSocks5Connection(&temp->Connection, fdSelector);
+    if (currentTime - connection->LastConnectionOn >= socksMaxTimeout) {
+        if (null == connection->RemoteAddressString) {
+            LogInfo("Connection with client file descriptor %d and remote file descriptor %d timed out after %ld seconds",
+                    connection->ClientTcpConnection->FileDescriptor,
+                    connection->RemoteTcpConnection->FileDescriptor,
+                    currentTime - connection->LastConnectionOn
+            );
         }
+        else{
+            LogInfo("Connection to %s:%d timed out after %d seconds",
+                    connection->RemoteAddressString,
+                    connection->RemotePort,
+                    currentTime - connection->LastConnectionOn
+            );
+        }
+        DisposeSocks5Connection(connection, fdSelector);
     }
+
+
+}
+
+void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
+
+    ExecuteOnExistingElements(&socks5Pool, CheckForTimeoutInSingleConnection, fdSelector);
+
 }
 
 void NotifySocks5ConnectionAccess(void *data) {
@@ -271,53 +250,7 @@ void SetConnectionTimeout(time_t timeout) {
     socksMaxTimeout = timeout;
 }
 
-Socks5Connection *GetSocks5Connection() {
-    if (null == socks5Pool) {
-        Error( "SOCKS5 pool was not initialized");
-        return null;
-    }
 
-    PooledSocks5Connection * temp;
-    for ( temp = socks5Pool; temp != null ; temp = temp->Next) {
-        if (PooledSocks5ConnectionEmpty == temp->Status) {
-            temp->Status = PooledSocks5ConnectionInUse;
-            return &temp->Connection;
-        }
-
-        if (null == temp->Next)
-            break;
-    }
-
-    temp->Next = calloc(1, sizeof(PooledSocks5Connection));
-    temp = temp->Next;
-    temp->Status = PooledSocks5ConnectionInUse;
-
-    return &temp->Connection;
-}
-
-void DestroySocks5Connection(Socks5Connection *connection) {
-    if (null == socks5Pool) {
-        Error( "TCP pool was not initialized");
-        return;
-    }
-
-    memset(connection,0, sizeof(Socks5Connection));
-
-    PooledSocks5Connection * temp;
-    for (temp = socks5Pool; temp != null && &temp->Connection != connection ; temp = temp->Next);
-
-    if (null == temp)
-    {
-        Error("Error while destroying connection!");
-        return;
-    }
-    assert(&temp->Connection == connection);
-    temp->Status = PooledSocks5ConnectionEmpty;
-
-}
-
-
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 void Socks5ConnectionRead(SelectorKey *key) {
     FiniteStateMachine *fsm = &ATTACHMENT(key)->Fsm;

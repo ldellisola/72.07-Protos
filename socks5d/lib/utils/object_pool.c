@@ -1,8 +1,7 @@
 //
 // Created by Lucas Dell'Isola on 19/06/2022.
 //
-#include <malloc.h>
-#include <memory.h>
+
 #include <assert.h>
 #include "utils/object_pool.h"
 #include "utils/logger.h"
@@ -22,8 +21,9 @@ typedef struct PooledObject_ {
 
 
 void InitObjectPool(ObjectPool *pool, ObjectPoolHandlers *handlers, size_t poolSize, size_t objectSize) {
+    Debug("Initializing socks5Pool");
     if (poolSize < 1) {
-        LogDebug("Invalid initial pool size %d, using default value 1", poolSize);
+        LogDebug("Invalid initial socks5Pool size %d, using default value 1", poolSize);
         poolSize = 1;
     }
     pool->ObjectSize = objectSize;
@@ -48,8 +48,8 @@ void InitObjectPool(ObjectPool *pool, ObjectPoolHandlers *handlers, size_t poolS
 }
 
 void * GetObjectFromPool(ObjectPool *pool) {
-    if (null == pool) {
-        Error( "TCP pool was not initialized");
+    if (null == pool || null == pool->Handlers) {
+        Error( "Object socks5Pool was not initialized");
         return null;
     }
     PooledObject * temp;
@@ -80,9 +80,8 @@ void * GetObjectFromPool(ObjectPool *pool) {
 }
 
 void DestroyObject(ObjectPool *pool, void *object) {
-
-    if (null == pool) {
-        Error("Pool was not initialized");
+    if (null == pool || null == pool->Handlers) {
+        Error( "Object socks5Pool was not initialized");
         return;
     }
 
@@ -104,9 +103,9 @@ void DestroyObject(ObjectPool *pool, void *object) {
 }
 
 void CleanObjectPool(ObjectPool *pool) {
-    Debug("Cleaning object pool");
-    if (null == pool) {
-        Error("TCP pool was not initialized. Cannot clean it");
+    Debug("Cleaning object socks5Pool");
+    if (null == pool || null == pool->Handlers) {
+        Error("Object socks5Pool was not initialized");
         return;
     }
 
@@ -118,6 +117,19 @@ void CleanObjectPool(ObjectPool *pool) {
         }
         free(obj->Object);
         free(obj);
+    }
+}
+
+void ExecuteOnExistingElements(ObjectPool *pool, void (* callback)(void *, void *), void * data) {
+    if (null == pool || null == pool->Handlers) {
+        Error("Object socks5Pool was not initialized");
+        return;
+    }
+
+    for (PooledObject * temp = pool->Pool; temp != null ; temp = temp->Next){
+        if (PooledObjectEmpty == temp->Status)
+            continue;
+        callback(temp->Object,data);
     }
 }
 

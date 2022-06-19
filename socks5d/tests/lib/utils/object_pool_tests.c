@@ -9,8 +9,8 @@
 
 
 Suite *RegisterObjectPoolTestSuit() {
-    Suite *s = suite_create("object pool");
-    TCase *tc = tcase_create("object pool");
+    Suite *s = suite_create("object socks5Pool");
+    TCase *tc = tcase_create("object socks5Pool");
 
 //    tcase_add_test(tc, parser_hello);
     suite_add_tcase(s, tc);

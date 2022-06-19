@@ -13,7 +13,6 @@
 
 void * ResolveDNS(void *data);
 
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 void RequestReadInit(unsigned int state, void *data) {
 

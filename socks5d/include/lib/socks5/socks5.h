@@ -30,5 +30,8 @@
 #define SOCKS5_ADDRESS_TYPE_FQDN  0x03
 #define SOCKS5_ADDRESS_TYPE_IPV6  0x04
 
+#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
+
+
 
 #endif //SOCKS5D_SOCKS5_H

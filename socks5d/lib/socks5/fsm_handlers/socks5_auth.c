@@ -8,7 +8,6 @@
 #include "utils/logger.h"
 #include "socks5/socks5_messages.h"
 
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 void AuthReadInit(unsigned int state, void *data) {
     Socks5Connection *connection = ATTACHMENT(data);

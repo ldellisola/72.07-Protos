@@ -49,8 +49,8 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection);
 void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector);
 
 /**
- * It initializes the socks5 connection pool with a given size preallocated
- * @param initialSize initial size of the pool
+ * It initializes the socks5 connection socks5Pool with a given size preallocated
+ * @param initialSize initial size of the socks5Pool
  */
 void CreateSocks5ConnectionPool(int initialSize);
 

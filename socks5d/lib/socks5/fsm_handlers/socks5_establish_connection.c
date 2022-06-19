@@ -7,7 +7,6 @@
 #include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 void EstablishConnectionInit(unsigned int state, void *data) {
     SelectorKey * key = (SelectorKey *) data;

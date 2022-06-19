@@ -6,7 +6,6 @@
 #include "socks5/socks5_connection.h"
 #include "socks5/socks5_metrics.h"
 
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 void RemoteReadInit(unsigned int state, void *data) {
     Socks5Connection *connection = ATTACHMENT(data);

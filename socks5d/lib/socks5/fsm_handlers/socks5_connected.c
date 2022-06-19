@@ -7,7 +7,6 @@
 #include "socks5/socks5_password_dissector.h"
 #include "socks5/socks5_buffer.h"
 
-#define ATTACHMENT(key) ( (Socks5Connection*)((SelectorKey*)(key))->Data)
 
 void ConnectedConnectionInit(unsigned int state, void *data) {
     Socks5Connection *connection = ATTACHMENT(data);

@@ -5,30 +5,12 @@
 #include <unistd.h>
 #include <memory.h>
 #include <errno.h>
-#include <assert.h>
 #include "utils/logger.h"
 #include "utils/utils.h"
 #include "selector/selector.h"
 #include "utils/object_pool.h"
 
-//typedef enum {
-//    PooledTcpConnectionEmpty,
-//    PooledTcpConnectionInUse
-//} PooledTcpConnectionStatus;
 
-
-//typedef struct PooledTcpConnection_ {
-//    TcpConnection Connection;
-//    PooledTcpConnectionStatus Status;
-//    struct PooledTcpConnection_ *Next;
-//} PooledTcpConnection;
-
-//PooledTcpConnection *tcpPool = null;
-
-void create(void * obj){
-    TcpConnection * connection = (TcpConnection*) obj;
-    memset(connection,0, sizeof(TcpConnection));
-}
 
 void destroy(void * obj){
     TcpConnection * connection = (TcpConnection*) obj;
@@ -36,16 +18,11 @@ void destroy(void * obj){
     connection->FileDescriptor = -1;
 }
 
-ObjectPool pool;
-ObjectPoolHandlers handlers = {
-    .OnCreate = create,
+static ObjectPool tcpPool;
+static ObjectPoolHandlers handlers = {
+    .OnCreate = null,
     .OnDispose = destroy
 };
-
-
-//TcpConnection * GetTcpConnection();
-//void DestroyTcpConnection(TcpConnection * connection);
-
 
 int DisposeTcpConnection(TcpConnection *tcpConnection, fd_selector selector) {
     if (tcpConnection == null) {
@@ -66,8 +43,7 @@ int DisposeTcpConnection(TcpConnection *tcpConnection, fd_selector selector) {
 
     LogDebug("File descriptor %d closed successfully", tcpConnection->FileDescriptor);
 
-    DestroyObject(&pool,tcpConnection);
-//    DestroyTcpConnection(tcpConnection);
+    DestroyObject(&tcpPool, tcpConnection);
 
     Debug("TCP tcpConnection disposed successfully");
 
@@ -116,8 +92,7 @@ int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
 
 TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, socklen_t addrSize) {
 
-    TcpConnection *tcpSocket = GetObjectFromPool(&pool);
-//    TcpConnection *tcpSocket = GetTcpConnection();
+    TcpConnection *tcpSocket = GetObjectFromPool(&tcpPool);
 
     memcpy(&tcpSocket->Address, addr, addrSize);
     tcpSocket->AddressLength = addrSize;
@@ -158,96 +133,16 @@ bool IsTcpConnectionReady(TcpConnection *connection) {
     return true;
 }
 
-
-
-//void DestroyTcpConnection(TcpConnection * connection){
-//    if (null == tcpPool) {
-//        Error("TCP pool was not initialized");
-//        return;
-//    }
-//
-//    memset(connection,0, sizeof(TcpConnection));
-//    connection->FileDescriptor = -1;
-//
-//    PooledTcpConnection * temp;
-//
-//    for (temp = tcpPool; temp != null && &temp->Connection != connection ; temp = temp->Next);
-//
-//    if (null == temp)
-//    {
-//        Error("Error while destroying connection!");
-//        return;
-//    }
-//    assert(&temp->Connection == connection);
-//    temp->Status = PooledTcpConnectionEmpty;
-//}
-
-
-//TcpConnection *GetTcpConnection() {
-//    if (null == tcpPool) {
-//        Error( "TCP pool was not initialized");
-//        return null;
-//    }
-//
-//    PooledTcpConnection * temp;
-//
-//    for ( temp = tcpPool; temp != null ; temp = temp->Next) {
-//        if (PooledTcpConnectionEmpty == temp->Status) {
-//            temp->Status = PooledTcpConnectionInUse;
-//            return &temp->Connection;
-//        }
-//
-//        if (null == temp->Next)
-//            break;
-//    }
-//
-//    temp->Next = calloc(1, sizeof(PooledTcpConnection));
-//    temp = temp->Next;
-//    temp->Status = PooledTcpConnectionInUse;
-//
-//    return &temp->Connection;
-//
-//}
-
-
 void CleanTcpConnectionPool() {
-    CleanObjectPool(&pool);
-//    Debug("Cleaning Tcp connection pool");
-//    if (null == tcpPool) {
-//        Error("TCP pool was not initialized. Cannot clean it");
-//        return;
-//    }
-//
-//    PooledTcpConnection * next;
-//    for (PooledTcpConnection * conn = tcpPool; conn != null ; conn = next) {
-//        next = conn->Next;
-//        if (PooledTcpConnectionInUse == conn->Status){
-//            close(conn->Connection.FileDescriptor);
-//        }
-//        free(conn);
-//    }
+    Debug("Clearing TCP socks5Pool");
+    CleanObjectPool(&tcpPool);
 }
 
 
 
 void CreateTcpConnectionPool(int initialSize) {
    Debug("Initializing TCP Pool");
-    InitObjectPool(&pool,&handlers, initialSize, sizeof(TcpConnection));
-//    if (initialSize < 1) {
-//        LogDebug("Invalid initial pool size %d, using default value 1", initialSize);
-//        initialSize = 1;
-//    }
-//
-//    tcpPool = calloc(1, sizeof(PooledTcpConnection));
-//    tcpPool->Status = PooledTcpConnectionEmpty;
-//    PooledTcpConnection *current = tcpPool;
-//
-//    while (--initialSize > 0) {
-//        current->Next = calloc(1, sizeof(PooledTcpConnection));
-//        current = current->Next;
-//        current->Status = PooledTcpConnectionEmpty;
-//    }
-
+   InitObjectPool(&tcpPool, &handlers, initialSize, sizeof(TcpConnection));
 }
 
 
