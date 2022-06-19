@@ -7,7 +7,7 @@
 
 Inicialmente, el servidor empieza el servicio LULU al escuchar en TCP al puerto 8080. Cuando un cliente quiere hacer uso del servicio, establece una conexión TCP con el servidor. Cuando la conexión es establecida, el servidor LULU envía un saludo. El cliente y servidor intercambian comandos y respuestas (respectivamente) hasta que la conexión sea terminada o aborte. 
 Los comandos en LULU son case-sensitive, posiblemente seguidos por uno o más argumentos. Todos los comandos son terminados por el par CRLF. Las palabras clave y sus argumentos consisten de caracteres ASCII. Las palabras clave y los argumentos son separados por un único carácter “|”(PIPE). 
-Las respuestas en LULU consisten en un indicador de estado seguida por información adicional. Todas las respuestas son terminadas por el par CRLF. Las respuestas pueden ser de hasta X caracteres, incluyendo la terminación CRLF.  Actualmente hay dos indicadores de estado: positivo (“+”) y negativo (“-”).
+Las respuestas en LULU consisten en un indicador de estado seguida por información adicional. Todas las respuestas son terminadas por el par CRLF. Actualmente hay dos indicadores de estado: positivo (“+”) y negativo (“-”).
 Una sesión LULU pasa por varios estados en su ciclo de vida. Una vez que la conexión TCP se ha abierto y el servidor LULU ha enviado el saludo, la sesión entra al estado de AUTORIZACIÓN. En este estado el cliente debe identificarse al servidor LULU. Una vez que el cliente ha hecho esto de forma exitosa, la sesión entra en el estado de TRANSACCIÓN. En este estado, el cliente solicita acciones de parte del servidor LULU. Cuando el cliente da el comando GOODBYE, el servidor LULU responde con goodbye. La conexión TCP luego es terminada.
 El servidor DEBE responder a un comando no reconocido, no implementado, o invalido con un indicador negativo de estado. El servidor DEBE responder a un comando dado en un estado incorrecto respondiendo con un indicador de estado negativo. 
 Un servidor LULU tiene un timer de inactividad en el que desloguea al cliente al haber pasado este tiempo. El mínimo de tiempo aceptado son 10 minutos. Cuando el tiempo de inactividad es alcanzado el servidor cierra la conexión TCP sin enviar ninguna respuesta al cliente.
@@ -244,7 +244,7 @@ DEL|USER|username
 
 Notar que a excepcion de GET|TIMEOUT, GET|BUFFERSIZE, GET|METRICS y LIST|USERS la respuesta dada por el servidor LULU a cualquier comando solo es realmente importante hasta “-” y “+”. Todo texto que sigue luego de esta respuesta puede ser ignorado por el cliente.
 
-    Ejemplo de sesión en LULU
+### Ejemplo de sesión en LULU
     S:	<waiting for connection on TCP port 8080>
     C:	<open connection>
     C:	HELLO|lucia|luciapass

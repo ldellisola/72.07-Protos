@@ -2,7 +2,7 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "parsers/client_metrics_parser.h"
+#include "parsers/lulu/client_metrics_parser.h"
 #include "utils/logger.h"
 
 ClientMetricsParserState traverseWordMetrics(ClientMetricsParser *p, byte c, ClientMetricsParserState nextState, char *nextWord) {

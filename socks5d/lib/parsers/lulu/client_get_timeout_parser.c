@@ -2,19 +2,19 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "parsers/client_get_timeout_parser.h"
+#include "parsers/lulu/client_get_timeout_parser.h"
 #include "utils/logger.h"
 
 ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, byte c, ClientGetTimeoutParserState nextState, char *nextWord) {
 
     if(strlen(p->Word) == p->Index){
-        if((c == '|' && p->State == TimeoutGet) ||(c == '\r' && p->State == Timeout)){
+        if((c == '|' && p->State == GetTimeoutGet) ||(c == '\r' && p->State == GetTimeout)){
             p->Word = nextWord;
             p->Index = 0;
             return nextState;
         }
         Error("The word has finished and character given isnt a terminating character");
-        return TimeoutInvalidState;
+        return GetTimeoutInvalidState;
 
     }
 
@@ -22,8 +22,8 @@ ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, by
         p->Index++;
         return p->State;
     }
-    LogError( "%c is not part of the word \" %s \"", c, p->Word);
-    return TimeoutInvalidState;
+    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    return GetTimeoutInvalidState;
 }
 
 void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
@@ -33,7 +33,7 @@ void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
         return;
     }
 
-    p->State = TimeoutGet;
+    p->State = GetTimeoutGet;
     p->Index = 0;
 
     p->Timeout[0] = 'T';
@@ -59,37 +59,41 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
 //    Error( "char = %c", c);
 
     if (null == p) {
-        Error("Cannot feed GetTimeoutParser if is NULL");
-        return TimeoutInvalidState;
+        LogError(false, "Cannot feed GetTimeoutParser if is NULL");
+        return GetTimeoutInvalidState;
     }
 
     switch (p->State) {
-        case TimeoutGet:
-//            Error( "TimeoutGet");
-            p->State = traverseWordGetTimeout(p, c, Timeout, p->Timeout);
+        case GetTimeoutGet:
+//            LogError(false, "TimeoutGet");
+            p->State = traverseWordGetTimeout(p, c, GetTimeout, p->Timeout);
             break;
-        case Timeout:
-//            Error( "Timeout");
-            p->State = traverseWordGetTimeout(p, c, TimeoutCRLF, null);
+        case GetTimeout:
+//            LogError(false, "Timeout");
+            p->State = traverseWordGetTimeout(p, c, GetTimeoutCRLF, null);
             break;
 
-        case TimeoutCRLF:
-//            Error( "TimeoutCRLF");
+        case GetTimeoutCRLF:
+//            LogError(false, "TimeoutCRLF");
             if( c == '\n'){
-                p->State = TimeoutFinished;
+                p->State = GetTimeoutFinished;
                 break;
             }
             Error("There is a CR but no LF");
-            p->State =  TimeoutInvalidState;
+            p->State =  GetTimeoutInvalidState;
             break;
-        case TimeoutFinished:
-//            Error( "TimeoutFinished");
-        case TimeoutInvalidState:
-//            Error( "TimeoutInvalidState");
+        case GetTimeoutFinished:
+//            LogError(false, "TimeoutFinished");
+        case GetTimeoutInvalidState:
+//            LogError(false, "TimeoutInvalidState");
             break;
     }
     return p->State;
 }
+
+
+
+
 size_t ClientGetTimeoutParserConsume(ClientGetTimeoutParser *p, byte *c, size_t length) {
     LogDebug("ClientTimeoutParser consuming %d bytes", length);
     if (null == p) {
@@ -113,12 +117,12 @@ size_t ClientGetTimeoutParserConsume(ClientGetTimeoutParser *p, byte *c, size_t 
 bool ClientGetTimeoutParserHasFinished(ClientGetTimeoutParserState state) {
     switch (state) {
         default:
-        case TimeoutGet:
-        case Timeout:
-        case TimeoutCRLF:
+        case GetTimeoutGet:
+        case GetTimeout:
+        case GetTimeoutCRLF:
             return false;
-        case TimeoutInvalidState:
-        case TimeoutFinished:
+        case GetTimeoutInvalidState:
+        case GetTimeoutFinished:
             return true;
     }
 }

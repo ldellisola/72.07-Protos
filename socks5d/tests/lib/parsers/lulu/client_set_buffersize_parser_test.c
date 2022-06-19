@@ -3,7 +3,7 @@
 //
 
 #include "client_set_buffersize_parser_test.h"
-#include "parsers/client_set_buffersize_parser.h"
+#include "parsers/lulu/client_set_buffersize_parser.h"
 ClientSetBufferSizeParser parser;
 
 /**************************************************************************
@@ -47,7 +47,7 @@ START_TEST(Feed_NullParser_Fails)
         // Act
         ClientSetBufferSizeParserState state = ClientSetBufferSizeParserFeed(nullParser, 0);
         // Assert
-        ck_assert_int_eq(state, BufferSizeInvalidState);
+        ck_assert_int_eq(state, SetBufferSizeInvalidState);
     }
 END_TEST
 
@@ -60,12 +60,12 @@ START_TEST(Feed_Complete_Succeeds)
         byte message[] = {'S','E', 'T', '|','B','U','F','F','E','R','S','I','Z','E','|','5', '6', '4','\r', '\n'};
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, BufferSizeFinished);
+        ck_assert_int_eq(state, SetBufferSizeFinished);
         ck_assert_int_eq(parser.Value, 564);
     }
 END_TEST
@@ -79,12 +79,12 @@ START_TEST(Feed_Value_Fails)
         byte message[] = {'S','E', 'T', '|','B','U','F','F','E','R','S','I','Z','E','|','5', '-', '4','\r', '\n'};
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, BufferSizeInvalidState);
+        ck_assert_int_eq(state, SetBufferSizeInvalidState);
     }
 END_TEST
 START_TEST(Feed_CRLF_Fails)
@@ -95,12 +95,12 @@ START_TEST(Feed_CRLF_Fails)
         byte message[] = {'S','E', 'T', '|','B','U','F','F','E','R','S','I','Z','E','|','5', '6', '4','\r', 0};
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, BufferSizeInvalidState);
+        ck_assert_int_eq(state, SetBufferSizeInvalidState);
         ck_assert_int_eq(parser.Value, 564);
     }
 END_TEST
@@ -113,12 +113,12 @@ START_TEST(Feed_Complete_ExtraChar_Succeeds)
         byte message[] = {'S','E', 'T', '|','B','U','F','F','E','R','S','I','Z','E','|','5', '6', '4','\r', '\n', 'f', '3'};
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, BufferSizeFinished);
+        ck_assert_int_eq(state, SetBufferSizeFinished);
     }
 END_TEST
 
@@ -130,12 +130,12 @@ START_TEST(Feed_Set_Succeeds)
         byte message[] = {'S','E', 'T', '|' };
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, BufferSize);
+        ck_assert_int_eq(state, SetBufferSize);
     }
 END_TEST
 START_TEST(Feed_BufferSize_Succeeds)
@@ -146,7 +146,7 @@ START_TEST(Feed_BufferSize_Succeeds)
         byte message[] = {'S','E', 'T', '|','B','U','F','F','E','R','S','I','Z','E','|'};
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
@@ -162,12 +162,12 @@ START_TEST(Feed_Value_Succeeds)
         byte message[] = {'S','E', 'T', '|','B','U','F','F','E','R','S','I','Z','E','|','5', '3', '4','\r', };
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, BufferSizeCRLF);
+        ck_assert_int_eq(state, SetBufferSizeCRLF);
         ck_assert_int_eq(parser.Value, 534);
     }
 END_TEST
@@ -180,12 +180,12 @@ START_TEST(Feed_Value_Big_Fails)
         byte message[] = {'S','E', 'T', '|','B','U','F','F','E','R','S','I','Z','E','|','5', '6', '4','5', '6', '4','5', '6', '4','5', '6', '4','\r', '\n'};
         ClientSetBufferSizeParserState state;
         // Act
-        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != BufferSizeInvalidState; i++ ){
+        for (int i=0; i < (int)sizeof(message)/(int) sizeof(message[0]) && state != SetBufferSizeInvalidState; i++ ){
             state = ClientSetBufferSizeParserFeed(&parser, message[i]);
         }
 
         // Assert
-        ck_assert_int_eq(state, BufferSizeInvalidState);
+        ck_assert_int_eq(state, SetBufferSizeInvalidState);
     }
 END_TEST
 

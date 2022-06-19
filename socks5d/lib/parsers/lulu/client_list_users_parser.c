@@ -2,7 +2,7 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "parsers/client_list_users_parser.h"
+#include "parsers/lulu/client_list_users_parser.h"
 #include "utils/logger.h"
 
 ClientListUsersParserState traverseWordListUsers(ClientListUsersParser *p, byte c, ClientListUsersParserState nextState, char *nextWord) {

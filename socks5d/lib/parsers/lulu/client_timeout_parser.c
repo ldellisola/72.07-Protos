@@ -2,7 +2,7 @@
 // Created by tluci on 16/6/2022.
 //
 
-#include "parsers/client_timeout_parser.h"
+#include "parsers/lulu/client_timeout_parser.h"
 #include "utils/logger.h"
 
 ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, ClientTimeoutParserState nextState, char *nextWord) {

@@ -2,7 +2,7 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "parsers/client_set_user_parser.h"
+#include "parsers/lulu/client_set_user_parser.h"
 #include "utils/logger.h"
 
 ClientSetUserParserState traverseWordSetUser(ClientSetUserParser *p, byte c, ClientSetUserParserState nextState, char *nextWord) {

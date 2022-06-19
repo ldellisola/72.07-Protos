@@ -3,7 +3,7 @@
 //
 
 #include "client_goodbye_parser_test.h"
-#include "parsers/client_goodbye_parser.h"
+#include "parsers/lulu/client_goodbye_parser.h"
 ClientGoodbyeParser parser;
 
 /**************************************************************************

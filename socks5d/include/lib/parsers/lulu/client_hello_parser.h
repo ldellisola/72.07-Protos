@@ -10,7 +10,6 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define CR 0x0D
 #define MAXLONG 255
 typedef enum {
     Hello,
@@ -18,7 +17,7 @@ typedef enum {
     HelloPassword,
     HelloCRLF,
     HelloFinished,
-    HelloInvalidState
+    ClientHelloInvalidState
 
 } ClientHelloParserState;
 

@@ -12,11 +12,11 @@
 #include <ctype.h>
 typedef enum {
     BufferSizeSet,
-    BufferSize,
+    SetBufferSize,
     BufferSizeValue,
-    BufferSizeCRLF,
-    BufferSizeFinished,
-    BufferSizeInvalidState
+    SetBufferSizeCRLF,
+    SetBufferSizeFinished,
+    SetBufferSizeInvalidState
 
 } ClientSetBufferSizeParserState;
 
@@ -33,6 +33,6 @@ typedef struct {
 bool ClientSetBufferSizeParserHasFinished(ClientSetBufferSizeParserState state);
 void ClientSetBufferSizeParserReset(ClientSetBufferSizeParser *p);
 ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSizeParser *p, byte c);
-size_t ClientTimeoutParserConsume(ClientSetBufferSizeParser *p, byte *c, size_t length);
+size_t ClientSetBufferSizeParserConsume(ClientSetBufferSizeParser *p, byte *c, size_t length);
 
 #endif //SOCKS5D_CLIENT_SET_BUFFERSIZE_PARSER_H

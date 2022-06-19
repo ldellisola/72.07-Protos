@@ -2,7 +2,7 @@
 // Created by tluci on 17/6/2022.
 //
 
-#include "parsers/client_get_buffersize_parser.h"
+#include "parsers/lulu/client_get_buffersize_parser.h"
 #include "utils/logger.h"
 
 ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizeParser *p, byte c, ClientGetBufferSizeParserState nextState, char *nextWord) {
