@@ -19,6 +19,7 @@ set(
         socks5_users.c
         socks5_metrics.c
         socks5_password_dissector.c
+        socks5_buffer.c
 )
 
 add_library(socks5 STATIC ${SOURCES})

@@ -11,6 +11,7 @@
 #include "socks5/socks5_connection.h"
 #include "socks5/socks5_metrics.h"
 #include "socks5/socks5_password_dissector.h"
+#include "socks5/socks5_buffer.h"
 
 int ipv4Socket = FUNCTION_ERROR;
 int ipv6Socket = FUNCTION_ERROR;
@@ -26,14 +27,16 @@ const FdHandler socksv5 = {
         .handle_close      = NULL, // nada que liberar
 };
 
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout,
-                          const char *usernames[],
-                          const char *passwords[], bool passwordDissectors) {
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, const char *usernames[],
+                          const char *passwords[], bool passwordDissector, size_t bufferSize) {
+
     CreateSocks5ConnectionPool(poolSize);
+    SetSocks5BufferSize(bufferSize);
     SetConnectionTimeout(timeout);
     LoadSocks5Users(usernames, passwords);
     InitSocks5Metrics();
-    EnablePasswordDissector(passwordDissectors);
+    EnablePasswordDissector(passwordDissector);
+
     bool success = false;
     if (null == address){
         success= RegisterSocks5ServerOnIPv4(port,null);

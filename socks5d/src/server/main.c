@@ -50,7 +50,8 @@ int main(int argc, char **argv) {
             socks5Timeout,
             arguments.Usernames,
             arguments.Passwords,
-            arguments.EnablePasswordScanners
+            arguments.EnablePasswordScanners,
+            arguments.BufferSize
     );
 
 

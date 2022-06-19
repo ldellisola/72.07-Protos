@@ -16,6 +16,7 @@ typedef struct {
     const char *LuluAddress;
     const char * Usernames[11];
     const char * Passwords[11];
+    size_t BufferSize;
 } CliArguments;
 
 

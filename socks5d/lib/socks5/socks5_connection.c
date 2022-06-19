@@ -17,6 +17,7 @@
 #include "socks5/fsm_handlers/socks5_remote.h"
 #include "socks5/fsm_handlers/socks5_dns.h"
 #include "socks5/socks5_metrics.h"
+#include "socks5/socks5_buffer.h"
 
 static void Socks5ConnectionRead(SelectorKey *key);
 static void Socks5ConnectionWrite(SelectorKey *key);
@@ -147,10 +148,8 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     connection->Fsm.StatesSize = CS_ERROR;
     InitFsm(&connection->Fsm, socks5ConnectionFsm);
 
-    void *readBuffer = calloc(1000, sizeof(byte));
-    void *writeBuffer = calloc(1000, sizeof(byte));
-    BufferInit(&connection->WriteBuffer, 1000, writeBuffer);
-    BufferInit(&connection->ReadBuffer, 1000, readBuffer);
+    InitSocks5Buffer(&connection->WriteBuffer);
+    InitSocks5Buffer(&connection->ReadBuffer);
 
     RegisterConnectionInSocks5Metrics();
 
@@ -174,11 +173,8 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
     if (null != connection->RemoteTcpConnection)
         DisposeTcpConnection(connection->RemoteTcpConnection, selector);
 
-    if (null != connection->ReadBuffer.Data)
-        free(connection->ReadBuffer.Data);
-
-    if (null != connection->WriteBuffer.Data)
-        free(connection->WriteBuffer.Data);
+    DisposeSocks5Buffer(&connection->WriteBuffer);
+    DisposeSocks5Buffer(&connection->ReadBuffer);
 
     if (null != connection->User)
         LogOutSocks5User(connection->User);

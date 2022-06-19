@@ -23,6 +23,7 @@ CliArguments ParseCli(int argc, char **argv) {
             .EnablePasswordScanners=true,
             .LuluPort="8080",
             .LuluAddress=null,
+            .BufferSize = 1000
     };
 
     memset(args.Usernames,0,sizeof(args.Usernames));
@@ -30,7 +31,7 @@ CliArguments ParseCli(int argc, char **argv) {
 
     int numberOfUsers = 0;
     int ch;
-    while ((ch = getopt(argc,argv,"hl:L:Np:P:u:v")) != -1){
+    while ((ch = getopt(argc,argv,"hl:L:Np:P:u:vb:")) != -1){
         switch (ch) {
             case 'l':
                 args.SocksAddress = optarg;
@@ -47,12 +48,19 @@ CliArguments ParseCli(int argc, char **argv) {
             case 'P':
                 args.LuluPort = optarg;
                 break;
+            case 'b': {
+                long value = strtol(optarg, null, 10);
+                if (0 >= value)
+                    Fatal("Invalid buffer size");
+                else
+                    args.BufferSize = value;
+            }
+                break;
             case 'u':
                 if (numberOfUsers < 10)
                     LoadUser(&args, numberOfUsers++,optarg);
                 else {
-                    Error("Invalid number of users detected. Maximum is 10");
-                    exit(1);
+                    Fatal("Invalid number of users detected. Maximum is 10");
                 }
                 break;
             case 'v':

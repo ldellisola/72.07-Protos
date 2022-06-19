@@ -32,10 +32,8 @@ bool RegisterSocks5ServerOnIPv6(const char *port, const char *address);
  * @param passwords Initial set of passwords. The last element must be null
  * @return Whether the server was started successfully
  */
-bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout,
-                          const char *usernames[],
-                          const char *passwords[],
-                          bool passwordDissector);
+bool RegisterSocks5Server(const char *port, const char *address, int poolSize, time_t timeout, const char *usernames[],
+                          const char *passwords[], bool passwordDissector, size_t bufferSize);
 
 /**
  * It safely disposes all the allocated memory by the socks5 server
