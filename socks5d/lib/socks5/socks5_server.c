@@ -2,8 +2,6 @@
 // Created by Lucas Dell'Isola on 30/05/2022.
 //
 #include "socks5/socks5_server.h"
-#include <string.h>
-#include <stdio.h>
 #include <errno.h>
 #include "utils/utils.h"
 #include "utils/logger.h"
@@ -13,15 +11,15 @@
 #include "socks5/socks5_password_dissector.h"
 #include "socks5/socks5_buffer.h"
 
-int ipv4Socket = FUNCTION_ERROR;
-int ipv6Socket = FUNCTION_ERROR;
+static int ipv4Socket = FUNCTION_ERROR;
+static int ipv6Socket = FUNCTION_ERROR;
 
 
 
-void Socks5PassiveAccept(SelectorKey *key);
+static void Socks5PassiveAccept(SelectorKey *key);
 
 
-const FdHandler socksv5 = {
+static const FdHandler socksv5 = {
         .handle_read       = Socks5PassiveAccept,
         .handle_write      = NULL,
         .handle_close      = NULL, // nada que liberar

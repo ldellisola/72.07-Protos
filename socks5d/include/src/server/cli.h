@@ -17,6 +17,7 @@ typedef struct {
     const char * Usernames[11];
     const char * Passwords[11];
     size_t BufferSize;
+    long Timeout;
 } CliArguments;
 
 

@@ -53,7 +53,6 @@ unsigned ClientReadRun(void *data) {
 
     }
 
-    // TODO Handle error
     bool success = SELECTOR_STATUS_SUCCESS == SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
     success &= SELECTOR_STATUS_SUCCESS == SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_WRITE);
 

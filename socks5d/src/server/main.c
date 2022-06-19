@@ -39,15 +39,13 @@ int main(int argc, char **argv) {
 
     };
     int socks5PoolSize = 50;
-    time_t socks5Timeout = 10;
-
     bool startServer = true;
     startServer &= InitTcpServer(&options, socks5PoolSize * 2);
     startServer &= RegisterSocks5Server(
             arguments.SocksPort,
             arguments.SocksAddress,
             socks5PoolSize,
-            socks5Timeout,
+            arguments.Timeout,
             arguments.Usernames,
             arguments.Passwords,
             arguments.EnablePasswordScanners,

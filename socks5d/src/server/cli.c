@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <strings.h>
 #include <getopt.h>
+#include <errno.h>
 #include "server/cli.h"
 #include "utils/utils.h"
 #include "utils/logger.h"
@@ -23,7 +24,8 @@ CliArguments ParseCli(int argc, char **argv) {
             .EnablePasswordScanners=true,
             .LuluPort="8080",
             .LuluAddress=null,
-            .BufferSize = 1000
+            .BufferSize = 1000,
+            .Timeout = 500
     };
 
     memset(args.Usernames,0,sizeof(args.Usernames));
@@ -31,7 +33,8 @@ CliArguments ParseCli(int argc, char **argv) {
 
     int numberOfUsers = 0;
     int ch;
-    while ((ch = getopt(argc,argv,"hl:L:Np:P:u:vb:")) != -1){
+    long value;
+    while ((ch = getopt(argc,argv,"hl:L:Np:P:u:vb:t:")) != -1){
         switch (ch) {
             case 'l':
                 args.SocksAddress = optarg;
@@ -48,13 +51,19 @@ CliArguments ParseCli(int argc, char **argv) {
             case 'P':
                 args.LuluPort = optarg;
                 break;
-            case 'b': {
-                long value = strtol(optarg, null, 10);
+            case 'b':
+                value = strtol(optarg, null, 10);
                 if (0 >= value)
                     Fatal("Invalid buffer size");
                 else
                     args.BufferSize = value;
-            }
+                break;
+            case 't':
+                value = strtol(optarg, null, 10);
+                if (0  == value && (EINVAL == errno || ERANGE == errno))
+                    Fatal("Invalid timeout value");
+                else
+                    args.Timeout = value;
                 break;
             case 'u':
                 if (numberOfUsers < 10)

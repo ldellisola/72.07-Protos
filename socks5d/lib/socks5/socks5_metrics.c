@@ -5,7 +5,7 @@
 #include <memory.h>
 #include "socks5/socks5_metrics.h"
 
-Socks5Metrics metrics;
+static Socks5Metrics metrics;
 
 void InitSocks5Metrics() {
     memset(&metrics,0, sizeof(Socks5Metrics));

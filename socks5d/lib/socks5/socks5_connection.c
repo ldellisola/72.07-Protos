@@ -24,7 +24,7 @@ static void Socks5ConnectionRead(SelectorKey *key);
 static void Socks5ConnectionWrite(SelectorKey *key);
 static void Socks5ConnectionBlock(SelectorKey *key);
 
-const FdHandler socks5ConnectionHandler = {
+static const FdHandler socks5ConnectionHandler = {
         .handle_read   = Socks5ConnectionRead,
         .handle_write  = Socks5ConnectionWrite,
         .handle_block  = Socks5ConnectionBlock,
@@ -126,7 +126,7 @@ static ObjectPoolHandlers poolHandlers = {
 };
 
 static ObjectPool socks5Pool;
-time_t socksMaxTimeout = 100;
+static time_t socksMaxTimeout = 100;
 
 
 

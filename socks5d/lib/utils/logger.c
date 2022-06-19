@@ -11,7 +11,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-LOG_TYPE LogLevel = LOG_ERROR;
+static LOG_TYPE LogLevel = LOG_ERROR;
 
 
 void SetLogLevel(LOG_TYPE minimumType) {

@@ -12,9 +12,9 @@
 
 
 
-Socks5User * currentUsers = null;
+static Socks5User * currentUsers = null;
 
-void LoadSingleUser(const char *username, const char *password);
+static void LoadSingleUser(const char *username, const char *password);
 
 void LoadSocks5Users(const char *usernames[], const char *passwords[]) {
     if (null == usernames)

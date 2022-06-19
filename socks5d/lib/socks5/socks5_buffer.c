@@ -5,7 +5,7 @@
 #include "socks5/socks5_buffer.h"
 #include "utils/logger.h"
 
-size_t targetBufferSize = 1000;
+static size_t targetBufferSize = 1000;
 
 void SetSocks5BufferSize(size_t bufferSize) {
     if (bufferSize <=0)

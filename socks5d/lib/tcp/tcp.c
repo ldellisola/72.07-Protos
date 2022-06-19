@@ -13,7 +13,7 @@
 #include "tcp/tcp.h"
 
 
-int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize,
+static int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize,
                 int concurrentConnections);
 
 
@@ -21,7 +21,7 @@ int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *ad
 static fd_selector selector = NULL;
 static bool isRunning = true;
 
-const SelectorOptions options = {
+static const SelectorOptions options = {
         .Signal = SIGALRM,
         .SelectTimeout = {
                 .tv_sec = 10,

@@ -6,7 +6,7 @@
 #include "parsers/pop3/pop3_auth_parser.h"
 
 #define POP3_PORT 110
-bool arePasswordsDissectorsRunning = true;
+static bool arePasswordsDissectorsRunning = true;
 
 
 bool CanDetectPasswords(Socks5Connection * connection){

@@ -12,7 +12,7 @@
 
 
 
-void destroy(void * obj){
+static void destroy(void * obj){
     TcpConnection * connection = (TcpConnection*) obj;
     memset(connection,0, sizeof(TcpConnection));
     connection->FileDescriptor = -1;
