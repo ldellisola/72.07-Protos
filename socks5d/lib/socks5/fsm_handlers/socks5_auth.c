@@ -33,7 +33,7 @@ unsigned AuthReadRun(void *data) {
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead <= 0) {
-        Error( "Cannot read from Tcp connection");
+        Error("Cannot read from Tcp connection");
         return CS_ERROR;
     }
 
@@ -47,7 +47,6 @@ unsigned AuthReadRun(void *data) {
         return CS_ERROR;
 
     if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
-
         connection->User = LogInSocks5User(d->Parser.UName, d->Parser.Passwd);
         d->AuthSucceeded = null != connection->User;
 
@@ -57,7 +56,7 @@ unsigned AuthReadRun(void *data) {
         if (0 == bytesWritten)
             return CS_ERROR;
 
-        BufferWriteAdv(d->WriteBuffer, bytesWritten);
+        BufferWriteAdv(d->WriteBuffer, (ssize_t ) bytesWritten);
 
         return CS_AUTH_WRITE;
     }
@@ -78,18 +77,18 @@ unsigned AuthWriteRun(void *data) {
     AuthData *d = &connection->Data.Auth;
 
     if (!BufferCanRead(d->WriteBuffer)) {
-        if (!d->AuthSucceeded)
+        if (!d->AuthSucceeded) {
+            Debug("User not authorized");
             return CS_DONE;
-
-        if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_READ)) {
-            return CS_REQUEST_READ;
         }
-        return CS_ERROR;
+        Debug("User authorized");
+
+        bool success = SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_READ);
+        return success ? CS_REQUEST_READ : CS_ERROR;
     }
 
     size_t size;
     byte *ptr = BufferReadPtr(d->WriteBuffer, &size);
-
     ssize_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
 
     if(FUNCTION_ERROR == bytesWritten)

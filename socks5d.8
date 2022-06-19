@@ -60,6 +60,19 @@ hasta 10 veces.
 .IP "\fB\-v\fB"
 Imprime información sobre la versión versión y termina.
 
+.SH LOGS
+
+La verbosidad de los logs se configura utilizando la variable de enviroment SOCKS5D_LOG_LEVEL.
+De no estar presente, o ser un valor invalido, se configurara el valor INFO como default.
+El valor este se puede cambiar durante la ejecuccion del programa.
+
+Los posibles valores son:
+.IP "\fBDEBUG\fR"
+.IP "\fBINFO\fR"
+.IP "\fBWARN\fR"
+.IP "\fBERROR\fR"
+.IP "\fBFATAL\fR"
+
 .SH REGISTRO DE ACCESO
 
 Registra el uso del proxy en salida estandar. Una conexión por línea. Los campos de una

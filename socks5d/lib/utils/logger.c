@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include "utils/logger.h"
+#include "utils/utils.h"
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
@@ -70,6 +71,31 @@ void Log(LOG_TYPE type, const char *file, int line, bool hasInnerError, const ch
 
     if (LOG_FATAL == type)
         exit(1);
+}
+
+void SetLogLevelFromEnvironment() {
+    const char * level = getenv("SOCKS5D_LOG_LEVEL");
+    if (null == level)
+    {
+        SetLogLevel(LOG_INFO);
+        Info("SOCKS5D_LOG_LEVEL environment variable not set. Using default level INFO");
+        return;
+    }
+
+    if (0 == strcmp("INFO",level))
+        SetLogLevel(LOG_INFO);
+    else if (0 == strcmp("DEBUG",level))
+        SetLogLevel(LOG_DEBUG);
+    else if (0 == strcmp("WARN",level))
+        SetLogLevel(LOG_WARNING);
+    else if (0 == strcmp("ERROR",level))
+        SetLogLevel(LOG_ERROR);
+    else if (0 == strcmp("FATAL",level))
+        SetLogLevel(LOG_FATAL);
+    else{
+        SetLogLevel(LOG_INFO);
+        Info("SOCKS5D_LOG_LEVEL environment variable not set. Using default level INFO");
+    }
 }
 
 

@@ -31,6 +31,8 @@ typedef enum {
     LOG_FATAL
 } LOG_TYPE;
 
+void SetLogLevelFromEnvironment();
+
 void SetLogLevel(LOG_TYPE minimumType);
 
 void Log(LOG_TYPE type,const char * file, int line,bool hasInnerError, const char * format, ...);

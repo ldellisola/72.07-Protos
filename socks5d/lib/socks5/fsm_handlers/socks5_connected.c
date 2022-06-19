@@ -10,20 +10,12 @@
 
 void ConnectedConnectionInit(unsigned int state, void *data) {
 //    Socks5Connection *connection = ATTACHMENT(data);
-//    if (CanDetectPasswords(connection)) {
-//        Pop3AuthParser *d = &connection->Data.Pop3Parser;
-//        d->User = null;
-//        d->Password = null;
-//        ResetPop3AuthParser(d);
-//    }
+
 }
 
 void ConnectedConnectionClose(unsigned int state, void *data) {
 //    Socks5Connection *connection = ATTACHMENT(data);
-//    if (CanDetectPasswords(connection)) {
-//        Pop3AuthParser *d = &connection->Data.Pop3Parser;
-//        ResetPop3AuthParser(d);
-//    }
+
 }
 
 
@@ -32,23 +24,23 @@ unsigned ConnectedConnectionRun(void *data) {
     int requestedFd = ((SelectorKey *) data)->Fd;
     fd_selector selector = ((SelectorKey *) data)->Selector;
 
-    // TODO controlar errores aca
+
     if (connection->ClientTcpConnection->CanRead && requestedFd == connection->ClientTcpConnection->FileDescriptor) {
-        SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ);
-        SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
-        return CS_CLIENT_READ;
+        bool success = true;
+        success &= SELECTOR_STATUS_SUCCESS == SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ);
+        success &= SELECTOR_STATUS_SUCCESS == SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
+        return success ? CS_CLIENT_READ : CS_ERROR;
     }
 
     if (connection->RemoteTcpConnection->CanRead && requestedFd == connection->RemoteTcpConnection->FileDescriptor) {
-        SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_READ);
-        SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
-        return CS_REMOTE_READ;
+        bool success = true;
+        success &= SELECTOR_STATUS_SUCCESS == SelectorSetInterest(selector, connection->RemoteTcpConnection->FileDescriptor, SELECTOR_OP_READ);
+        success &= SELECTOR_STATUS_SUCCESS == SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_NOOP);
+        return success ? CS_REMOTE_READ : CS_ERROR;
     }
 
-
-    if (IsTcpConnectionDisconnected(connection->ClientTcpConnection) && IsTcpConnectionDisconnected(connection->RemoteTcpConnection)) {
+    if (IsTcpConnectionDisconnected(connection->ClientTcpConnection) && IsTcpConnectionDisconnected(connection->RemoteTcpConnection))
         return CS_DONE;
-    }
 
     return CS_CONNECTED;
 }

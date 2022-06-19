@@ -26,26 +26,33 @@ void EstablishConnectionInit(unsigned int state, void *data) {
     if (null != connection->RemoteTcpConnection)
         DisposeTcpConnection(connection->RemoteTcpConnection,key->Selector);
 
-
-
     TcpConnection *remoteConnection = null;
 
-    if (AF_INET == d->CurrentRemoteAddress->ai_family)
+    if (AF_INET == d->CurrentRemoteAddress->ai_family) {
+        char buffer[INET_ADDRSTRLEN +1];
+        GetIPFromAddress((struct sockaddr_storage *) d->CurrentRemoteAddress->ai_addr, buffer, INET_ADDRSTRLEN + 1);
+        LogDebug("Attempting to connect to IPv4 %s",buffer);
         remoteConnection = ConnectToIPv4TcpServer(
                 d->CurrentRemoteAddress->ai_addr,
                 connection->Handler,
                 connection
         );
+    }
 
-    if (AF_INET6 == d->CurrentRemoteAddress->ai_family)
+    if (AF_INET6 == d->CurrentRemoteAddress->ai_family) {
+        char buffer[INET6_ADDRSTRLEN +1];
+        GetIPFromAddress((struct sockaddr_storage *) d->CurrentRemoteAddress->ai_addr, buffer, INET6_ADDRSTRLEN + 1);
+        LogDebug("Attempting to connect to IPv6 %s",buffer);
         remoteConnection = ConnectToIPv6TcpServer(
                 d->CurrentRemoteAddress->ai_addr,
                 connection->Handler,
                 connection
         );
+    }
 
     // free address if not dns
     if (null == d->RemoteAddress && null != d->CurrentRemoteAddress){
+        Debug("Releasing remote address memory because it was not resolved by DNS");
         free(d->CurrentRemoteAddress->ai_addr);
         free(d->CurrentRemoteAddress);
     }
@@ -66,8 +73,10 @@ void EstablishConnectionClose(unsigned int state, void *data) {
     RequestData * d = &connection->Data.Request;
 
     // free dns address
-    if (null != d->RemoteAddress)
+    if (null != d->RemoteAddress) {
+        Debug("Disposing DNS resolved addresses");
         freeaddrinfo(d->RemoteAddress);
+    }
 }
 
 unsigned EstablishConnectionRun(void *data) {

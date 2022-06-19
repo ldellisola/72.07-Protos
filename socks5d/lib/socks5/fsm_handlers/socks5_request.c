@@ -38,7 +38,7 @@ unsigned RequestReadRun(void *data) {
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead < 0) {
-        Error( "Cannot read from Tcp connection");
+        Error("Cannot read from Tcp connection");
         return CS_ERROR;
     }
 
@@ -52,12 +52,12 @@ unsigned RequestReadRun(void *data) {
         return CS_ERROR;
 
     if (d->Parser.CMD != SOCKS5_CMD_CONNECT) {
+        Warning("Invalid socks5 command detected. Only CONNECT is supported!");
         d->Command = SOCKS5_REPLY_COMMAND_NOT_SUPPORTED;
         return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ? CS_REQUEST_WRITE : CS_ERROR;
     }
 
     if (d->Parser.AType == SOCKS5_ADDRESS_TYPE_FQDN) {
-
         SelectorKey * allocatedKey = malloc(sizeof(SelectorKey));
         if(null == allocatedKey)
             d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
@@ -110,11 +110,10 @@ unsigned RequestReadRun(void *data) {
         GetIPFromAddress((struct sockaddr_storage *) in6, connection->RemoteAddressString,INET6_ADDRSTRLEN +1);
     }
 
-
     connection->RemotePort = GetPortNumberFromNetworkOrder(d->Parser.DestPort);
 
-    return SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP) ? CS_ESTABLISH_CONNECTION
-                                                                                     : CS_ERROR;
+    bool selectorSuccess = SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_NOOP);
+    return  selectorSuccess ? CS_ESTABLISH_CONNECTION : CS_ERROR;
 }
 
 void RequestWriteClose(unsigned int state, void *data) {
@@ -141,7 +140,7 @@ void RequestWriteInit(unsigned int state, void *data) {
     size_t size;
     byte *buffer = BufferWritePtr(d->WriteBuffer, &size);
     size_t messageSize = BuildRequestResponse(buffer, size, d->Command);
-    BufferWriteAdv(d->WriteBuffer, messageSize);
+    BufferWriteAdv(d->WriteBuffer, (ssize_t ) messageSize);
 
     int destAddressType;
 

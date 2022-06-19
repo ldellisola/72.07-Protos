@@ -18,8 +18,6 @@
 #include "socks5/fsm_handlers/socks5_dns.h"
 #include "socks5/socks5_metrics.h"
 
-// TODO: Test
-
 static void Socks5ConnectionRead(SelectorKey *key);
 static void Socks5ConnectionWrite(SelectorKey *key);
 static void Socks5ConnectionBlock(SelectorKey *key);
@@ -245,11 +243,20 @@ void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
             continue;
 
         if (currentTime - temp->Connection.LastConnectionOn >= socksMaxTimeout) {
-            LogInfo("Connection with client file descriptor %d and remote file descriptor %d timed out after %ld seconds",
-                    temp->Connection.ClientTcpConnection->FileDescriptor,
-                    temp->Connection.RemoteTcpConnection->FileDescriptor,
-                    currentTime - temp->Connection.LastConnectionOn
-                    );
+            if (null == temp->Connection.RemoteAddressString) {
+                LogInfo("Connection with client file descriptor %d and remote file descriptor %d timed out after %ld seconds",
+                        temp->Connection.ClientTcpConnection->FileDescriptor,
+                        temp->Connection.RemoteTcpConnection->FileDescriptor,
+                        currentTime - temp->Connection.LastConnectionOn
+                );
+            }
+            else{
+                LogInfo("Connection to %s:%d timed out after %d seconds",
+                        temp->Connection.RemoteAddressString,
+                        temp->Connection.RemotePort,
+                        currentTime - temp->Connection.LastConnectionOn
+                );
+            }
             DisposeSocks5Connection(&temp->Connection, fdSelector);
         }
     }

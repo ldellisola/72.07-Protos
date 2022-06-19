@@ -38,7 +38,6 @@ size_t BuildRequestResponse(byte *buffer, size_t length, int replyCommand) {
         return 0;
     }
 
-
     buffer[0] = SOCKS5_PROTOCOL_VERSION;
     buffer[1] = replyCommand;
     buffer[2] = 0;

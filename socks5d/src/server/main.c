@@ -14,11 +14,11 @@ static void sigterm_handler(const int signal) {
 }
 
 int main(int argc, char **argv) {
+    SetLogLevelFromEnvironment();
 
     close(0);
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
-    SetLogLevel(LOG_INFO);
 
     Info("Starting server...");
 
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 
     };
     int socks5PoolSize = 50;
-    time_t socks5Timeout = 500;
+    time_t socks5Timeout = 10;
 
     bool startServer = true;
     startServer &= InitTcpServer(&options, socks5PoolSize * 2);

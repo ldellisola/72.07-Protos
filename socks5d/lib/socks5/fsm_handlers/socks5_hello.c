@@ -45,7 +45,7 @@ unsigned HelloReadRun(void *data) {
     byte *buffer = BufferWritePtr(d->ReadBuffer, &bufferSize);
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
-    if (bytesRead <= 0) {
+    if (FUNCTION_ERROR == bytesRead) {
         Error( "Cannot read from Tcp connection");
         return CS_ERROR;
     }
@@ -67,7 +67,7 @@ unsigned HelloReadRun(void *data) {
         size_t bytesWritten = BuildHelloResponse(buffer, bufferSize, d->AuthenticationMethod);
         if (0 == bytesWritten)
             return CS_ERROR;
-        BufferWriteAdv(d->WriteBuffer, bytesWritten);
+        BufferWriteAdv(d->WriteBuffer, (ssize_t) bytesWritten);
 
         return CS_HELLO_WRITE;
     }
