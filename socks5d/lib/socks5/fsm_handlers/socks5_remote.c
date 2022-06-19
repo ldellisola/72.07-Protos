@@ -30,7 +30,7 @@ unsigned RemoteReadRun(void *data) {
         return CS_CLIENT_WRITE;
     }
 
-    if (ERROR == bytes){
+    if (FUNCTION_ERROR == bytes){
         return CS_ERROR;
     }
 
@@ -76,7 +76,7 @@ unsigned RemoteWriteRun(void *data) {
 
     ssize_t bytes = WriteToTcpConnection(connection->RemoteTcpConnection, buffer, len);
 
-    if (ERROR == bytes){
+    if (FUNCTION_ERROR == bytes){
         return CS_ERROR;
     }
 

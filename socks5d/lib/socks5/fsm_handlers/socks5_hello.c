@@ -46,7 +46,7 @@ unsigned HelloReadRun(void *data) {
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead <= 0) {
-        LogError(false, "Cannot read from Tcp connection");
+        Error( "Cannot read from Tcp connection");
         return CS_ERROR;
     }
 
@@ -100,7 +100,7 @@ unsigned HelloWriteRun(void *data) {
 
     ssize_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
 
-    if (ERROR == bytesWritten){
+    if (FUNCTION_ERROR == bytesWritten){
         return CS_ERROR;
     }
 

@@ -6,29 +6,29 @@
 #include "utils/logger.h"
 
 ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloParserState nextState, char *nextWord) {
-//    LogError(false, "char c = %c", c);
+//    Error( "char c = %c", c);
     if(strlen(p->Word) == p->Index){
         if(c == '|'){
             p->Word = nextWord;
             p->Index = 0;
             return nextState;
         }
-        LogError(false, "Im in the last letter of the word and there is no pipe");
+        Error( "Im in the last letter of the word and there is no pipe");
         return HelloInvalidState;
     }
     if (c == p->Word[p->Index]) {
         p->Index++;
         return p->State;
     }
-    LogError(false, "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
+    LogError( "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
     return HelloInvalidState;
 
 }
 
 void ClientHelloParserReset(ClientHelloParser *p) {
-    LogInfo("Resetting HelloParser...");
+    Debug("Resetting HelloParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL HelloParser");
+        Error( "Cannot reset NULL HelloParser");
         return;
     }
 
@@ -44,14 +44,14 @@ void ClientHelloParserReset(ClientHelloParser *p) {
     p->Hello[4] = 'O';
     p->Hello[5] = 0;
     p->Word = p->Hello;
-    LogInfo("HelloParser reset!");
+    Debug("HelloParser reset!");
 }
 
 ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
-    LogInfo("Feeding %d to ClientHelloParser", c);
-//    LogError(false, "char= %c", c);
+    LogDebug("Feeding %d to ClientHelloParser", c);
+//    Error( "char= %c", c);
     if (null == p) {
-        LogError(false, "Cannot feed HelloParser if is NULL");
+        Error( "Cannot feed HelloParser if is NULL");
         return HelloInvalidState;
     }
 
@@ -62,7 +62,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
         case HelloUsername:
             if(c == '|'){
                 if(p->Index == 0){
-                    LogError(false, "Username has to be at least 1 character long");
+                    Error( "Username has to be at least 1 character long");
                     p->State = HelloInvalidState;
                     break;
                 }
@@ -77,7 +77,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 break;
             }
             if(p->Index == MAXLONG+1){
-                LogError(false, "Username can have max 255 characters");
+                Error( "Username can have max 255 characters");
                 p->State = HelloInvalidState;
                 break;
             }
@@ -86,7 +86,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             break;
         case HelloPassword:
             if(c == '|'){
-                LogError(false, "Too many arguments");
+                Error( "Too many arguments");
                 p->State = HelloInvalidState;
                 break;
             }
@@ -96,7 +96,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 break;
             }
             if(p->Index == MAXLONG+1){
-                LogError(false, "Password can have max 255 characters");
+                Error( "Password can have max 255 characters");
                 p->State = HelloInvalidState;
                 break;
             }
@@ -108,19 +108,19 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 if(p->PrevState == HelloPassword){
                     if(p->Index == 0){
                         p->State = HelloInvalidState;
-                        LogError(false, "Password has to be at least 1 character long");
+                        Error( "Password has to be at least 1 character long");
                         break;
                     }
                     p->State = HelloFinished;
                     break;
                 }
-                LogError(false, "More arguments needed");
+                Error( "More arguments needed");
                 p->State = HelloInvalidState;
                 break;
             }
             if(c == '\r'){
                 if(p->Index == MAXLONG+1){
-                    LogError(false, "Password and Username can have max 255 characters");
+                    Error( "Password and Username can have max 255 characters");
                     p->State = HelloInvalidState;
                     break;
                 }
@@ -131,7 +131,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             if(c == '|'){
                 if(p->PrevState == HelloUsername){
                     if(p->Index == MAXLONG+1){
-                        LogError(false, "Username can have max 255 characters");
+                        Error( "Username can have max 255 characters");
                         p->State = HelloInvalidState;
                         break;
                     }
@@ -141,12 +141,12 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                     p->State = HelloPassword;
                     break;
                 }
-                LogError(false, "Too many arguments");
+                Error( "Too many arguments");
                 p->State = HelloInvalidState;
                 break;
             }
             if(p->Index == MAXLONG){
-                LogError(false, "Username and password can have max 255 characters");
+                Error( "Username and password can have max 255 characters");
                 p->State = HelloInvalidState;
                 break;
             }
@@ -169,14 +169,14 @@ bool ClientHelloParserHasFailed(ClientHelloParserState state) {
 }
 
 size_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, size_t length) {
-    LogInfo("AuthParser consuming %d bytes", length);
+    LogDebug("AuthParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if HelloParser is NULL");
+        Error( "Cannot consume if HelloParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "HelloParser cannot consume NULL array");
+        Error( "HelloParser cannot consume NULL array");
         return 0;
     }
 

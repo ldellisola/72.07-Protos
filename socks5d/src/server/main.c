@@ -14,13 +14,17 @@ static void sigterm_handler(const int signal) {
 }
 
 int main(int argc, char **argv) {
+
     close(0);
     setvbuf(stdout, NULL, _IONBF, 0);
     setvbuf(stderr, NULL, _IONBF, 0);
     SetLogLevel(LOG_INFO);
 
+    Info("Starting server...");
+
     signal(SIGTERM, sigterm_handler);
     signal(SIGINT, sigterm_handler);
+
 
     CliArguments arguments = ParseCli(argc, argv);
 
@@ -50,11 +54,17 @@ int main(int argc, char **argv) {
     );
 
 
-    if (startServer)
+    if (startServer) {
         RunTcpServer();
+    }
+    else{
+        Warning("Server could not be started");
+    }
 
+    Info("Shutting down...");
     DisposeSocks5Server();
     DisposeTcpServer();
+    Info("Shut down complete!");
 
 }
 

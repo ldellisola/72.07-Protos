@@ -52,10 +52,9 @@ void EstablishConnectionInit(unsigned int state, void *data) {
 
 
     if (null == remoteConnection) {
-        LogError(true, "Cannot connect to remote server");
+        LogErrorWithReason("Cannot connect to remote address %s",connection->RemoteAddressString);
         d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
         SelectorSetInterestKey(key,SELECTOR_OP_READ | SELECTOR_OP_WRITE);
-//        return;
     }
 
     connection->RemoteTcpConnection = remoteConnection;

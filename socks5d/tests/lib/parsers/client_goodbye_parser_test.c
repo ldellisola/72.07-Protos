@@ -125,7 +125,7 @@ START_TEST(Consume_CompleteMessage_Succeeds)
         int messageLength = 9;
         byte message[] = {'G','O', 'O', 'D','B', 'Y', 'E', '\r', '\n'};
         // Act
-        int consumedBytes = ClientGoodbyeParserConsume(&parser, message, messageLength);
+        size_t consumedBytes = ClientGoodbyeParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, messageLength);
         ck_assert_int_eq(parser.State, GoodbyeFinished);
@@ -140,7 +140,7 @@ START_TEST(Consume_CompleteMessageWithExtraLength_Succeeds)
         int messageLength = 12;
         byte message[] = {'G','O', 'O', 'D','B', 'Y', 'E', '\r', '\n', 0, 0};
         // Act
-        int consumedBytes = ClientGoodbyeParserConsume(&parser, message, messageLength);
+        size_t consumedBytes = ClientGoodbyeParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, contentLength);
         ck_assert_int_eq(parser.State, GoodbyeFinished);
@@ -154,7 +154,7 @@ START_TEST(Consume_IncompleteGoodbye_Succeeds)
         int messageLength = 5;
         byte message[] = {'G','O', 'O', 'D','B', 'Y', 'E'};
         // Act
-        int consumedBytes = ClientGoodbyeParserConsume(&parser, message, messageLength);
+        size_t consumedBytes = ClientGoodbyeParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, messageLength);
         ck_assert_int_eq(parser.State, Goodbye);
@@ -168,7 +168,7 @@ START_TEST(Consume_NullParser_Fails)
         int messageLength = 9;
         byte message[] = {'G','O', 'O', 'D','B', 'Y', 'E', '\r', '\n'};
         // Act
-        int consumedBytes = ClientGoodbyeParserConsume(nullParser, message, messageLength);
+        size_t consumedBytes = ClientGoodbyeParserConsume(nullParser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, 0);
     }

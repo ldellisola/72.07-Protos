@@ -60,7 +60,7 @@ START_TEST(Feed_NullParser_Fails){
 START_TEST(Consume_InvalidCommand_Succeeds){
     // arrange
     const char * data = "QUIT";
-    int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
     // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -71,7 +71,7 @@ END_TEST
 START_TEST(Consume_MultipleInvalidCommand_Succeeds){
     // arrange
     const char * data = "QUIT\r\nQUIT\r\n";
-    int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
     // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -82,7 +82,7 @@ END_TEST
 START_TEST(Consume_InvalidUserLikeCommand_Succeeds){
     // arrange
     const char * data = "UserNOT";
-    int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
     // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -93,7 +93,7 @@ END_TEST
 START_TEST(Consume_InvalidPassLikeCommand_Succeeds){
     // arrange
     const char * data = "paNOTss";
-    int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
     // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -104,7 +104,7 @@ END_TEST
 START_TEST(Consume_UserCommand_Succeeds){
     // arrange
     const char * data = "USER";
-    int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
     // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -116,7 +116,7 @@ END_TEST
 START_TEST(Consume_UserCommandWithSpace_Succeeds){
     // arrange
     const char * data = "USER ";
-    int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
     // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -127,7 +127,7 @@ END_TEST
 START_TEST(Consume_CompleteUserOnly_Succeeds){
     // arrange
     const char * data = "USER lucas\r\n";
-    int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
     // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -140,7 +140,7 @@ END_TEST
 START_TEST(Consume_PassCommand_Succeeds){
         // arrange
         const char * data = "PASS";
-        int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
         // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -152,7 +152,7 @@ END_TEST
 START_TEST(Consume_PassCommandWithSpace_Succeeds){
         // arrange
         const char * data = "PASS ";
-        int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
         // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -163,7 +163,7 @@ END_TEST
 START_TEST(Consume_CompletePass_Succeeds){
         // arrange
         const char * data = "pass lucas\r\n";
-        int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
         // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -180,7 +180,7 @@ START_TEST(Consume_CompleteLongPass_Succeeds){
         // arrange
         const char * longPass = "lucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucas";
         const char * data = "pass lucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucaslucas\r\n";
-        int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
         // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert
@@ -195,7 +195,7 @@ END_TEST
 START_TEST(Consume_TwoPasswords_Succeeds){
         // arrange
         const char * data = "pass lucas\r\npass juan\r\n";
-        int dataLen = strlen(data);
+        size_t dataLen = strlen(data);
         // act
         ConsumePop3AuthParser((void *)data,dataLen,&parser);
         // assert

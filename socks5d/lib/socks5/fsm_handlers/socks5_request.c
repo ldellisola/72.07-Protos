@@ -38,7 +38,7 @@ unsigned RequestReadRun(void *data) {
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead < 0) {
-        LogError(false, "Cannot read from Tcp connection");
+        Error( "Cannot read from Tcp connection");
         return CS_ERROR;
     }
 
@@ -189,7 +189,11 @@ unsigned RequestWriteRun(void *data) {
     size_t size;
     byte *ptr = BufferReadPtr(d->WriteBuffer, &size);
 
-    size_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
+    ssize_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
+
+    if (0 == bytesWritten)
+        return CS_ERROR;
+
     BufferReadAdv(d->WriteBuffer, bytesWritten);
 
     return CS_REQUEST_WRITE;

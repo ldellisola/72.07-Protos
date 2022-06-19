@@ -30,5 +30,4 @@ bool ClientMetricsParserHasFinished(ClientMetricsParserState state);
 void ClientMetricsParserReset(ClientMetricsParser *p);
 ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c);
 size_t ClientMetricsParserConsume(ClientMetricsParser *p, byte *c, size_t length);
-bool ClientMetricsParserHasFinished(ClientMetricsParserState state);
 #endif //SOCKS5D_CLIENT_METRICS_PARSER_H

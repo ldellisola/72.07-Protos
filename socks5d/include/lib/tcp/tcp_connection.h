@@ -32,7 +32,7 @@ TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, sockle
 /**
  * It safely disposes a tcp tcpConnection
  * @param tcpConnection tcpConnection to be disposed
- * @return OK or ERROR whether there were any errors.
+ * @return FUNCTION_OK or FUNCTION_ERROR whether there were any errors.
  */
 int DisposeTcpConnection(TcpConnection *tcpConnection, fd_selector selector);
 

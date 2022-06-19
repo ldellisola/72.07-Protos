@@ -5,38 +5,38 @@
 #include "parsers/socks5/request_parser.h"
 
 RequestParser RequestParserInit() {
-    LogInfo("Creating RequestParser...");
+    Debug("Creating RequestParser...");
     RequestParser parser;
 
     RequestParserReset(&parser);
 
-    LogInfo("RequestParser created!");
+    Debug("RequestParser created!");
     return parser;
 }
 
 RequestParserState RequestParserFeed(RequestParser *p, byte c) {
-    LogInfo("Feeding %d to RequestParser", c);
+    LogDebug("Feeding %d to RequestParser", c);
     if (null == p) {
-        LogError(false, "Cannot feed RequestParser if is NULL");
+        Error( "Cannot feed RequestParser if is NULL");
         return RequestInvalidState;
     }
 
     switch (p->State) {
         case RequestVersion:
             p->State = 0x05 == c ? RequestCMD : RequestErrorUnsupportedVersion;
-            LogInfo("RequestParser socks5 protocol version: %d", c);
+            LogDebug("RequestParser socks5 protocol version: %d", c);
             break;
         case RequestCMD:
-            LogInfo("RequestParser detected command %d", c);
+            LogDebug("RequestParser detected command %d", c);
             p->CMD = c;
             p->State = RequestRSV;
             break;
         case RequestRSV:
-            LogInfo("RequestParser reserved byte %d", c);
+            LogDebug("RequestParser reserved byte %d", c);
             p->State = 0 == c ? RequestAType : RequestInvalidState;
             break;
         case RequestAType:
-            LogInfo("RequestParser address type %d", c);
+            LogDebug("RequestParser address type %d", c);
             p->AType = c;
 
             switch (p->AType) {
@@ -72,19 +72,19 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
             p->DestAddress[p->AddressPosition++] = c;
 
             if (p->AddressLength == p->AddressPosition) {
-//                LogInfo("RequestParser Address %s", p->DestAddress);
+//                Debug(("RequestParser Address %s", p->DestAddress);
                 p->State = RequestDestPortFirstByte;
             }
             break;
         case RequestDestPortFirstByte:
-            LogInfo("RequestParser port first byte %d", c);
+            LogDebug("RequestParser port first byte %d", c);
             p->DestPort[0] = c;
             p->State = RequestDestPortSecondByte;
             break;
         case RequestDestPortSecondByte:
-            LogInfo("RequestParser port second byte %d", c);
+            LogDebug("RequestParser port second byte %d", c);
             p->DestPort[1] = c;
-            LogInfo("RequestParser complete port %d", GetPortNumberFromNetworkOrder(p->DestPort));
+            LogDebug("RequestParser complete port %d", GetPortNumberFromNetworkOrder(p->DestPort));
             p->State = RequestDone;
             break;
         case RequestDone:
@@ -92,7 +92,7 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
         case RequestInvalidState:
             break;
         default:
-            LogError(false, "request invalid state");
+            Error( "request invalid state");
             p->State = RequestInvalidState;
             break;
     }
@@ -100,9 +100,9 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
 }
 
 void RequestParserReset(RequestParser *p) {
-    LogInfo("Resetting RequestParser...");
+    Debug("Resetting RequestParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL RequestParser");
+        Error( "Cannot reset NULL RequestParser");
         return;
     }
 
@@ -114,18 +114,18 @@ void RequestParserReset(RequestParser *p) {
     p->AddressPosition = 0;
     p->CMD = 0;
 
-    LogInfo("AuthParser reset!");
+    Debug("AuthParser reset!");
 }
 
 size_t RequestParserConsume(RequestParser *p, byte *c, size_t length) {
-    LogInfo("RequestParser consuming %d bytes", length);
+    LogDebug("RequestParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if RequestParser is NULL");
+        Error("Cannot consume if RequestParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "RequestParser cannot consume NULL array");
+        Error("RequestParser cannot consume NULL array");
         return 0;
     }
 

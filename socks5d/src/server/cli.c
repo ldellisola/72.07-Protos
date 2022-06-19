@@ -51,7 +51,7 @@ CliArguments ParseCli(int argc, char **argv) {
                 if (numberOfUsers < 10)
                     LoadUser(&args, numberOfUsers++,optarg);
                 else {
-                    LogError(false,"Invalid number of users detected. Maximum is 10");
+                    Error("Invalid number of users detected. Maximum is 10");
                     exit(1);
                 }
                 break;
@@ -73,7 +73,7 @@ CliArguments ParseCli(int argc, char **argv) {
 void LoadUser(CliArguments * args,int userNum, char * user){
     char *p = strchr(user, ':');
     if(null == p) {
-        LogError(false,"Password not found");
+        Error("Password not found");
         exit(1);
     } else {
         *p = 0;

@@ -31,7 +31,7 @@ unsigned ClientReadRun(void *data) {
         return CS_REMOTE_WRITE;
     }
 
-    if (ERROR == bytes){
+    if (FUNCTION_ERROR == bytes){
         return CS_ERROR;
     }
 
@@ -91,7 +91,7 @@ unsigned ClientWriteRun(void *data) {
     byte *buffer = BufferReadPtr(&connection->WriteBuffer, &len);
     ssize_t bytes = WriteToTcpConnection(connection->ClientTcpConnection, buffer, len);
 
-    if (ERROR == bytes)
+    if (FUNCTION_ERROR == bytes)
         return CS_ERROR;
 
     BufferReadAdv(&connection->WriteBuffer, bytes);

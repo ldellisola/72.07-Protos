@@ -13,7 +13,7 @@ ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, by
             p->Index = 0;
             return nextState;
         }
-        LogError(false, "The word has finished and character given isnt a terminating character");
+        Error("The word has finished and character given isnt a terminating character");
         return TimeoutInvalidState;
 
     }
@@ -22,14 +22,14 @@ ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, by
         p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    LogError( "%c is not part of the word \" %s \"", c, p->Word);
     return TimeoutInvalidState;
 }
 
 void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
-    LogInfo("Resetting ClientGetTimeoutParser...");
+    Debug("Resetting ClientGetTimeoutParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL ClientGetTimeoutParser");
+        Error("Cannot reset NULL ClientGetTimeoutParser");
         return;
     }
 
@@ -51,54 +51,54 @@ void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
     p->Get[3] = 0;
     p->Word = p->Get;
 
-    LogInfo("TimeoutParser reset!");
+    Debug("TimeoutParser reset!");
 }
 
 ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p, byte c) {
-    LogInfo("Feeding %d to ClientGetTimeoutParser", c);
-//    LogError(false, "char = %c", c);
+    LogDebug("Feeding %d to ClientGetTimeoutParser", c);
+//    Error( "char = %c", c);
 
     if (null == p) {
-        LogError(false, "Cannot feed GetTimeoutParser if is NULL");
+        Error("Cannot feed GetTimeoutParser if is NULL");
         return TimeoutInvalidState;
     }
 
     switch (p->State) {
         case TimeoutGet:
-//            LogError(false, "TimeoutGet");
+//            Error( "TimeoutGet");
             p->State = traverseWordGetTimeout(p, c, Timeout, p->Timeout);
             break;
         case Timeout:
-//            LogError(false, "Timeout");
+//            Error( "Timeout");
             p->State = traverseWordGetTimeout(p, c, TimeoutCRLF, null);
             break;
 
         case TimeoutCRLF:
-//            LogError(false, "TimeoutCRLF");
+//            Error( "TimeoutCRLF");
             if( c == '\n'){
                 p->State = TimeoutFinished;
                 break;
             }
-            LogError(false, "There is a CR but no LF");
+            Error("There is a CR but no LF");
             p->State =  TimeoutInvalidState;
             break;
         case TimeoutFinished:
-//            LogError(false, "TimeoutFinished");
+//            Error( "TimeoutFinished");
         case TimeoutInvalidState:
-//            LogError(false, "TimeoutInvalidState");
+//            Error( "TimeoutInvalidState");
             break;
     }
     return p->State;
 }
 size_t ClientGetTimeoutParserConsume(ClientGetTimeoutParser *p, byte *c, size_t length) {
-    LogInfo("ClientTimeoutParser consuming %d bytes", length);
+    LogDebug("ClientTimeoutParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if ClientGetTimeoutParser is NULL");
+        Error( "Cannot consume if ClientGetTimeoutParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "ClientGetTimeoutParser cannot consume NULL array");
+        Error( "ClientGetTimeoutParser cannot consume NULL array");
         return 0;
     }
 

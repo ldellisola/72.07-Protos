@@ -96,7 +96,6 @@ SelectorStatus SelectorInit(const SelectorOptions *c) {
 
 SelectorStatus SelectorClose(void) {
     // Nada para liberar.
-    // TODO(juan): podriamos reestablecer el Handler de la señal.
     return SELECTOR_STATUS_SUCCESS;
 }
 
@@ -495,7 +494,6 @@ static void handle_block_notifications(fd_selector s) {
 SelectorStatus SelectorNotifyBlock(fd_selector s, const int fd) {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
 
-    // TODO(juan): usar un tcpPool
     BlockingJob *job = malloc(sizeof(*job));
     if (job == NULL) {
         ret = SELECTOR_STATUS_ENOMEM;

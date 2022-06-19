@@ -13,7 +13,7 @@ ClientMetricsParserState traverseWordMetrics(ClientMetricsParser *p, byte c, Cli
             p->Index = 0;
             return nextState;
         }
-        LogError(false, "The word has finished and character given isnt a terminating character");
+        Error( "The word has finished and character given isnt a terminating character");
         return MetricsInvalidState;
 
     }
@@ -22,14 +22,14 @@ ClientMetricsParserState traverseWordMetrics(ClientMetricsParser *p, byte c, Cli
         p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    LogError( "%c is not part of the word \" %s \"", c, p->Word);
     return MetricsInvalidState;
 }
 
 void ClientMetricsParserReset(ClientMetricsParser *p) {
-    LogInfo("Resetting ClientMetricsParser...");
+    Debug("Resetting ClientMetricsParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL ClientMetricsParser");
+        Error( "Cannot reset NULL ClientMetricsParser");
         return;
     }
 
@@ -51,54 +51,54 @@ void ClientMetricsParserReset(ClientMetricsParser *p) {
     p->Get[3] = 0;
     p->Word = p->Get;
 
-    LogInfo("MetricsParser reset!");
+    Debug("MetricsParser reset!");
 }
 
 ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c) {
-    LogInfo("Feeding %d to ClientMetricsParser", c);
-//    LogError(false, "char = %c", c);
+    LogDebug("Feeding %d to ClientMetricsParser", c);
+//    Error( "char = %c", c);
 
     if (null == p) {
-        LogError(false, "Cannot feed MetricsParser if is NULL");
+        Error( "Cannot feed MetricsParser if is NULL");
         return MetricsInvalidState;
     }
 
     switch (p->State) {
         case MetricsGet:
-//            LogError(false, "MetricsGet");
+//            Error( "MetricsGet");
             p->State = traverseWordMetrics(p, c, Metrics, p->Metrics);
             break;
         case Metrics:
-//            LogError(false, "Metrics");
+//            Error( "Metrics");
             p->State = traverseWordMetrics(p, c, MetricsCRLF, null);
             break;
 
         case MetricsCRLF:
-//            LogError(false, "MetricsCRLF");
+//            Error( "MetricsCRLF");
             if( c == '\n'){
                 p->State = MetricsFinished;
                 break;
             }
-            LogError(false, "There is a CR but no LF");
+            Error( "There is a CR but no LF");
             p->State =  MetricsInvalidState;
             break;
         case MetricsFinished:
-//            LogError(false, "MetricsFinished");
+//            Error( "MetricsFinished");
         case MetricsInvalidState:
-//            LogError(false, "MetricsInvalidState");
+//            Error( "MetricsInvalidState");
             break;
     }
     return p->State;
 }
 size_t ClientMetricsParserConsume(ClientMetricsParser *p, byte *c, size_t length) {
-    LogInfo("ClientMetricsParser consuming %d bytes", length);
+    LogDebug("ClientMetricsParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if ClientMetricsParser is NULL");
+        Error( "Cannot consume if ClientMetricsParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "ClientMetricsParser cannot consume NULL array");
+        Error( "ClientMetricsParser cannot consume NULL array");
         return 0;
     }
 

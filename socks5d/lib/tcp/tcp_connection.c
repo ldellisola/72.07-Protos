@@ -30,44 +30,46 @@ void DestroyTcpConnection(TcpConnection * connection);
 
 int DisposeTcpConnection(TcpConnection *tcpConnection, fd_selector selector) {
     if (tcpConnection == null) {
-        LogError(false, "Failed to dispose TCP tcpConnection. Cannot be null");
-        return ERROR;
+        Error("Failed to dispose TCP tcpConnection. Cannot be null");
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Disposing TCP tcpConnection on file descriptor %d", tcpConnection->FileDescriptor);
+    LogDebug("Disposing TCP tcpConnection on file descriptor %d", tcpConnection->FileDescriptor);
 
     if (SELECTOR_STATUS_SUCCESS != SelectorUnregisterFd(selector, tcpConnection->FileDescriptor)) {
-        LogError(false, "Cannot unregister file descriptor");
+        Error("Cannot unregister file descriptor");
     }
 
     if (close(tcpConnection->FileDescriptor) < 0) {
-        LogError(true, "Cannot close file descriptor %d", tcpConnection->FileDescriptor);
-        return ERROR;
+        LogErrorWithReason("Cannot close file descriptor %d", tcpConnection->FileDescriptor);
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("File descriptor %d closed successfully", tcpConnection->FileDescriptor);
+    LogDebug("File descriptor %d closed successfully", tcpConnection->FileDescriptor);
 
     DestroyTcpConnection(tcpConnection);
 
-    LogInfo("TCP tcpConnection disposed successfully");
+    Debug("TCP tcpConnection disposed successfully");
 
-    return OK;
+    return FUNCTION_OK;
 }
 
 int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
     if (socket == null) {
-        LogError(false, "Failed to disconnect TCP socket. Cannot be null");
-        return ERROR;
+        Error( "Failed to disconnect TCP socket. Cannot be null");
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Disconnecting %s from TCP socket on file descriptor %d...", GetShutdownModeName(how),
-            socket->FileDescriptor);
+    LogDebug("Disconnecting %s from TCP socket on file descriptor %d...",
+             GetShutdownModeName(how),
+            socket->FileDescriptor
+    );
 
     int shutdownResult = shutdown(socket->FileDescriptor, how);
 
     if (shutdownResult < 0 && (errno != ENOTCONN || socket->CanWrite)) {
-        LogError(true, "Cannot close TCP socket on file descriptor %d...", socket->FileDescriptor);
-        return ERROR;
+        LogErrorWithReason("Cannot close TCP socket on file descriptor %d...", socket->FileDescriptor);
+        return FUNCTION_ERROR;
     }
 
     switch (how) {
@@ -81,13 +83,15 @@ int DisconnectFromTcpConnection(TcpConnection *socket, int how) {
             socket->CanRead = false;
             socket->CanWrite = false;
             break;
+        default:
+            break;
     }
 
 
-    LogInfo("Successfully disconnected %s from TCP socket on file descriptor %d!", GetShutdownModeName(how),
+    LogDebug("Successfully disconnected %s from TCP socket on file descriptor %d!", GetShutdownModeName(how),
             socket->FileDescriptor);
 
-    return OK;
+    return FUNCTION_OK;
 }
 
 TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, socklen_t addrSize) {
@@ -108,7 +112,7 @@ TcpConnection *CreateTcpConnection(int fd, struct sockaddr_storage *addr, sockle
 
 bool IsTcpConnectionDisconnected(TcpConnection *connection) {
     if (null == connection) {
-        LogError(false, "Tcp connection cannot be null");
+        Error("Tcp connection cannot be null");
     }
 
     return !connection->CanWrite && !connection->CanRead;
@@ -120,7 +124,7 @@ bool IsTcpConnectionReady(TcpConnection *connection) {
     int result = getsockopt(connection->FileDescriptor, SOL_SOCKET, SO_ERROR, &error, &len);
 
     if (result < 0) {
-        LogError(false, "Cannot get Socket Options");
+        Error("Cannot get Socket Options");
         return false;
     }
 
@@ -137,7 +141,7 @@ bool IsTcpConnectionReady(TcpConnection *connection) {
 
 void DestroyTcpConnection(TcpConnection * connection){
     if (null == tcpPool) {
-        LogError(false, "TCP pool was not initialized");
+        Error("TCP pool was not initialized");
         return;
     }
 
@@ -150,7 +154,7 @@ void DestroyTcpConnection(TcpConnection * connection){
 
     if (null == temp)
     {
-        LogError(false,"Error while destroying connection!");
+        Error("Error while destroying connection!");
         return;
     }
     assert(&temp->Connection == connection);
@@ -160,7 +164,7 @@ void DestroyTcpConnection(TcpConnection * connection){
 
 TcpConnection *GetTcpConnection() {
     if (null == tcpPool) {
-        LogError(false, "TCP pool was not initialized");
+        Error( "TCP pool was not initialized");
         return null;
     }
 
@@ -186,9 +190,9 @@ TcpConnection *GetTcpConnection() {
 
 
 void CleanTcpConnectionPool() {
-    LogInfo("Cleaning Tcp connection pool");
+    Debug("Cleaning Tcp connection pool");
     if (null == tcpPool) {
-        LogError(false, "TCP pool was not initialized. Cannot clean it");
+        Error("TCP pool was not initialized. Cannot clean it");
         return;
     }
 
@@ -203,9 +207,9 @@ void CleanTcpConnectionPool() {
 }
 
 void CreateTcpConnectionPool(int initialSize) {
-    LogInfo("Initializing TCP Pool");
+   Debug("Initializing TCP Pool");
     if (initialSize < 1) {
-        LogInfo("Invalid initial pool size %d, using default value 1", initialSize);
+        LogDebug("Invalid initial pool size %d, using default value 1", initialSize);
         initialSize = 1;
     }
 

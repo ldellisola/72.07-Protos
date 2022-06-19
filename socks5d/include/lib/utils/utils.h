@@ -9,8 +9,8 @@
 #include <netdb.h>
 
 #define null NULL
-#define OK 0
-#define ERROR (-1)
+#define FUNCTION_OK 0
+#define FUNCTION_ERROR (-1)
 
 
 typedef uint8_t byte;

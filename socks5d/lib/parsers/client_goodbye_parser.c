@@ -7,9 +7,9 @@
 #include "utils/logger.h"
 
 void ClientGoodbyeParserReset(ClientGoodbyeParser *p) {
-    LogInfo("Resetting HelloParser...");
+    Debug("Resetting HelloParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL HelloParser");
+        Error( "Cannot reset NULL HelloParser");
         return;
     }
 
@@ -24,17 +24,17 @@ void ClientGoodbyeParserReset(ClientGoodbyeParser *p) {
     p->Goodbye[5] = 'Y';
     p->Goodbye[6] = 'E';
 
-    LogInfo("HelloParser reset!");
+    Debug("HelloParser reset!");
 }
 
 ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, ClientGoodbyeParserState nextState) {
-//    LogError(false, "char c = %c", c);
+//    Error( "char c = %c", c);
 
     if (p->Index == strlen(p->Goodbye)-1) {
         if (c == '\r') {
             return nextState;
         }
-        LogError(false, "Im in the last letter of the word and there is no pipe");
+        Error( "Im in the last letter of the word and there is no pipe");
         return GoodbyeInvalidState;
     }
 
@@ -42,15 +42,15 @@ ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, Cli
         p->Index++;
         return p->State;
     }
-    LogError(false, "wrong character for GOODBYE, i was waiting for %c and got %c", p->Goodbye[p->Index], c);
+    LogError( "wrong character for GOODBYE, i was waiting for %c and got %c", p->Goodbye[p->Index], c);
     return GoodbyeInvalidState;
 
 }
 
 ClientGoodbyeParserState ClientGoodbyeParserFeed(ClientGoodbyeParser *p, byte c) {
-    LogInfo("Feeding %d to ClientGoodbyeParser", c);
+    LogDebug("Feeding %d to ClientGoodbyeParser", c);
     if (null == p) {
-        LogError(false, "Cannot feed ClientGoodbyeParser if is NULL");
+        Error( "Cannot feed ClientGoodbyeParser if is NULL");
         return GoodbyeInvalidState;
     }
 
@@ -70,19 +70,19 @@ ClientGoodbyeParserState ClientGoodbyeParserFeed(ClientGoodbyeParser *p, byte c)
 }
 
 size_t ClientGoodbyeParserConsume(ClientGoodbyeParser *p, byte *c, size_t length) {
-    LogInfo("AuthParser consuming %d bytes", length);
+    LogDebug("AuthParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if HelloParser is NULL");
+        Error( "Cannot consume if HelloParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "HelloParser cannot consume NULL array");
+        Error( "HelloParser cannot consume NULL array");
         return 0;
     }
 
     for (size_t i = 0; i < length; ++i) {
-//        LogError(false, "char c = %c", c[i]);
+//        Error( "char c = %c", c[i]);
         ClientGoodbyeParserState state = ClientGoodbyeParserFeed(p, c[i]);
         if (ClientGoodbyeParserHasFinished(state))
             return i + 1;

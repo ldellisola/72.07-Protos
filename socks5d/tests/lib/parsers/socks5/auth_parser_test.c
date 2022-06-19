@@ -191,7 +191,7 @@ START_TEST(Consume_CompleteMessage_Succeeds)
         byte pLen = 0x03;
         byte message[] = {0x01, uLen, 'p', 'r', 'o', pLen, 't', 'o', 's'};
         // Act
-        int consumedBytes = AuthParserConsume(&parser, message, messageLength);
+        size_t consumedBytes = AuthParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, messageLength);
         ck_assert_int_eq(parser.State, AuthFinished);
@@ -211,7 +211,7 @@ START_TEST(Consume_CompleteMessageWithExtraLength_Succeeds)
         byte pLen = 0x03;
         byte message[] = {0x01, uLen, 'p', 'r', 'o', pLen, 't', 'o', 's', 0, 0, 0};
         // Act
-        int consumedBytes = AuthParserConsume(&parser, message, messageLength);
+        size_t consumedBytes = AuthParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, contentLength);
         ck_assert_int_eq(parser.State, AuthFinished);
@@ -229,7 +229,7 @@ START_TEST(Consume_IncompleteMessage_Succeeds)
         byte uLen = 0x03;
         byte message[] = {0x01, uLen, 'p', 'r', 'o'};
         // Act
-        int consumedBytes = AuthParserConsume(&parser, message, messageLength);
+        size_t consumedBytes = AuthParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, messageLength);
         ck_assert_int_eq(parser.State, AuthPLen);
@@ -246,7 +246,7 @@ START_TEST(Consume_NullParser_Fails)
         byte uLen = 0x03;
         byte message[] = {0x01, uLen, 'p', 'r', 'o'};
         // Act
-        int consumedBytes = AuthParserConsume(nullParser, message, messageLength);
+        size_t consumedBytes = AuthParserConsume(nullParser, message, messageLength);
         // Assert
         ck_assert_int_eq(consumedBytes, 0);
     }

@@ -13,7 +13,7 @@ ClientListUsersParserState traverseWordListUsers(ClientListUsersParser *p, byte 
             p->Index = 0;
             return nextState;
         }
-        LogError(false, "The word has finished and character given isnt a terminating character");
+        Error( "The word has finished and character given isnt a terminating character");
         return ListInvalidState;
 
     }
@@ -22,14 +22,14 @@ ClientListUsersParserState traverseWordListUsers(ClientListUsersParser *p, byte 
         p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    LogError( "%c is not part of the word \" %s \"", c, p->Word);
     return ListInvalidState;
 }
 
 void ClientListUsersParserReset(ClientListUsersParser *p) {
-    LogInfo("Resetting ClientListUsersParser...");
+    Debug("Resetting ClientListUsersParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL ClientListUsersParser");
+        Error( "Cannot reset NULL ClientListUsersParser");
         return;
     }
 
@@ -50,54 +50,54 @@ void ClientListUsersParserReset(ClientListUsersParser *p) {
     p->Users[5] = 0;
     p->Word = p->List;
 
-    LogInfo("ListUsersParser reset!");
+    Debug("ListUsersParser reset!");
 }
 
 ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, byte c) {
-    LogInfo("Feeding %d to ClientListUsersParser", c);
-//    LogError(false, "char = %c", c);
+    LogDebug("Feeding %d to ClientListUsersParser", c);
+//    Error( "char = %c", c);
 
     if (null == p) {
-        LogError(false, "Cannot feed ListUsersParser if is NULL");
+        Error( "Cannot feed ListUsersParser if is NULL");
         return ListInvalidState;
     }
 
     switch (p->State) {
         case List:
-//            LogError(false, "BufferSizeGet");
+//            Error( "BufferSizeGet");
             p->State = traverseWordListUsers(p, c, ListUsers, p->Users);
             break;
         case ListUsers:
-//            LogError(false, "BufferSize");
+//            Error( "BufferSize");
             p->State = traverseWordListUsers(p, c, ListCRLF, null);
             break;
 
         case ListCRLF:
-//            LogError(false, "BufferSizeCRLF");
+//            Error( "BufferSizeCRLF");
             if( c == '\n'){
                 p->State = ListFinished;
                 break;
             }
-            LogError(false, "There is a CR but no LF");
+            Error( "There is a CR but no LF");
             p->State =  ListInvalidState;
             break;
         case ListFinished:
-//            LogError(false, "BufferSizeFinished");
+//            Error( "BufferSizeFinished");
         case ListInvalidState:
-//            LogError(false, "BufferSizeInvalidState");
+//            Error( "BufferSizeInvalidState");
             break;
     }
     return p->State;
 }
 size_t ClientListUsersParserConsume(ClientListUsersParser *p, byte *c, size_t length) {
-    LogInfo("ClientBufferSizeParser consuming %d bytes", length);
+    LogDebug("ClientBufferSizeParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if ClientListUsersParser is NULL");
+        Error( "Cannot consume if ClientListUsersParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "ClientListUsersParser cannot consume NULL array");
+        Error( "ClientListUsersParser cannot consume NULL array");
         return 0;
     }
 

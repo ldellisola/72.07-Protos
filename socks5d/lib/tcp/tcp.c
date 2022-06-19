@@ -14,7 +14,7 @@
 
 
 int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize,
-                 unsigned concurrentConnections);
+                int concurrentConnections);
 
 
 
@@ -34,13 +34,13 @@ bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
     CreateTcpConnectionPool(poolSize);
 
     if (SELECTOR_STATUS_SUCCESS != SelectorInit(null == optionalOptions ? &options : optionalOptions)) {
-        LogError(false, "Cannot initialize Selector");
+        Error( "Cannot initialize Selector");
         return false;
     }
 
     selector = SelectorNew(1024);
     if (null == selector) {
-        LogError(false, "Cannot create selector");
+        Error( "Cannot create selector");
         return false;
     }
 
@@ -49,7 +49,7 @@ bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
 
 
 int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections) {
-    LogInfo("Staring TCP server on IPv4...");
+    Debug("Staring TCP server on IPv4...");
 
     struct sockaddr_in addr;
     memset(&addr, 0, sizeof(addr));
@@ -62,14 +62,14 @@ int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char 
 
         switch (inet_pton(AF_INET, address, &in4Addr)) {
             case 1:
-                LogInfo("IPv4 address %s parsed successfully", address);
+                LogDebug("IPv4 address %s parsed successfully", address);
                 break;
             case 0:
-                LogError(true, "Address %s cannot be parsed into an IPv4", address);
-                return -1;
+                LogErrorWithReason("Address %s cannot be parsed into an IPv4", address);
+                return FUNCTION_ERROR;
             default:
-                LogError(true, "Unknown error parsing IPv4");
-                return -1;
+                ErrorWithReason("Unknown error parsing IPv4");
+                return FUNCTION_ERROR;
         }
 
         addr.sin_addr = in4Addr;
@@ -79,7 +79,7 @@ int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char 
 }
 
 int IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections) {
-    LogInfo("Staring TCP server on IPv6...");
+    Debug("Staring TCP server on IPv6...");
 
     struct sockaddr_in6 addr;
     memset(&addr, 0, sizeof(addr));
@@ -91,14 +91,14 @@ int IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char 
         struct in6_addr in6Addr;
         switch (inet_pton(AF_INET6, address, &in6Addr)) {
             case 1:
-                LogInfo("IPv6 address %s parsed successfully", address);
+                LogDebug("IPv6 address %s parsed successfully", address);
                 break;
             case 0:
-                LogError(true, "Address %s cannot be parsed into an IPv6", address);
-                return -1;
+                LogErrorWithReason("Address %s cannot be parsed into an IPv6", address);
+                return FUNCTION_ERROR;
             default:
-                LogError(true, "Unknown error parsing IPv6");
-                return -1;
+                ErrorWithReason("Unknown error parsing IPv6");
+                return FUNCTION_ERROR;
         }
         addr.sin6_addr = in6Addr;
     }
@@ -112,7 +112,7 @@ bool RunTcpServer() {
     while (isRunning) {
         selectorStatus = SelectorSelect((fd_selector) selector);
         if (selectorStatus != SELECTOR_STATUS_SUCCESS) {
-            LogError(false, "Error on selector. Exiting...");
+            Error("Error on selector. Exiting...");
             return false;
         }
     }
@@ -132,25 +132,25 @@ void DisposeTcpServer() {
 
 
 TcpConnection *AcceptNewTcpConnection(int fd) {
-    LogInfo("Waiting for new TCP connections...");
+    Debug("Waiting for new TCP connections...");
     struct sockaddr_storage clientAddr;
     socklen_t clientAddrLen = sizeof(clientAddr);
 
     const int client = accept(fd, (struct sockaddr *) &clientAddr, &clientAddrLen);
 
     if (-1 == client) {
-        LogError(false, "Cannot accept client connection in fd %d", fd);
+        LogError("Cannot accept client connection in fd %d", fd);
         return null;
     }
 
     if (-1 == SelectorFdSetNio(client)) {
-        LogError(false, "Cannot set client socket non-blocking in fd %d", client);
+        LogError("Cannot set client socket non-blocking in fd %d", client);
         return null;
     }
 
     TcpConnection *tcpConnection = CreateTcpConnection(client, &clientAddr, clientAddrLen);
 
-    LogInfo("New TCP connection up and running on file descriptor %d", tcpConnection->FileDescriptor);
+    LogDebug("New TCP connection up and running on file descriptor %d", tcpConnection->FileDescriptor);
 
     return tcpConnection;
 }
@@ -158,48 +158,48 @@ TcpConnection *AcceptNewTcpConnection(int fd) {
 
 ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t bufferLength) {
     if (socket == null) {
-        LogError(false, "Cannot ReadHead from null TCP socket");
-        return ERROR;
+        Error("Cannot ReadHead from null TCP socket");
+        return FUNCTION_ERROR;
     }
 
     if (buffer == null) {
-        LogError(false, "TCP ReadHead buffer cannot be null");
-        return ERROR;
+        Error("TCP ReadHead buffer cannot be null");
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Reading from TCP socket on file descriptor %d...", socket->FileDescriptor);
+    LogDebug("Reading from TCP socket on file descriptor %d...", socket->FileDescriptor);
     long bytes = recv(socket->FileDescriptor, buffer, bufferLength, 0);
 
     if (bytes < 0) {
-        LogError(true, "Could not read from TCP socket on file descriptor %d", socket->FileDescriptor);
-        return ERROR;
+        LogErrorWithReason("Could not read from TCP socket on file descriptor %d", socket->FileDescriptor);
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Read %d bytes from TCP socket on file descriptor %d", bytes, socket->FileDescriptor);
+    LogDebug("Read %d bytes from TCP socket on file descriptor %d", bytes, socket->FileDescriptor);
     return bytes;
 }
 
 ssize_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength) {
     if (socket == null) {
-        LogError(false, "Cannot WriteHead to null TCP socket");
-        return ERROR;
+        Error("Cannot WriteHead to null TCP socket");
+        return FUNCTION_ERROR;
     }
 
     if (content == null) {
-        LogError(false, "TCP WriteHead buffer cannot be null");
-        return ERROR;
+        Error("TCP WriteHead buffer cannot be null");
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Writing %d bytes to TCP socket on file descriptor %d...", contentLength, socket->FileDescriptor);
+    LogDebug("Writing %d bytes to TCP socket on file descriptor %d...", contentLength, socket->FileDescriptor);
 
     long bytes = send(socket->FileDescriptor, content, contentLength, 0);
 
     if (bytes < 0) {
-        LogError(true, "Could not WriteHead to TCP socket on file descriptor %d", socket->FileDescriptor);
-        return ERROR;
+        LogErrorWithReason("Could not WriteHead to TCP socket on file descriptor %d", socket->FileDescriptor);
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Wrote %d bytes to TCP socket on file descriptor %d", bytes, socket->FileDescriptor);
+    LogDebug("Wrote %d bytes to TCP socket on file descriptor %d", bytes, socket->FileDescriptor);
 
     return bytes;
 }
@@ -207,12 +207,12 @@ ssize_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t conten
 TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler *handler, void *data) {
 
     if (null == address) {
-        LogError(false, "Address cannot be null");
+        Error("Address cannot be null");
         return null;
     }
 
     if (AF_INET != address->sa_family){
-        LogError(false,"Only IPv4 addresses are supported");
+        Error("Only IPv4 addresses are supported");
         return null;
     }
 
@@ -220,13 +220,13 @@ TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
 
     if (-1 == SelectorFdSetNio(sock)) {
-        LogError(false, "Cannot set server socket flags");
+        Error("Cannot set server socket flags");
         close(sock);
         return false;
     }
 
     if (null == selector) {
-        LogError(false, "Selector not created!");
+        Error("Selector not created!");
         close(sock);
         return false;
     }
@@ -240,7 +240,7 @@ TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler
     );
 
     if (status != SELECTOR_STATUS_SUCCESS) {
-        LogError(false, "Cannot register TCP socket on selector");
+        Error("Cannot register TCP socket on selector");
         close(sock);
         return null;
     }
@@ -252,39 +252,43 @@ TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler
         return CreateTcpConnection(sock, (struct sockaddr_storage *) address, sizeof(*address));
     }
 
+    char buffer[INET_ADDRSTRLEN +1];
+    GetIPFromAddress((struct sockaddr_storage *) address, buffer, INET_ADDRSTRLEN + 1);
+    LogWarningWithReason("Connection to IPv4 address %s failed", buffer);
+
     return null;
 }
 
 TcpConnection *ConnectToIPv6TcpServer(struct sockaddr * address, const FdHandler *handler, void *data) {
-    LogInfo("Connecting to IPv6 server...");
+    Debug("Connecting to IPv6 server...");
 
     if (null == address){
-        LogError(false,"Address cannot be null");
+        Error("Address cannot be null");
         return null;
     }
 
     if (AF_INET6 != address->sa_family){
-        LogError(false,"Only IPv6 addresses are supported");
+        Error("Only IPv6 addresses are supported");
         return null;
     }
 
 
     int sock = socket(AF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
-    LogInfo("Remote IPv6 connection with file descriptor %d",sock);
+    LogDebug("Remote IPv6 connection with file descriptor %d",sock);
 
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
 
     if (-1 == SelectorFdSetNio(sock)) {
-        LogError(false, "Cannot set server socket flags");
+        Error("Cannot set server socket flags");
         close(sock);
         return false;
     }
 
-    LogInfo("Sock with file descriptor %d is non-blocking",sock);
+    LogDebug("Sock with file descriptor %d is non-blocking",sock);
 
     if (null == selector) {
-        LogError(false, "Selector not created!");
+        Error("Selector not created!");
         close(sock);
         return false;
     }
@@ -302,41 +306,45 @@ TcpConnection *ConnectToIPv6TcpServer(struct sockaddr * address, const FdHandler
         );
 
         if (status != SELECTOR_STATUS_SUCCESS) {
-            LogError(false, "Cannot register TCP socket on selector");
+            Error("Cannot register TCP socket on selector");
             close(sock);
             return null;
         }
-        LogInfo("Remote IPv6 connection succeeded!");
+        Debug("Remote IPv6 connection succeeded!");
         return CreateTcpConnection(sock, (struct sockaddr_storage *) address, sizeof(*address));
     }
+
+    char buffer[INET6_ADDRSTRLEN +1];
+    GetIPFromAddress((struct sockaddr_storage *) address, buffer, INET6_ADDRSTRLEN + 1);
+    LogWarningWithReason("Connection to IPv6 address %s failed", buffer);
 
     return null;
 }
 
 
 int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize,
-                 unsigned concurrentConnections) {
+                int concurrentConnections) {
 
     if (port > 65535 || port <= 0) {
-        LogError(false, "Invalid port. Cannot be null");
-        return -1;
+        Error("Invalid port. Cannot be null");
+        return FUNCTION_ERROR;
     }
 
     if (null == address){
-        LogError(false,"Address cannot be null");
-        return -1;
+        Error("Address cannot be null");
+        return FUNCTION_ERROR;
     }
 
     if (null == selector) {
-        LogError(false, "Selector not created!");
-        return -1;
+        Error("Selector not created!");
+        return FUNCTION_ERROR;
     }
 
     int servSock = socket(address->sa_family, SOCK_STREAM, IPPROTO_TCP);
 
     if (servSock < 0) {
-        LogError(true, "Cannot open passive socket");
-        return -1;
+        ErrorWithReason("Cannot open passive socket");
+        return FUNCTION_ERROR;
     }
 
     setsockopt(servSock, SOL_SOCKET, SO_REUSEADDR, &(int) {1}, sizeof(int));
@@ -344,36 +352,36 @@ int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *ad
     if (AF_INET6 == address->sa_family)
         setsockopt(servSock, SOL_IPV6, IPV6_V6ONLY, &(int) {1}, sizeof(int));
 
-    LogInfo("Opened passive socket %d for TCP server",servSock);
+    LogDebug("Opened passive socket %d for TCP server",servSock);
 
     if (bind(servSock, address, addressSize) < 0) {
-        LogError(true, "Cannot bind socket to file descriptor");
+        ErrorWithReason("Cannot bind socket to file descriptor");
         close(servSock);
-        return -1;
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Bound TCP server socket to file descriptor");
+    Debug("Bound TCP server socket to file descriptor");
 
     if (listen(servSock, concurrentConnections) < 0) {
-        LogError(true, "Cannot set passive socket to listen");
+        ErrorWithReason("Cannot set passive socket to listen");
         close(servSock);
-        return -1;
+        return FUNCTION_ERROR;
     }
 
-    LogInfo("Set TCP server socket %d to listen", servSock);
+    LogDebug("Set TCP server socket %d to listen", servSock);
 
     if (-1 == SelectorFdSetNio(servSock)) {
-        LogError(false, "Cannot set server socket flags");
+        Error("Cannot set server socket flags");
         close(servSock);
-        return -1;
+        return FUNCTION_ERROR;
     }
 
     SelectorStatus status = SelectorRegister((fd_selector) selector, servSock, handler, SELECTOR_OP_READ, null);
 
     if (status != SELECTOR_STATUS_SUCCESS) {
-        LogError(false, "Cannot register TCP socket on selector");
+        Error("Cannot register TCP socket on selector");
         close(servSock);
-        return -1;
+        return FUNCTION_ERROR;
     }
 
     return servSock;

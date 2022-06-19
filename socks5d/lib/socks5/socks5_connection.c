@@ -134,12 +134,12 @@ void DestroySocks5Connection(Socks5Connection * connection);
 
 
 Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
-    LogInfo("Creating Socks5Connection.");
+    Debug("Creating Socks5Connection.");
 
     Socks5Connection *connection = GetSocks5Connection();
 
     if (null == tcpConnection)
-        LogError(false, "Cannot allocate space for Socks5Connection");
+        Error("Cannot allocate space for Socks5Connection");
 
     connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &socks5ConnectionHandler;
@@ -156,15 +156,15 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
 
     RegisterConnectionInSocks5Metrics();
 
-    LogInfo("Socks5Connection Created!");
+    Debug("Socks5Connection Created!");
     return connection;
 }
 
 
 void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector) {
-    LogInfo("Disposing Socks5Connection...");
+    Debug("Disposing Socks5Connection...");
     if (null == connection) {
-        LogError(false, "Cannot destroy NULL Socks5Connection");
+        Error( "Cannot destroy NULL Socks5Connection");
         return;
     }
 
@@ -189,13 +189,13 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
         free(connection->RemoteAddressString);
 
     DestroySocks5Connection(connection);
-    LogInfo("Socks5Connection disposed!");
+    Debug("Socks5Connection disposed!");
 }
 
 
 
 void CreateSocks5ConnectionPool(int initialSize) {
-    LogInfo("Initializing SOCKS5 Pool");
+    Debug("Initializing SOCKS5 Pool");
     if (initialSize < 1) {
         LogInfo("Invalid initial pool size %d, using default value 1", initialSize);
         initialSize = 1;
@@ -213,9 +213,9 @@ void CreateSocks5ConnectionPool(int initialSize) {
 }
 
 void CleanSocks5ConnectionPool() {
-    LogInfo("Cleaning SOCKS5 connection pool");
+    Debug("Cleaning SOCKS5 connection pool");
     if (null == socks5Pool) {
-        LogError(false, "TCP pool was not initialized. Cannot clean it");
+        Error( "TCP pool was not initialized. Cannot clean it");
         return;
     }
 
@@ -228,7 +228,7 @@ void CleanSocks5ConnectionPool() {
 
 void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
     if (null == socks5Pool) {
-        LogError(false, "SOCKS5 pool was not initialized");
+        Error( "SOCKS5 pool was not initialized");
     }
     if (socksMaxTimeout <= 0)
         return;
@@ -236,7 +236,7 @@ void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
     time_t currentTime = time(null);
     if ((time_t) -1 == currentTime)
     {
-        LogError(true,"Cannot get current time");
+        ErrorWithReason("Cannot get current time");
         return;
     }
 
@@ -270,7 +270,7 @@ void SetConnectionTimeout(time_t timeout) {
 
 Socks5Connection *GetSocks5Connection() {
     if (null == socks5Pool) {
-        LogError(false, "SOCKS5 pool was not initialized");
+        Error( "SOCKS5 pool was not initialized");
         return null;
     }
 
@@ -294,7 +294,7 @@ Socks5Connection *GetSocks5Connection() {
 
 void DestroySocks5Connection(Socks5Connection *connection) {
     if (null == socks5Pool) {
-        LogError(false, "TCP pool was not initialized");
+        Error( "TCP pool was not initialized");
         return;
     }
 
@@ -305,7 +305,7 @@ void DestroySocks5Connection(Socks5Connection *connection) {
 
     if (null == temp)
     {
-        LogError(false,"Error while destroying connection!");
+        Error("Error while destroying connection!");
         return;
     }
     assert(&temp->Connection == connection);

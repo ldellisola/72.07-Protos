@@ -325,7 +325,7 @@ START_TEST(Consume_CompleteMessageWithIPV4_Succeeds)
                 port[0], port[1]
         };
         // Act
-        int bytes = RequestParserConsume(&parser, message, messageLength);
+        size_t bytes = RequestParserConsume(&parser, message, messageLength);
 
         // Assert
         ck_assert_int_eq(bytes, messageLength);
@@ -359,7 +359,7 @@ START_TEST(Consume_CompleteMessageWithIPV6_Succeeds)
                 port[0], port[1]
         };
         // Act
-        int bytes = RequestParserConsume(&parser, message, messageLength);
+        size_t bytes = RequestParserConsume(&parser, message, messageLength);
 
         // Assert
         ck_assert_int_eq(bytes, messageLength);
@@ -391,7 +391,7 @@ START_TEST(Consume_CompleteMessageWithFQDN_Succeeds)
                 address[8], address[9], port[0], port[1]
         };
         // Act
-        int bytes = RequestParserConsume(&parser, message, messageLength);
+        size_t bytes = RequestParserConsume(&parser, message, messageLength);
 
         // Assert
         ck_assert_int_eq(bytes, messageLength);
@@ -417,7 +417,7 @@ START_TEST(Consume_IncompleteMessage_Succeeds)
                 socksVersion, cmd, 0, atype, addrLen
         };
         // Act
-        int bytes = RequestParserConsume(&parser, message, messageLength);
+        size_t bytes = RequestParserConsume(&parser, message, messageLength);
         // Assert
         ck_assert_int_eq(bytes, messageLength);
         ck_assert_int_eq(parser.State, RequestDestAddrFQDN);
@@ -445,7 +445,7 @@ START_TEST(Consume_CompleteMessageWithExtraLength_Succeeds)
                 0, 0, 0, 0, 0
         };
         // Act
-        int bytes = RequestParserConsume(&parser, message, messageLength);
+        size_t bytes = RequestParserConsume(&parser, message, messageLength);
 
         // Assert
         ck_assert_int_eq(bytes, 17);

@@ -33,7 +33,7 @@ unsigned AuthReadRun(void *data) {
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead <= 0) {
-        LogError(false, "Cannot read from Tcp connection");
+        Error( "Cannot read from Tcp connection");
         return CS_ERROR;
     }
 
@@ -56,6 +56,7 @@ unsigned AuthReadRun(void *data) {
 
         if (0 == bytesWritten)
             return CS_ERROR;
+
         BufferWriteAdv(d->WriteBuffer, bytesWritten);
 
         return CS_AUTH_WRITE;
@@ -91,7 +92,7 @@ unsigned AuthWriteRun(void *data) {
 
     ssize_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
 
-    if(ERROR == bytesWritten)
+    if(FUNCTION_ERROR == bytesWritten)
         return CS_ERROR;
 
     BufferReadAdv(d->WriteBuffer, bytesWritten);

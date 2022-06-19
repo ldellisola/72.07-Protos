@@ -10,7 +10,7 @@
 
 size_t BuildHelloResponse(byte *buffer, size_t length, int authenticationMethod) {
     if (length < 2) {
-        LogError(false, "Buffer to small to WriteHead HelloResponse");
+        Error( "Buffer to small to WriteHead HelloResponse");
         return 0;
     }
 
@@ -21,7 +21,7 @@ size_t BuildHelloResponse(byte *buffer, size_t length, int authenticationMethod)
 
 size_t BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceeded) {
     if (length < 2) {
-        LogError(false, "Buffer to small to WriteHead AuthResponse");
+        Error("Buffer to small to WriteHead AuthResponse");
         return 0;
     }
 
@@ -34,7 +34,7 @@ size_t BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceed
 size_t BuildRequestResponse(byte *buffer, size_t length, int replyCommand) {
 
     if (length < 10) {
-        LogError(false, "Buffer to small to WriteHead RequestResponse with IPv4");
+        Error( "Buffer to small to WriteHead RequestResponse with IPv4");
         return 0;
     }
 

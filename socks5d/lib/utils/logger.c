@@ -8,35 +8,68 @@
 #include <errno.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 
 LOG_TYPE LogLevel = LOG_ERROR;
 
-void LogInfo(const char *message, ...) {
-    if (LogLevel != LOG_INFO)
-        return;
-
-    va_list arg;
-    va_start (arg, message);
-
-    fprintf(stdout, "INFO: ");
-    vfprintf(stdout, message, arg);
-    fprintf(stdout, "\n");
-    va_end (arg);
-}
-
-void LogError(bool showInnerError, const char *message, ...) {
-    va_list arg;
-    va_start (arg, message);
-
-    fprintf(stderr, "ERROR: ");
-    vfprintf(stderr, message, arg);
-    fprintf(stderr, "\n");
-    if (showInnerError)
-        fprintf(stderr, "\tReason: %s\n", strerror(errno));
-
-    va_end (arg);
-}
 
 void SetLogLevel(LOG_TYPE minimumType) {
     LogLevel = minimumType;
 }
+
+void Log(LOG_TYPE type, const char *file, int line, bool hasInnerError, const char *format, ...) {
+
+    if (type < LogLevel)
+        return;
+
+    va_list arg;
+    va_start (arg, format);
+
+    FILE * output;
+    const char *  title;
+
+    switch (type) {
+        case LOG_DEBUG:
+            output = stdout;
+            title = "DEBUG";
+            fprintf(output, "%s on File %s, line %d:\n\t",title,file,line);
+            break;
+        case LOG_INFO:
+            output = stdout;
+            title = "INFO";
+            fprintf(output, "%s: ",title);
+            break;
+        case LOG_WARNING:
+            output = stderr;
+            title = "WARNING";
+            fprintf(output, "%s on File %s, line %d:\n\t",title,file,line);
+            break;
+        case LOG_ERROR:
+            output = stderr;
+            title = "ERROR";
+            fprintf(output, "%s on File %s, line %d:\n\t",title,file,line);
+            break;
+        case LOG_FATAL:
+            output = stderr;
+            title = "FATAL";
+            fprintf(output, "%s on File %s, line %d:\n\t",title,file,line);
+            break;
+        default:
+            output = stderr;
+            title = "?????";
+            fprintf(output, "%s on File %s, line %d:\n\t",title,file,line);
+            break;
+    }
+
+    vfprintf(output, format, arg);
+    fprintf(output, "\n");
+    if (hasInnerError)
+        fprintf(output, "\tReason: %s\n", strerror(errno));
+
+    va_end (arg);
+
+    if (LOG_FATAL == type)
+        exit(1);
+}
+
+

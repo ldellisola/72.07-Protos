@@ -13,7 +13,7 @@ ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizePars
             p->Index = 0;
             return nextState;
         }
-        LogError(false, "The word has finished and character given isnt a terminating character");
+        Error("The word has finished and character given isnt a terminating character");
         return BufferSizeInvalidState;
 
     }
@@ -22,14 +22,14 @@ ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizePars
         p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    LogError( "%c is not part of the word \" %s \"", c, p->Word);
     return BufferSizeInvalidState;
 }
 
 void ClientGetBufferSizeParserReset(ClientGetBufferSizeParser *p) {
-    LogInfo("Resetting ClientGetBufferSizeParser...");
+    Debug("Resetting ClientGetBufferSizeParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL ClientGetBufferSizeParser");
+        Error("Cannot reset NULL ClientGetBufferSizeParser");
         return;
     }
 
@@ -54,54 +54,54 @@ void ClientGetBufferSizeParserReset(ClientGetBufferSizeParser *p) {
     p->Get[3] = 0;
     p->Word = p->Get;
 
-    LogInfo("BufferSizeParser reset!");
+    Debug("BufferSizeParser reset!");
 }
 
 ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSizeParser *p, byte c) {
-    LogInfo("Feeding %d to ClientGetBufferSizeParser", c);
-//    LogError(false, "char = %c", c);
+    LogDebug("Feeding %d to ClientGetBufferSizeParser", c);
+//    Error( "char = %c", c);
 
     if (null == p) {
-        LogError(false, "Cannot feed GetBufferSizeParser if is NULL");
+        Error("Cannot feed GetBufferSizeParser if is NULL");
         return BufferSizeInvalidState;
     }
 
     switch (p->State) {
         case BufferSizeGet:
-//            LogError(false, "BufferSizeGet");
+//            Error( "BufferSizeGet");
             p->State = traverseWordGetBufferSize(p, c, BufferSize, p->BufferSize);
             break;
         case BufferSize:
-//            LogError(false, "BufferSize");
+//            Error( "BufferSize");
             p->State = traverseWordGetBufferSize(p, c, BufferSizeCRLF, null);
             break;
 
         case BufferSizeCRLF:
-//            LogError(false, "BufferSizeCRLF");
+//            Error( "BufferSizeCRLF");
             if( c == '\n'){
                 p->State = BufferSizeFinished;
                 break;
             }
-            LogError(false, "There is a CR but no LF");
+            Error( "There is a CR but no LF");
             p->State =  BufferSizeInvalidState;
             break;
         case BufferSizeFinished:
-//            LogError(false, "BufferSizeFinished");
+//            Error( "BufferSizeFinished");
         case BufferSizeInvalidState:
-//            LogError(false, "BufferSizeInvalidState");
+//            Error( "BufferSizeInvalidState");
             break;
     }
     return p->State;
 }
 size_t ClientGetBufferSizeParserConsume(ClientGetBufferSizeParser *p, byte *c, size_t length) {
-    LogInfo("ClientBufferSizeParser consuming %d bytes", length);
+    LogDebug("ClientBufferSizeParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if ClientGetBufferSizeParser is NULL");
+        Error( "Cannot consume if ClientGetBufferSizeParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "ClientGetBufferSizeParser cannot consume NULL array");
+        Error( "ClientGetBufferSizeParser cannot consume NULL array");
         return 0;
     }
 

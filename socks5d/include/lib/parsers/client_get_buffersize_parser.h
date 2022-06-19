@@ -30,5 +30,4 @@ bool ClientGetBufferSizeParserHasFinished(ClientGetBufferSizeParserState state);
 void ClientGetBufferSizeParserReset(ClientGetBufferSizeParser *p);
 ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSizeParser *p, byte c);
 size_t ClientGetBufferSizeParserConsume(ClientGetBufferSizeParser *p, byte *c, size_t length);
-bool ClientGetBufferSizeParserHasFinished(ClientGetBufferSizeParserState state);
 #endif //SOCKS5D_CLIENT_GET_BUFFERSIZE_PARSER_H

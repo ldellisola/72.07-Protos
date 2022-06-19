@@ -6,29 +6,29 @@
 #include "utils/logger.h"
 
 ClientDelUserParserState traverseWordDel(ClientDelUserParser *p, byte c, ClientDelUserParserState nextState, char *nextWord) {
-//    LogError(false, "char c = %c", c);
+//    Error( "char c = %c", c);
     if(strlen(p->Word) == p->Index){
         if(c == '|'){
             p->Word = nextWord;
             p->Index = 0;
             return nextState;
         }
-        LogError(false, "Im in the last letter of the word and there is no pipe");
+        Error("Im in the last letter of the word and there is no pipe");
         return DelInvalidState;
     }
     if (c == p->Word[p->Index]) {
         p->Index++;
         return p->State;
     }
-    LogError(false, "wrong character for word, was waiting for %c and got %c", p->Word[p->Index], c);
+    LogError( "wrong character for word, was waiting for %c and got %c", p->Word[p->Index], c);
     return DelInvalidState;
 
 }
 
 void ClientDelUserParserReset(ClientDelUserParser *p) {
-    LogInfo("Resetting DelParser...");
+    Debug("Resetting DelParser...");
     if (null == p) {
-        LogError(false, "Cannot reset NULL DelParser");
+        Error("Cannot reset NULL DelParser");
         return;
     }
 
@@ -47,14 +47,14 @@ void ClientDelUserParserReset(ClientDelUserParser *p) {
     p->User[4] = 0;
 
     p->Word = p->Del;
-    LogInfo("DelUserParser reset!");
+    Debug("DelUserParser reset!");
 }
 
 ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c) {
-    LogInfo("Feeding %d to ClientDelUserParser", c);
-//    LogError(false, "char= %c", c);
+    LogDebug("Feeding %d to ClientDelUserParser", c);
+//    Error( "char= %c", c);
     if (null == p) {
-        LogError(false, "Cannot feed DelUserParser if is NULL");
+        Error("Cannot feed DelUserParser if is NULL");
         return DelInvalidState;
     }
 
@@ -67,7 +67,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
             break;
         case DelUserName:
             if(c == '|'){
-                LogError(false, "Too many arguments");
+                Error( "Too many arguments");
                 p->State = DelInvalidState;
                 break;
             }
@@ -76,7 +76,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
                 break;
             }
             if(p->Index == MAXLONG+1){
-                LogError(false, "Username can have max 255 characters");
+                Error("Username can have max 255 characters");
                 p->State = DelInvalidState;
                 break;
             }
@@ -87,20 +87,20 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
             if(c == '\n'){
                 if(p->Index == 0){
                     p->State = DelInvalidState;
-                    LogError(false, "Username has to be at least 1 character long");
+                    Error("Username has to be at least 1 character long");
                     break;
                 }
                 p->State = DelFinished;
                 break;
             }
             if(c == '|'){
-                LogError(false, "Too many arguments");
+                Error("Too many arguments");
                 p->State = DelInvalidState;
                 break;
             }
             if(c == '\r'){
                 if(p->Index == MAXLONG+1){
-                    LogError(false, "Username can have max 255 characters");
+                    Error("Username can have max 255 characters");
                     p->State = DelInvalidState;
                     break;
                 }
@@ -110,7 +110,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
             }
 
             if(p->Index == MAXLONG){
-                LogError(false, "Username and password can have max 255 characters");
+                Error( "Username and password can have max 255 characters");
                 p->State = DelInvalidState;
                 break;
             }
@@ -133,14 +133,14 @@ bool ClientDelUserParserHasFailed(ClientDelUserParserState state) {
 }
 
 size_t ClientDelUserParserConsume(ClientDelUserParser *p, byte *c, size_t length) {
-    LogInfo("DelUserParser consuming %d bytes", length);
+    LogDebug("DelUserParser consuming %d bytes", length);
     if (null == p) {
-        LogError(false, "Cannot consume if DelUserParser is NULL");
+        Error("Cannot consume if DelUserParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        LogError(false, "DelUserParser cannot consume NULL array");
+        Error("DelUserParser cannot consume NULL array");
         return 0;
     }
 

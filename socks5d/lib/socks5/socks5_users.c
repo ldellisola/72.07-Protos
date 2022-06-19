@@ -19,7 +19,7 @@ void LoadSingleUser(const char *username, const char *password);
 void LoadSocks5Users(const char *usernames[], const char *passwords[]) {
     if (null == usernames)
     {
-        LogError(false,"users cannot be null");
+        Error("users cannot be null");
         return;
     }
 
@@ -36,7 +36,7 @@ Socks5User * LogInSocks5User(const char * username, const char * password) {
 
     if(null == username || null ==password)
     {
-        LogError(false,"username and password cannot be null");
+        Error("username and password cannot be null");
         return null;
     }
 
@@ -57,7 +57,7 @@ bool DeleteSocks5User(const char *username) {
 
     if(null == username)
     {
-        LogError(false,"Username cannot be null");
+        Error("Username cannot be null");
     }
 
     Socks5User * current = null;
@@ -98,7 +98,7 @@ int GetAllLoggedInSocks5Users(char **usernames, int length) {
 void LogOutSocks5User(struct Socks5User *user) {
 
     if(null == user) {
-        LogError(false,"User cannot be null");
+        Error("User cannot be null");
         return;
     }
 
@@ -111,9 +111,9 @@ void LogOutSocks5User(struct Socks5User *user) {
 }
 
 void DisposeAllSocks5Users() {
-    LogInfo("Disposing Socks5 users");
+    Debug("Disposing Socks5 users");
     if (null == currentUsers) {
-        LogInfo("Users where not initialized. Cannot dispose them");
+        Warning("Users where not initialized. Cannot dispose them");
         return;
     }
 
@@ -138,11 +138,11 @@ void LoadSingleUser(const char *username, const char *password) {
         if (!current->InUse)
         {
             current->InUse = true;
-            int usernameLength = strlen(username);
+            size_t usernameLength = strlen(username);
             current->Username = calloc(usernameLength+1, sizeof(char));
             strncpy(current->Username, username, usernameLength);
 
-            int passwordLength = strlen(password);
+            size_t passwordLength = strlen(password);
             current->Password = calloc(passwordLength+1, sizeof(char));
             strncpy(current->Password, password, passwordLength);
 
@@ -158,11 +158,11 @@ void LoadSingleUser(const char *username, const char *password) {
     current = (Socks5User *) current->Next;
 
     current->InUse = true;
-    int usernameLength = strlen(username);
+    size_t usernameLength = strlen(username);
     current->Username = calloc(usernameLength, sizeof(char));
     strncpy(current->Username, username, usernameLength);
 
-    int passwordLength = strlen(password);
+    size_t passwordLength = strlen(password);
     current->Password = calloc(passwordLength, sizeof(char));
     strncpy(current->Password, password, passwordLength);
 }
