@@ -137,7 +137,8 @@ void Socks5PassiveAccept(SelectorKey *key) {
             client->FileDescriptor,
             connection->Handler,
             SELECTOR_OP_READ,
-            connection
+            connection,
+            true
     );
 
     if (SELECTOR_STATUS_SUCCESS != status) {

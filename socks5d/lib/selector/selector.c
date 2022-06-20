@@ -105,6 +105,7 @@ typedef struct {
     FdInterest Interest;
     const FdHandler *Handler;
     void *Data;
+    bool HasTimeout;
 } Item;
 
 /* tarea bloqueante */
@@ -326,7 +327,8 @@ SelectorStatus SelectorRegister(
         int fd,
         const FdHandler *handler,
         FdInterest interest,
-        void *data)
+        void *data,
+        bool hasTimout)
         {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
     // 0. validación de argumentos
@@ -353,6 +355,7 @@ SelectorStatus SelectorRegister(
         item->Handler = handler;
         item->Interest = interest;
         item->Data = data;
+        item->HasTimeout = hasTimout;
 
         // actualizo colaterales
         if (fd > s->MaxFd) {
@@ -444,6 +447,7 @@ static void handle_iteration(fd_selector s) {
         if (ITEM_USED(item)) {
             key.Fd = item->Fd;
             key.Data = item->Data;
+            key.HasTimeout = item->HasTimeout;
 
             if (NULL != conf.OnConnectionCall && NULL != key.Data)
                 conf.OnConnectionCall(key.Data);
