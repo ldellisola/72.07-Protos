@@ -291,7 +291,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 return LULU_CS_TRANSACTION_WRITE;
             }
             break;
-        default:
+        case T_PARSER_COUNT:
             BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
@@ -302,9 +302,12 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
 
                 BufferWriteAdv(d->WriteBuffer, (ssize_t ) bytesWritten);
 
-                return LULU_CS_HELLO_WRITE;
+                return LULU_CS_TRANSACTION_WRITE;
             }
             return LULU_CS_ERROR;
+        default:
+            Error("hay un num muy grande");
+            break;
     }
     return LULU_CS_ERROR;
 }

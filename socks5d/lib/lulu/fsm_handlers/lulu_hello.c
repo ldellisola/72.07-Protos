@@ -41,13 +41,10 @@ unsigned LuluHelloReadRun(void *data) {
 
     int possibleReturn = NO_RETURN;
 
-    while (d->ParserIndex <= PARSER_COUNT ){
+    while (d->ParserIndex <= PARSER_COUNT && possibleReturn == NO_RETURN){
          possibleReturn = RunParser(d, buffer, bytesRead, connection, data, bufferSize);
-         if(possibleReturn != NO_RETURN){
-             return possibleReturn;
-         }
     }
-    return LULU_CS_ERROR;
+    return possibleReturn;
 }
 
 int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnection *connection, void *data, size_t bufferSize ){
