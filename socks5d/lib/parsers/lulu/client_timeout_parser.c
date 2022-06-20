@@ -57,7 +57,7 @@ void ClientTimeoutParserReset(ClientTimeoutParser *p) {
 
 ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c) {
     LogDebug("Feeding %d to ClientTimeoutParser", c);
-//    Error( "char = %c", c);
+//    LogError( "char = %c", c);
 
     if (null == p) {
         Debug( "Cannot feed TimeoutParser if is NULL");
@@ -76,7 +76,14 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
         case TimeoutValue:
 //            Error( "TimeoutValue");
             if(isdigit(c)){
-                p->Value *=10 + ((char)c- '0');
+                int digit = (uint8_t) ((char)c- '0');
+//                LogError( "digit = %d, value = %d", digit, p->Value);
+                p->Value = (p->Value * 10) + digit;
+//                LogError( "value = %d", p->Value);
+                if(p->Value > 10000000000){
+                    LogDebug("Timeout too big", p->Value, digit);
+                    p->State = TimeoutInvalidState;
+                }
                 break;
             }
             if(c == '\r'){

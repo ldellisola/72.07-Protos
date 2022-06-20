@@ -61,7 +61,7 @@ START_TEST(Feed_Complete_Succeeds)
 
     // Assert
     ck_assert_int_eq(state, TimeoutFinished);
-    ck_assert_int_eq(TimeoutValue, 534);
+    ck_assert_int_eq(parser.Value, 534);
 }
 END_TEST
 

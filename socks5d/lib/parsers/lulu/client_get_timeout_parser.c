@@ -59,7 +59,7 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
 //    Error( "char = %c", c);
 
     if (null == p) {
-        LogError(false, "Cannot feed GetTimeoutParser if is NULL");
+        LogDebug(false, "Cannot feed GetTimeoutParser if is NULL");
         return GetTimeoutInvalidState;
     }
 
