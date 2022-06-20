@@ -52,7 +52,7 @@ unsigned LuluTransactionReadRun(void *data) {
 
     int possibleReturn = NO_RETURN;
 
-    while (d->ParserIndex < T_PARSER_COUNT ){
+    while (d->ParserIndex <= T_PARSER_COUNT ){
         possibleReturn = RunTransactionParser(d, buffer, bytesRead, connection, data, bufferSize);
         if(possibleReturn != NO_RETURN){
             return possibleReturn;

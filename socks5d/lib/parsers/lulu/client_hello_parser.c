@@ -27,7 +27,6 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
 
 void ClientHelloParserReset(ClientHelloParser *p) {
     Debug("Resetting HelloParser...");
-    Info("Resetting HelloParser...");
     if (null == p) {
         Error( "Cannot reset NULL HelloParser");
         return;
@@ -50,7 +49,6 @@ void ClientHelloParserReset(ClientHelloParser *p) {
 
 ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
     LogDebug("Feeding %d to ClientHelloParser", c);
-    LogInfo( "char= %c", c);
     if (null == p) {
         Error("Cannot feed HelloParser if is NULL");
         return ClientHelloInvalidState;

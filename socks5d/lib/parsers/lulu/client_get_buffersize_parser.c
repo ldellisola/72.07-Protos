@@ -61,7 +61,6 @@ void ClientGetBufferSizeParserReset(ClientGetBufferSizeParser *p) {
 
 ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSizeParser *p, byte c) {
     LogDebug("Feeding %d to ClientGetBufferSizeParser", c);
-    LogInfo( "buffersize char= %c", c);
 
     if (null == p) {
         Error("Cannot feed GetBufferSizeParser if is NULL");

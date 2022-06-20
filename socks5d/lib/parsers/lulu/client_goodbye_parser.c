@@ -49,7 +49,6 @@ ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, Cli
 
 ClientGoodbyeParserState ClientGoodbyeParserFeed(ClientGoodbyeParser *p, byte c) {
     LogDebug("Feeding %d to ClientGoodbyeParser", c);
-    LogInfo( "char= %c", c);
     if (null == p) {
         Error( "Cannot feed ClientGoodbyeParser if is NULL");
         return GoodbyeInvalidState;
