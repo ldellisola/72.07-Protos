@@ -40,7 +40,7 @@ async Task RunUser(int requestsPerSecond,string target, CancellationToken token)
         double msToWait = 1000 / requestsPerSecond;
         msToWait += 100 * (random.NextSingle() - 0.5);
         
-        await Task.Delay((int) msToWait,token);
+        await Task.Delay((int) Math.Max(msToWait,10),token);
     }
     Console.WriteLine("Shutting down user...");
 }
