@@ -13,7 +13,7 @@ ClientSetBufferSizeParserState traverseWordSetBufferSize(ClientSetBufferSizePars
             p->Index = 0;
             return nextState;
         }
-        Error("The word has finished and character given isnt a terminating character");
+        Debug("The word has finished and character given isnt a terminating character");
         return SetBufferSizeInvalidState;
 
     }
@@ -22,7 +22,7 @@ ClientSetBufferSizeParserState traverseWordSetBufferSize(ClientSetBufferSizePars
         p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    LogDebug("%c is not part of the word \" %s \"", c, p->Word);
     return SetBufferSizeInvalidState;
 }
 
@@ -82,7 +82,7 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
                 int digit = (uint8_t) ((char)c- '0');
                 p->Value = (p->Value * 10) + digit;
                 if(p->Value > 10000000000){
-                    LogError("BufferSize too big", p->Value, digit);
+                    LogDebug("BufferSize too big", p->Value, digit);
                     p->State = SetBufferSizeInvalidState;
                 }
 //                Error( "is digit, value = %d, digit = %d", p->Value, digit);
@@ -92,7 +92,7 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
                 p->State = SetBufferSizeCRLF;
                 break;
             }
-            LogError(false, "Character\"%c\" is not a digit", c);
+            LogDebug(false, "Character\"%c\" is not a digit", c);
             p->State =SetBufferSizeInvalidState;
             break;
         case SetBufferSizeCRLF:
@@ -101,7 +101,7 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
                 p->State = SetBufferSizeFinished;
                 break;
             }
-            LogError(false, "Waiting for LF for CRLF pair and got: %c", c);
+            LogDebug(false, "Waiting for LF for CRLF pair and got: %c", c);
             p->State = SetBufferSizeInvalidState;
             break;
         case SetBufferSizeFinished:

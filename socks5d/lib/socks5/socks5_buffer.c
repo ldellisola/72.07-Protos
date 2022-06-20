@@ -14,6 +14,10 @@ void SetSocks5BufferSize(size_t bufferSize) {
         targetBufferSize = bufferSize;
 }
 
+size_t GetSocks5BufferSize() {
+    return targetBufferSize;
+}
+
 void InitSocks5Buffer(ArrayBuffer *buffer) {
     if (null == buffer)
     {

@@ -63,3 +63,7 @@ void NotifySocks5ConnectionAccess(void *data) {
 void SetSocks5ConnectionTimeout(time_t timeout) {
     socksMaxTimeout = timeout;
 }
+
+time_t GetSocks5ConnectionTimeout(){
+    return socksMaxTimeout;
+}

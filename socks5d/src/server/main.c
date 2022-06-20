@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     };
 
     int socks5PoolSize = 50;
-//    int luluPoolSize = 50;
+    int luluPoolSize = 50;
 
     bool startServer = true;
     startServer &= InitTcpServer(&options, socks5PoolSize * 2);
@@ -56,11 +56,15 @@ int main(int argc, char **argv) {
             arguments.EnablePasswordScanners,
             arguments.BufferSize
     );
-//    startServer &= RegisterLuluServer(
-//            arguments.LuluPort,
-//            arguments.LuluAddress,
-//            luluPoolSize
-//    );
+    const char *luluUsernames[] = {"admin", "lucia", "lucas", null};
+    const char *luluPasswords[] = {"adminPass", "luciaPass", "lucasPass", null};
+    startServer &= RegisterLuluServer(
+            arguments.LuluPort,
+            arguments.LuluAddress,
+            luluPoolSize,
+            luluUsernames,
+            luluPasswords
+    );
 
 
     if (startServer) {
@@ -69,7 +73,7 @@ int main(int argc, char **argv) {
     else{
         Warning("Server could not be started");
     }
-
+    DisposeLuluServer();
     Info("Shutting down...");
     DisposeSocks5Server();
     DisposeTcpServer();

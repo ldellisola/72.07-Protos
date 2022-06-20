@@ -4,7 +4,9 @@
 
 #ifndef SOCKS5D_SOCKS5_USERS_H
 #define SOCKS5D_SOCKS5_USERS_H
-
+#define LOGGED_IN   2
+#define OK  0
+#define DOESNT_EXIST 1
 #include <stdbool.h>
 #include "socks5.h"
 
@@ -15,6 +17,7 @@ typedef struct Socks5User{
     bool InUse;
     bool IsLoggedIn;
 }Socks5User;
+
 
 /**
  * It loads to memory a set of users
@@ -40,9 +43,9 @@ void LogOutSocks5User(struct Socks5User * user);
 /**
  * It deletes a user. If the user is logged in, then it cannot be erased.
  * @param username username to delete
- * @return Whether the user was deleted or not
+ * @return 0 deleted, 1 error doesnt exist, 2 error logged in
  */
-bool DeleteSocks5User(const char * username);
+int DeleteSocks5User(const char * username);
 
 /**
  * It retrieves all the currently logged users.

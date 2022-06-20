@@ -13,7 +13,7 @@ ClientMetricsParserState traverseWordMetrics(ClientMetricsParser *p, byte c, Cli
             p->Index = 0;
             return nextState;
         }
-        Error( "The word has finished and character given isnt a terminating character");
+        Debug( "The word has finished and character given isnt a terminating character");
         return MetricsInvalidState;
 
     }
@@ -22,7 +22,7 @@ ClientMetricsParserState traverseWordMetrics(ClientMetricsParser *p, byte c, Cli
         p->Index++;
         return p->State;
     }
-    LogError( "%c is not part of the word \" %s \"", c, p->Word);
+    LogDebug( "%c is not part of the word \" %s \"", c, p->Word);
     return MetricsInvalidState;
 }
 
@@ -79,7 +79,7 @@ ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c)
                 p->State = MetricsFinished;
                 break;
             }
-            Error( "There is a CR but no LF");
+            Debug( "There is a CR but no LF");
             p->State =  MetricsInvalidState;
             break;
         case MetricsFinished:

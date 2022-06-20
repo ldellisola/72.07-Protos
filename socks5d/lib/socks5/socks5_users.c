@@ -53,7 +53,7 @@ Socks5User * LogInSocks5User(const char * username, const char * password) {
     return null;
 }
 
-bool DeleteSocks5User(const char *username) {
+int DeleteSocks5User(const char *username) {
 
     if(null == username)
     {
@@ -75,11 +75,12 @@ bool DeleteSocks5User(const char *username) {
 
             current->InUse = false;
             current->IsLoggedIn = false;
-            return true;
+            return OK;
         }
+        if(isUser) return LOGGED_IN;
     }
 
-    return false;
+    return DOESNT_EXIST;
 }
 
 int GetAllLoggedInSocks5Users(char **usernames, int length) {

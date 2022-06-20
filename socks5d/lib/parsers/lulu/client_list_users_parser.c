@@ -13,7 +13,7 @@ ClientListUsersParserState traverseWordListUsers(ClientListUsersParser *p, byte 
             p->Index = 0;
             return nextState;
         }
-        Error( "The word has finished and character given isnt a terminating character");
+        Debug( "The word has finished and character given isnt a terminating character");
         return ListInvalidState;
 
     }
@@ -22,14 +22,14 @@ ClientListUsersParserState traverseWordListUsers(ClientListUsersParser *p, byte 
         p->Index++;
         return p->State;
     }
-    LogError( "%c is not part of the word \" %s \"", c, p->Word);
+    LogDebug( "%c is not part of the word \" %s \"", c, p->Word);
     return ListInvalidState;
 }
 
 void ClientListUsersParserReset(ClientListUsersParser *p) {
     Debug("Resetting ClientListUsersParser...");
     if (null == p) {
-        Error( "Cannot reset NULL ClientListUsersParser");
+        Debug( "Cannot reset NULL ClientListUsersParser");
         return;
     }
 
@@ -78,7 +78,7 @@ ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, b
                 p->State = ListFinished;
                 break;
             }
-            Error( "There is a CR but no LF");
+            Debug( "There is a CR but no LF");
             p->State =  ListInvalidState;
             break;
         case ListFinished:

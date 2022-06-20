@@ -215,6 +215,7 @@ DEL|USER|username
     Respuestas posibles:
         +OK
         -USER DOESNT EXIST
+        -USER LOGGED IN
 
     Ejemplo:
         C:	DEL|USER|user1
@@ -222,6 +223,9 @@ DEL|USER|username
         …
         C:	DEL|USER|user11
         S:	-USER DOESNT EXIST
+        …
+        C:	DEL|USER|user2
+        S:	-USER LOGGED IN
 
 ### Resumen de comandos LULU
 #### Válidos en el estado de AUTORIZACIÓN

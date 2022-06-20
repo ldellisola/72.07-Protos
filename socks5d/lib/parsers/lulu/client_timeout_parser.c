@@ -13,7 +13,7 @@ ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, Cli
             p->Index = 0;
             return nextState;
         }
-        Error( "The word has finished and character given isnt a terminating character");
+        Debug( "The word has finished and character given isnt a terminating character");
         return TimeoutInvalidState;
 
     }
@@ -22,7 +22,7 @@ ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, Cli
         p->Index++;
         return p->State;
     }
-    LogError( "%c is not part of the word \" %s \"", c, p->Word);
+    LogDebug( "%c is not part of the word \" %s \"", c, p->Word);
     return TimeoutInvalidState;
 }
 
@@ -83,7 +83,7 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
                 p->State = TimeoutCRLF;
                 break;
             }
-            LogError( "Character\"%c\" is not a digit", c);
+            LogDebug( "Character\"%c\" is not a digit", c);
             p->State =TimeoutInvalidState;
             break;
         case TimeoutCRLF:
