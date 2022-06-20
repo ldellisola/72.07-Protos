@@ -23,7 +23,7 @@ size_t BuildClientHelloResponse(byte *buffer, size_t length, bool authentication
 size_t BuildClientGoodbyeResponse(byte *buffer, size_t length);
 size_t BuildClientNotRecognisedResponse(byte *buffer, size_t length);
 size_t BuildClientSetTimeoutResponse(byte *buffer, size_t length, size_t timeout);
-size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,int64_t bufferSize );
+size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,size_t bufferSize );
 size_t BuildClientGetTimeoutResponse(byte *buffer, size_t length);
 size_t BuildClientGetBufferSizeResponse(byte *buffer, size_t length);
 size_t BuildClientGetMetricsResponse(byte *buffer, size_t length);

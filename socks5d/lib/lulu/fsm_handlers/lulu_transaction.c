@@ -5,6 +5,9 @@
 #include "lulu/fsm_handlers/lulu_transaction.h"
 #include "utils/logger.h"
 #include "lulu/lulu_messages.h"
+#include "lulu/lulu.h"
+
+#include "lulu/lulu_connection.h"
 
 int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRead, LuluConnection *connection, void *data, size_t bufferSize );
 
@@ -26,6 +29,11 @@ void LuluTransactionReadInit(unsigned int state, void *data) {
     ClientTimeoutParserReset(&d->TimeoutParser);
     ClientGoodbyeParserReset(&d->GoodbyeParser);
 }
+void LuluTransactionWriteInit(unsigned int state, void *data) {
+
+
+}
+
 
 unsigned LuluTransactionReadRun(void *data) {
     LuluConnection *connection = ATTACHMENT_LULU(data);
@@ -44,7 +52,7 @@ unsigned LuluTransactionReadRun(void *data) {
 
     int possibleReturn = NO_RETURN;
 
-    while (d->ParserIndex < PARSER_COUNT ){
+    while (d->ParserIndex < T_PARSER_COUNT ){
         possibleReturn = RunTransactionParser(d, buffer, bytesRead, connection, data, bufferSize);
         if(possibleReturn != NO_RETURN){
             return possibleReturn;
@@ -74,6 +82,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientSetBufferSizeResponse(buffer, bufferSize, d->SetBufferSizeParser.Value);
@@ -97,6 +106,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientGoodbyeResponse(buffer, bufferSize);
@@ -119,6 +129,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientDelUserResponse(buffer, bufferSize, d->DelUserParser.UName);
@@ -141,6 +152,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientGetMetricsResponse(buffer, bufferSize);
@@ -159,10 +171,11 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
             if (!ClientGetBufferSizeParserHasFinished(d->GetBufferSizeParser.State))
                 return LULU_CS_TRANSACTION_READ;
 
-            if (ClientGetBufferSizeHasFailed(d->GetBufferSizeParser.State)){
+            if (ClientGetBufferSizeParserHasFailed(d->GetBufferSizeParser.State)){
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientGetBufferSizeResponse(buffer, bufferSize);
@@ -185,6 +198,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientSetTimeoutResponse(buffer, bufferSize, d->TimeoutParser.Value);
@@ -207,6 +221,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientSetUserResponse(buffer, bufferSize, d->SetUserParser.UName,d->SetUserParser.Passwd );
@@ -229,6 +244,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientListUsersResponse(buffer, bufferSize );
@@ -249,8 +265,9 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
 
             if (ClientGetTimeoutParserHasFailed(d->GetTimeoutParser.State)){
                 d->ParserIndex++;
-                return LULU_CS_ERROR;
+                return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientGetTimeoutResponse(buffer, bufferSize );
@@ -264,6 +281,18 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
             }
             break;
         default:
+            BufferReset(d->ReadBuffer);
+            if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
+                buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
+                size_t bytesWritten = BuildClientNotRecognisedResponse(buffer, bufferSize);
+
+                if (0 == bytesWritten)
+                    return LULU_CS_ERROR;
+
+                BufferWriteAdv(d->WriteBuffer, (ssize_t ) bytesWritten);
+
+                return LULU_CS_HELLO_WRITE;
+            }
             return LULU_CS_ERROR;
     }
     return LULU_CS_ERROR;
@@ -271,6 +300,21 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
 
 void LuluTransactionReadClose(unsigned int state, void *data) {
 
+}
+void LuluTransactionWriteClose(unsigned int state, void *data) {
+    LuluConnection *connection = ATTACHMENT_LULU(data);
+    ClientTransactionData *d = &connection->Data.Transaction;
+    d->ParserIndex = 0;
+    BufferReset(d->WriteBuffer);
+    ClientDelUserParserReset(&d->DelUserParser);
+    ClientGetBufferSizeParserReset(&d->GetBufferSizeParser);
+    ClientGetTimeoutParserReset(&d->GetTimeoutParser);
+    ClientListUsersParserReset(&d->ListUsersParser);
+    ClientMetricsParserReset(&d->MetricsParser);
+    ClientSetBufferSizeParserReset(&d->SetBufferSizeParser);
+    ClientSetUserParserReset(&d->SetUserParser);
+    ClientTimeoutParserReset(&d->TimeoutParser);
+    ClientGoodbyeParserReset(&d->GoodbyeParser);
 }
 
 unsigned LuluTransactionWriteRun(void *data) {

@@ -4,6 +4,7 @@
 
 #ifndef SOCKS5D_LULU_TRANSACTION_H
 #define SOCKS5D_LULU_TRANSACTION_H
+#include "utils/utils.h"
 #include "parsers/lulu/client_set_buffersize_parser.h"
 #include "parsers/lulu/client_metrics_parser.h"
 #include "parsers/lulu/client_get_buffersize_parser.h"
@@ -14,9 +15,7 @@
 #include "parsers/lulu/client_del_user_parser.h"
 #include "parsers/lulu/client_get_timeout_parser.h"
 #include "utils/buffer.h"
-#include "lulu/lulu_connection.h"
-
-#define NO_RETURN -1
+#define T_PARSER_COUNT 9
 // TODO: HACER UN ENUM JE
 #define T_GOODBYE_PARSER 0
 #define T_SET_BUFFER_SIZE_PARSER 1
@@ -30,7 +29,7 @@
 
 
 typedef struct {
-    uint8_t ParserIndex;
+    byte ParserIndex;
     ClientGoodbyeParser GoodbyeParser;
     ClientSetBufferSizeParser SetBufferSizeParser;
     ClientMetricsParser MetricsParser;
@@ -46,4 +45,8 @@ typedef struct {
 
 void LuluTransactionReadInit(unsigned int state, void *data);
 unsigned LuluTransactionReadRun(void *data);
+unsigned LuluTransactionWriteRun(void *data);
+void LuluTransactionWriteClose(unsigned int state, void *data);
+void LuluTransactionReadClose(unsigned int state, void *data);
+void LuluTransactionWriteInit(unsigned int state, void *data);
 #endif //SOCKS5D_LULU_TRANSACTION_H

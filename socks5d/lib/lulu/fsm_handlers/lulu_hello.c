@@ -69,6 +69,7 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
                 d->ParserIndex++;
                 return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 connection->User = LogInLuluUser(d->HelloParser.UName, d->HelloParser.Passwd);
                 d->ClientHelloSucceeded = null != connection->User;
@@ -91,8 +92,9 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
 
             if (ClientGoodbyeParserHasFailed(d->GoodbyeParser.State)){
                 d->ParserIndex++;
-                return LULU_CS_ERROR;
+                return NO_RETURN;
             }
+            BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientGoodbyeResponse(buffer, bufferSize);
@@ -106,12 +108,22 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
             }
             break;
         default:
-            return LULU_CS_ERROR;
+            BufferReset(d->ReadBuffer);
+            if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
+                buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
+                size_t bytesWritten = BuildClientNotRecognisedResponse(buffer, bufferSize);
+
+                if (0 == bytesWritten)
+                    return LULU_CS_ERROR;
+
+                BufferWriteAdv(d->WriteBuffer, (ssize_t ) bytesWritten);
+
+                return LULU_CS_HELLO_WRITE;
+            }
     }
     return LULU_CS_ERROR;
 }
 
-// TODO: aca tengo que reset los parsers?
 void LuluHelloReadClose(unsigned int state, void *data) {
 
 }
@@ -120,6 +132,9 @@ void LuluHelloWriteClose(unsigned int state, void *data) {
     LuluConnection *connection = ATTACHMENT_LULU_HELLO(data);
     ClientHelloData *d = &connection->Data.Auth;
     d->ParserIndex = 0;
+    BufferReset(d->WriteBuffer);
+    ClientHelloParserReset(&d->HelloParser);
+    ClientGoodbyeParserReset(&d->GoodbyeParser);
 }
 
 unsigned LuluHelloWriteRun(void *data) {

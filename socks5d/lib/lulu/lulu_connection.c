@@ -33,14 +33,14 @@ static StateDefinition luluConnectionFsm[] = {
         {
                 .state = LULU_CS_TRANSACTION_READ,
                 .on_arrival = LuluTransactionReadInit,
-//                .on_departure = RequestReadClose,
+                .on_departure = LuluTransactionReadClose,
                 .on_read_ready = LuluTransactionReadRun
         },
         {
                 .state = LULU_CS_TRANSACTION_WRITE,
-//                .on_arrival = RequestWriteInit,
-//                .on_write_ready = RequestWriteRun,
-//                .on_departure = RequestWriteClose
+                .on_arrival = LuluTransactionWriteInit,
+                .on_write_ready = LuluTransactionWriteRun,
+                .on_departure = LuluTransactionWriteClose
         },
         {
                 .state = LULU_CS_DONE,

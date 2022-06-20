@@ -5,6 +5,7 @@
 #include "parsers/lulu/client_get_buffersize_parser.h"
 #include "utils/logger.h"
 
+#include <string.h>
 ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizeParser *p, byte c, ClientGetBufferSizeParserState nextState, char *nextWord) {
 
     if(strlen(p->Word) == p->Index){
@@ -22,6 +23,7 @@ ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizePars
         p->Index++;
         return p->State;
     }
+    Info("not get buffersize");
     LogError( "%c is not part of the word \" %s \"", c, p->Word);
     return BufferSizeInvalidState;
 }
@@ -59,7 +61,7 @@ void ClientGetBufferSizeParserReset(ClientGetBufferSizeParser *p) {
 
 ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSizeParser *p, byte c) {
     LogDebug("Feeding %d to ClientGetBufferSizeParser", c);
-//    Error( "char = %c", c);
+    LogInfo( "buffersize char= %c", c);
 
     if (null == p) {
         Error("Cannot feed GetBufferSizeParser if is NULL");

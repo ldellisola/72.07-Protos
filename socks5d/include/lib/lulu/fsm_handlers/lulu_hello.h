@@ -8,8 +8,9 @@
 #include "parsers/lulu/client_goodbye_parser.h"
 #include "utils/buffer.h"
 #include "lulu/lulu_connection_status.h"
+#include "lulu/lulu.h"
 #define PARSER_COUNT 2
-#define NO_RETURN -1
+
 #define HELLO_PARSER 0
 #define GOODBYE_PARSER 1
 typedef struct {

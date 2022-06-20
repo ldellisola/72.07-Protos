@@ -50,8 +50,8 @@ size_t BuildClientSetTimeoutResponse(byte *buffer, size_t length, size_t timeout
 
     return LEN_OK;
 }
-size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,int64_t bufferSize ) {
-    bool validBufferSize;
+size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,size_t bufferSize ) {
+    bool validBufferSize = true;
     if(bufferSize <= 0 || bufferSize >= 10000000000){
         validBufferSize = false;
     }
@@ -76,10 +76,11 @@ size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,int64_t buff
 size_t BuildClientGetTimeoutResponse(byte *buffer, size_t length) {
     int timeout = 0;
 //    TODO: DONDE ESTA TIMEOUT
-    uint64_t nDigits = 1;
-    if(timeout !=0){
-        nDigits = floor(log10(abs(timeout))) + 1;
-    }
+
+    char num[11] = {0};
+    sprintf(num, "%d", timeout);
+    size_t nDigits = strlen(num);
+
 
     if (length < (nDigits + 3)) {
         Error("Buffer to small to WriteHead ClientGetTimeoutResponse");
@@ -95,10 +96,10 @@ size_t BuildClientGetTimeoutResponse(byte *buffer, size_t length) {
 size_t BuildClientGetBufferSizeResponse(byte *buffer, size_t length) {
     size_t bufferSize;
     bufferSize = GetSocks5BufferSize();
-    uint64_t nDigits = 1;
-    if(bufferSize !=0){
-        nDigits = floor(log10(bufferSize)) + 1;
-    }
+
+    char num[11]={0};
+    sprintf(num, "%lu", bufferSize);
+    size_t nDigits= strlen(num);
 
     if (length < (nDigits + 3)) {
         Error("Buffer to small to WriteHead ClientGetBufferSizeResponse");
@@ -115,20 +116,24 @@ size_t BuildClientGetBufferSizeResponse(byte *buffer, size_t length) {
 size_t BuildClientGetMetricsResponse(byte *buffer, size_t length) {
     Socks5Metrics *metrics = GetSocks5Metrics();
     size_t nDigits = 0;
-    nDigits += metrics->BytesTransferred !=0? (floor(log10(metrics->BytesTransferred)) + 1) : 1;
-    nDigits += metrics->CurrentConnections !=0? (floor(log10(metrics->CurrentConnections)) + 1) : 1;
-    nDigits += metrics->HistoricalConnections !=0? (floor(log10(metrics->HistoricalConnections)) + 1) : 1;
-
-    if (length < (nDigits + 5)) {
+    char num[11]={0};
+    sprintf(num, "%lu", metrics->BytesTransferred);
+    nDigits+= strlen(num);
+    sprintf(num, "%lu", metrics->CurrentConnections);
+    nDigits+= strlen(num);
+    sprintf(num, "%lu", metrics->HistoricalConnections);
+    nDigits+= strlen(num);
+    nDigits+=5;
+    if (length < (nDigits)) {
         Error("Buffer to small to WriteHead ClientGetBufferSizeResponse");
         return 0;
     }
-    char str[nDigits+5];
+    char str[nDigits];
     sprintf(str, "+%lu|%lu|%lu\r", metrics->HistoricalConnections, metrics->CurrentConnections, metrics->BytesTransferred);
-    str[nDigits+4] = '\n';
-    fillBuffer(str, buffer,(int)nDigits+5 );
+    str[nDigits-1] = '\n';
+    fillBuffer(str, buffer,(int)nDigits );
 
-    return nDigits+3;
+    return nDigits;
 }
 
 size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
@@ -170,7 +175,7 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     }
 //    TODO: free?
     const char** usernames = calloc(2, sizeof(byte));
-    const char** passwords= calloc(2, sizeof(byte));;
+    const char** passwords= calloc(2, sizeof(byte));
     usernames[0] = username;
     usernames[1] = null;
     passwords[0] = password;
