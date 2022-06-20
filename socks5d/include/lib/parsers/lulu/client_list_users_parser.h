@@ -29,4 +29,5 @@ bool ClientListUsersParserHasFinished(ClientListUsersParserState state);
 void ClientListUsersParserReset(ClientListUsersParser *p);
 ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, byte c);
 size_t ClientListUsersParserConsume(ClientListUsersParser *p, byte *c, size_t length);
+bool ClientListUsersParserHasFailed(ClientListUsersParserState state);
 #endif //SOCKS5D_CLIENT_LIST_USERS_PARSER_H

@@ -37,4 +37,5 @@ bool ClientSetUserParserHasFinished(ClientSetUserParserState state);
 void ClientSetUserParserReset(ClientSetUserParser *p);
 ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c);
 size_t ClientSetUserParserConsume(ClientSetUserParser *p, byte *c, size_t length);
+bool ClientSetUserParserHasFailed(ClientSetUserParserState state);
 #endif //SOCKS5D_CLIENT_SET_USER_PARSER_H

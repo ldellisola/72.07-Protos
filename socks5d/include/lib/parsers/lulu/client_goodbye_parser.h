@@ -25,4 +25,5 @@ bool ClientGoodbyeParserHasFinished(ClientGoodbyeParserState state);
 void ClientGoodbyeParserReset(ClientGoodbyeParser *p);
 ClientGoodbyeParserState ClientGoodbyeParserFeed(ClientGoodbyeParser *p, byte c);
 size_t ClientGoodbyeParserConsume(ClientGoodbyeParser *p, byte *c, size_t length);
+bool ClientGoodbyeParserHasFailed(ClientGoodbyeParserState state);
 #endif //SOCKS5D_CLIENT_GOODBYE_PARSER_H

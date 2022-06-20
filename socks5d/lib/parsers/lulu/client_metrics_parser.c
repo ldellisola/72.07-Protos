@@ -123,3 +123,8 @@ bool ClientMetricsParserHasFinished(ClientMetricsParserState state) {
     }
 }
 
+bool ClientMetricsParserHasFailed(ClientMetricsParserState state) {
+    return state == MetricsInvalidState ? true : false;
+}
+
+

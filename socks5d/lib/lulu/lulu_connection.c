@@ -3,6 +3,7 @@
 //
 
 #include "lulu/lulu_connection.h"
+#include "lulu/fsm_handlers/lulu_hello.h"
 #include "lulu/lulu_connection_status.h"
 #include "utils/utils.h"
 #include "utils/logger.h"
@@ -19,13 +20,13 @@ const FdHandler luluConnectionHandler = {
 
 static StateDefinition luluConnectionFsm[] = {
         {
-                .state = LULU_CS_AUTH_READ,
-//                .on_arrival = AuthReadInit,
-//                .on_departure = AuthReadClose,
-//                .on_read_ready = AuthReadRun
+                .state = LULU_CS_HELLO_READ,
+                .on_arrival = LuluHelloReadInit,
+//                .on_departure = LuluHelloReadClose,
+                .on_read_ready = LuluHelloReadRun
         },
         {
-                .state = LULU_CS_AUTH_WRITE,
+                .state = LULU_CS_HELLO_WRITE,
 //                .on_write_ready = AuthWriteRun,
 //                .on_departure = AuthWriteClose
         },
@@ -72,7 +73,7 @@ LuluConnection *CreateLuluConnection(TcpConnection *tcpConnection) {
     connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &luluConnectionHandler;
     connection->User = null;
-    connection->Fsm.InitialState = LULU_CS_AUTH_READ;
+    connection->Fsm.InitialState = LULU_CS_HELLO_READ;
     connection->Fsm.StatesSize = LULU_CS_ERROR;
     InitFsm(&connection->Fsm, luluConnectionFsm);
 
@@ -174,7 +175,7 @@ void DestroyLuluConnection(LuluConnection *connection) {
 
 void LuluConnectionRead(SelectorKey *key) {
     FiniteStateMachine *fsm = &ATTACHMENT(key)->Fsm;
-    CONNECTION_STATE st = HandleReadFsm(fsm, key);
+    LULU_CONNECTION_STATE st = HandleReadFsm(fsm, key);
 
     if (LULU_CS_ERROR == st || LULU_CS_DONE == st) {
         DisposeLuluConnection(ATTACHMENT(key), key->Selector);
@@ -184,7 +185,7 @@ void LuluConnectionRead(SelectorKey *key) {
 
 void LuluConnectionWrite(SelectorKey *key) {
     FiniteStateMachine *fsm = &ATTACHMENT(key)->Fsm;
-    CONNECTION_STATE st = HandleWriteFsm(fsm, key);
+    LULU_CONNECTION_STATE st = HandleWriteFsm(fsm, key);
 
     if (LULU_CS_ERROR == st || LULU_CS_DONE == st) {
         DisposeLuluConnection(ATTACHMENT(key), key->Selector);

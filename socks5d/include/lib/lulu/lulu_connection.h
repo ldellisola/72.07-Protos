@@ -18,6 +18,7 @@
 #include "parsers/lulu/client_set_buffersize_parser.h"
 #include "lulu/lulu_users.h"
 #include "fsm/fsm.h"
+#include "lulu/fsm_handlers/lulu_hello.h"
 
 typedef struct {
     time_t LastConnectionOn;
@@ -26,6 +27,7 @@ typedef struct {
 
     struct LuluUser * User;
     const FdHandler *Handler;
+    ClientHelloData Auth;
     ClientDelUserParser DelUserParser;
     ClientGetBufferSizeParser GetBufferSizeParser;
     ClientGetTimeoutParser GetTimeoutParser;

@@ -33,4 +33,5 @@ bool ClientTimeoutParserHasFinished(ClientTimeoutParserState state);
 void ClientTimeoutParserReset(ClientTimeoutParser *p);
 ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c);
 size_t ClientTimeoutParserConsume(ClientTimeoutParser *p, byte *c, size_t length);
+bool ClientTimeoutParserHasFailed(ClientTimeoutParserState state);
 #endif //SOCKS5D_CLIENT_TIMEOUT_PARSER_H
