@@ -91,3 +91,16 @@ void LuluPassiveAccept(SelectorKey *key) {
         LogError(false, "Cannot register new LULU connection to the selector");
     }
 }
+
+void DisposeLuluServer() {
+
+    if (FUNCTION_ERROR != ipv6SocketLulu)
+        close(ipv6SocketLulu);
+
+    if (FUNCTION_ERROR != ipv4SocketLulu)
+        close(ipv4SocketLulu);
+
+    DisposeAllLuluUsers();
+//    CleanLuluConnectionPool();
+}
+

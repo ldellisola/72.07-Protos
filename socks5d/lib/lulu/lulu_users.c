@@ -28,6 +28,7 @@ LuluUser * LogInLuluUser(const char * username, const char * password) {
 
     return null;
 }
+
 void LoadLuluUsers(const char *usernames[], const char *passwords[]) {
     if (null == usernames)
     {
@@ -79,4 +80,39 @@ void LoadSingleLuluUser(const char *username, const char *password) {
     strncpy(current->Password, password, passwordLength);
 }
 
-// TODO: FREE USERS
+void LogOutLuluUser(struct LuluUser *user) {
+
+    if(null == user) {
+        Error("User cannot be null");
+        return;
+    }
+
+    LuluUser * current = null;
+
+    for (current = currentLuluUsers; null != current ; current = current->Next){
+        if ((LuluUser *)user == current)
+            current->IsLoggedIn = false;
+    }
+}
+
+void DisposeAllLuluUsers() {
+    Debug("Disposing Socks5 users");
+    if (null == currentLuluUsers) {
+        Warning("Users where not initialized. Cannot dispose them");
+        return;
+    }
+
+    LuluUser * next;
+    for (LuluUser * user = currentLuluUsers; user != null ; user = next) {
+        next = (LuluUser *) user->Next;
+
+        if (null != user->Username)
+            free(user->Username);
+
+        if (null != user->Password)
+            free(user->Password);
+
+        free(user);
+    }
+
+}

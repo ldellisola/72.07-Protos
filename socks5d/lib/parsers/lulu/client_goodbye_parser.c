@@ -34,7 +34,7 @@ ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, Cli
         if (c == '\r') {
             return nextState;
         }
-        Error( "Im in the last letter of the word and there is no pipe");
+        Debug( "Im in the last letter of the word and there is no pipe");
         return GoodbyeInvalidState;
     }
 
@@ -42,7 +42,7 @@ ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, Cli
         p->Index++;
         return p->State;
     }
-    LogError( "wrong character for GOODBYE, i was waiting for %c and got %c", p->Goodbye[p->Index], c);
+    LogDebug( "wrong character for GOODBYE, i was waiting for %c and got %c", p->Goodbye[p->Index], c);
     return GoodbyeInvalidState;
 
 }
@@ -50,7 +50,7 @@ ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, Cli
 ClientGoodbyeParserState ClientGoodbyeParserFeed(ClientGoodbyeParser *p, byte c) {
     LogDebug("Feeding %d to ClientGoodbyeParser", c);
     if (null == p) {
-        Error( "Cannot feed ClientGoodbyeParser if is NULL");
+        Debug( "Cannot feed ClientGoodbyeParser if is NULL");
         return GoodbyeInvalidState;
     }
 

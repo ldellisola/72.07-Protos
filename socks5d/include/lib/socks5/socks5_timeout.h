@@ -25,4 +25,10 @@ void NotifySocks5ConnectionAccess(void * data);
  */
 void SetSocks5ConnectionTimeout(time_t timeout);
 
+/**
+ * It gets the time it takes for a connection to timeout
+ * If its 0 or negative, then connections will never timeout
+ */
+time_t GetSocks5ConnectionTimeout();
+
 #endif //SOCKS5D_SOCKS5_TIMEOUT_H

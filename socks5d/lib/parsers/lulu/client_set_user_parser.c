@@ -13,7 +13,7 @@ ClientSetUserParserState traverseWordSetUser(ClientSetUserParser *p, byte c, Cli
             p->Index = 0;
             return nextState;
         }
-        Error( "The word has finished and character given isnt a terminating character");
+        Debug( "The word has finished and character given isnt a terminating character");
         return UserInvalidState;
 
     }
@@ -22,7 +22,7 @@ ClientSetUserParserState traverseWordSetUser(ClientSetUserParser *p, byte c, Cli
         p->Index++;
         return p->State;
     }
-    LogError( "Waiting for a \"%c\" and got a \"%c\" in the word \" %s \"", p->Word[p->Index], c, p->Word);
+    LogDebug( "Waiting for a \"%c\" and got a \"%c\" in the word \" %s \"", p->Word[p->Index], c, p->Word);
 
     return UserInvalidState;
 
@@ -73,7 +73,7 @@ ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c)
         case UserName:
             if(c == '|'){
                 if(p->Index == 0){
-                    Error( "Username must be at least 1 character long");
+                    Debug( "Username must be at least 1 character long");
                     p->State = UserInvalidState;
                     break;
                 }
@@ -88,7 +88,7 @@ ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c)
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error( "Username can be up to 255 characters long");
+                Debug( "Username can be up to 255 characters long");
                 p->State = UserInvalidState;
                 break;
             }
@@ -106,7 +106,7 @@ ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c)
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error( "Password can be up to 50 characters long");
+                Debug( "Password can be up to 50 characters long");
                 p->State = UserInvalidState;
                 break;
             }
@@ -117,19 +117,19 @@ ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c)
             if(c =='\n'){
                 if(p->PrevState == UserPassword){
                     if(p->Index == 0){
-                        Error( "Password must be at least 1 character long");
+                        Debug( "Password must be at least 1 character long");
                         p->State = UserInvalidState;
                         break;
                     }
                     p->State = UserFinished;
                     break;
                 }
-                Error( "More Arguments needed");
+                Debug( "More Arguments needed");
                 p->State = UserInvalidState;
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error( "Username and Password can be up to 50 characters long");
+                Debug( "Username and Password can be up to 50 characters long");
                 p->State = UserInvalidState;
                 break;
             }
@@ -141,7 +141,7 @@ ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c)
             if(c == '|'){
                 if(p->PrevState == UserName){
                     if(p->Index == MAXLONG+1){
-                        Error( "Username can have max 255 characters");
+                        Debug( "Username can have max 255 characters");
                         p->State = UserInvalidState;
                         break;
                     }
@@ -151,7 +151,7 @@ ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c)
                     p->State = UserPassword;
                     break;
                 }
-                Error( "Too many arguments");
+                Debug( "Too many arguments");
                 p->State = UserInvalidState;
                 break;
             }

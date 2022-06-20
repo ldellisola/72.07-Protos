@@ -10,12 +10,11 @@
 #include <assert.h>
 static void LuluConnectionRead(SelectorKey *key);
 static void LuluConnectionWrite(SelectorKey *key);
-//static void LuluConnectionBlock(SelectorKey *key);
-//
+
+
 const FdHandler luluConnectionHandler = {
         .handle_read   = LuluConnectionRead,
-        .handle_write  = LuluConnectionWrite,
-//        .handle_block  = LuluConnectionBlock,
+        .handle_write  = LuluConnectionWrite
 };
 
 static StateDefinition luluConnectionFsm[] = {
@@ -60,8 +59,9 @@ typedef struct PooledLuluConnection_{
     PooledLuluConnectionStatus Status;
 }PooledLuluConnection;
 
-PooledLuluConnection * luluPool;
 
+PooledLuluConnection * luluPool;
+//void CleanLuluPool( PooledLuluConnection * pool);
 LuluConnection *CreateLuluConnection(TcpConnection *tcpConnection) {
     Info("Creating LuluConnection.");
 
@@ -127,6 +127,11 @@ void CreateLuluConnectionPool(int initialSize) {
         current->Status = PooledLuluConnectionEmpty;
     }
 }
+//void CleanLuluConnectionPool() {
+//    Debug("Cleaning LULU connection luluPool");
+//    ExecuteOnExistingElements(&luluPool, (void (*)(void *, void *)) DisposeLuluConnection, GetSelector());
+//    CleanLuluPool(&luluPool);
+//}
 
 void DisposeLuluConnection(LuluConnection *connection, fd_selector selector) {
     Info("Disposing LuluConnection...");
@@ -144,8 +149,8 @@ void DisposeLuluConnection(LuluConnection *connection, fd_selector selector) {
     if (null != connection->WriteBuffer.Data)
         free(connection->WriteBuffer.Data);
 
-//    if (null != connection->User)
-//        LogOutLuluUser(connection->User);
+    if (null != connection->User)
+        LogOutLuluUser(connection->User);
 
     DestroyLuluConnection(connection);
     Info("Socks5Connection disposed!");
@@ -192,3 +197,20 @@ void LuluConnectionWrite(SelectorKey *key) {
     }
 }
 
+//void CleanLuluPool( PooledLuluConnection * pool){
+//    Debug("Cleaning object luluPool");
+//    if (null == pool || null ==  pool->Handlers) {
+//        Error("Object socks5Pool was not initialized");
+//        return;
+//    }
+//
+//    PooledLuluConnection * next;
+//    for (PooledLuluConnection * obj = pool->Pool; obj != null ; obj = next) {
+//        next = obj->Next;
+//        if ( PooledObjectInUse == obj->Status && null != pool->Handlers->OnDispose){
+//            pool->Handlers->OnDispose(obj);
+//        }
+//        free(obj->Object);
+//        free(obj);
+//    }
+//}

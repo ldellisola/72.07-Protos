@@ -61,7 +61,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
         case HelloUsername:
             if(c == '|'){
                 if(p->Index == 0){
-                    Error("Username has to be at least 1 character long");
+                    Debug("Username has to be at least 1 character long");
                     p->State = ClientHelloInvalidState;
                     break;
                 }
@@ -76,7 +76,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error("Username can have max 255 characters");
+                Debug("Username can have max 255 characters");
                 p->State = ClientHelloInvalidState;
                 break;
             }
@@ -85,7 +85,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             break;
         case HelloPassword:
             if(c == '|'){
-                Error("Too many arguments");
+                Debug("Too many arguments");
                 p->State = ClientHelloInvalidState;
                 break;
             }
@@ -95,7 +95,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error("Password can have max 255 characters");
+                Debug("Password can have max 255 characters");
                 p->State = ClientHelloInvalidState;
                 break;
             }
@@ -107,19 +107,19 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                 if(p->PrevState == HelloPassword){
                     if(p->Index == 0){
                         p->State = ClientHelloInvalidState;
-                        Error("Password has to be at least 1 character long");
+                        Debug("Password has to be at least 1 character long");
                         break;
                     }
                     p->State = HelloFinished;
                     break;
                 }
-                Error("More arguments needed");
+                Debug("More arguments needed");
                 p->State = ClientHelloInvalidState;
                 break;
             }
             if(c == '\r'){
                 if(p->Index == MAXLONG+1){
-                    Error("Password and Username can have max 255 characters");
+                    Debug("Password and Username can have max 255 characters");
                     p->State = ClientHelloInvalidState;
                     break;
                 }
@@ -130,7 +130,7 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
             if(c == '|'){
                 if(p->PrevState == HelloUsername){
                     if(p->Index == MAXLONG+1){
-                        Error("Username can have max 255 characters");
+                        Debug("Username can have max 255 characters");
                         p->State = ClientHelloInvalidState;
                         break;
                     }
@@ -140,12 +140,12 @@ ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
                     p->State = HelloPassword;
                     break;
                 }
-                Error("Too many arguments");
+                Debug("Too many arguments");
                 p->State = ClientHelloInvalidState;
                 break;
             }
             if(p->Index == MAXLONG){
-                Error("Username and password can have max 255 characters");
+                Debug("Username and password can have max 255 characters");
                 p->State = ClientHelloInvalidState;
                 break;
             }

@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     else{
         Warning("Server could not be started");
     }
-
+    DisposeLuluServer();
     Info("Shutting down...");
     DisposeSocks5Server();
     DisposeTcpServer();

@@ -13,7 +13,7 @@ ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, by
             p->Index = 0;
             return nextState;
         }
-        Error("The word has finished and character given isnt a terminating character");
+        Debug("The word has finished and character given isnt a terminating character");
         return GetTimeoutInvalidState;
 
     }
@@ -22,7 +22,7 @@ ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, by
         p->Index++;
         return p->State;
     }
-    LogError(false, "%c is not part of the word \" %s \"", c, p->Word);
+    LogDebug(false, "%c is not part of the word \" %s \"", c, p->Word);
     return GetTimeoutInvalidState;
 }
 
@@ -79,7 +79,7 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
                 p->State = GetTimeoutFinished;
                 break;
             }
-            Error("There is a CR but no LF");
+            Debug("There is a CR but no LF");
             p->State =  GetTimeoutInvalidState;
             break;
         case GetTimeoutFinished:

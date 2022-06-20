@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "utils/logger.h"
+#include "socks5/socks5_timeout.h"
 void fillBuffer(const char* string,byte * buffer, int length );
 
 size_t BuildClientHelloResponse(byte *buffer, size_t length, bool authenticationSucceeded) {
@@ -40,8 +41,7 @@ size_t BuildClientGoodbyeResponse(byte *buffer, size_t length) {
 }
 size_t BuildClientSetTimeoutResponse(byte *buffer, size_t length, size_t timeout) {
 
-//    TODO: DONDE ESTA timeout
-
+    SetSocks5ConnectionTimeout(timeout);
     if (length < LEN_OK) {
         Error("Buffer to small to WriteHead ClientSetTimeoutResponse");
         return 0;
@@ -74,24 +74,21 @@ size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,size_t buffe
     }
 }
 size_t BuildClientGetTimeoutResponse(byte *buffer, size_t length) {
-    int timeout = 0;
-//    TODO: DONDE ESTA TIMEOUT
-
-    char num[11] = {0};
-    sprintf(num, "%d", timeout);
+    long timeout = 0;
+    timeout = GetSocks5ConnectionTimeout();
+    char num[15] = {0};
+    sprintf(num, "+%ld\r\n", timeout);
     size_t nDigits = strlen(num);
 
 
-    if (length < (nDigits + 3)) {
+    if (length < (nDigits)) {
         Error("Buffer to small to WriteHead ClientGetTimeoutResponse");
         return 0;
     }
-    char str[nDigits+3];
-    sprintf(str, "+%d\r", timeout);
-    str[nDigits+2] = '\n';
-    fillBuffer(str, buffer,(int)nDigits+3 );
 
-    return nDigits+3;
+    fillBuffer(num, buffer,(int)nDigits );
+
+    return nDigits;
 }
 size_t BuildClientGetBufferSizeResponse(byte *buffer, size_t length) {
     size_t bufferSize;
@@ -137,7 +134,7 @@ size_t BuildClientGetMetricsResponse(byte *buffer, size_t length) {
 }
 
 size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
-//    TODO:freee
+//    TODO:freee / listo
     char **usernames = calloc(200, sizeof(byte));
     int users = GetAllLoggedInSocks5Users(usernames,200 );
     if(users == 0){
@@ -146,7 +143,7 @@ size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
         return 11;
     }
 
-    
+
     users = (users == -1)? 200:users;
     //       +     usernames    pipes and \r    \n
     char str[1 +   users*255  +    users       + 1];
@@ -167,7 +164,9 @@ size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
 
 size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, char* password) {
 
-//    todo: free?
+//    todo: free?/listo
+
+//  I check that username doesnt exist
     char **loggedUsernames = calloc(200, sizeof(byte));
     int users = GetAllLoggedInSocks5Users(loggedUsernames,200 );
 
@@ -183,7 +182,9 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
             return 14;
         }
     }
-//    TODO: free?
+    free(loggedUsernames);
+//    TODO: free?/listo
+//  I create user
     const char** usernames = calloc(2, sizeof(byte));
     const char** passwords= calloc(2, sizeof(byte));
     usernames[0] = username;
@@ -191,13 +192,13 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     passwords[0] = password;
     passwords[1] = null;
     LoadSocks5Users(usernames,passwords );
-
     if (length < LEN_OK) {
         Error("Buffer to small to WriteHead ClientSetUserSizeResponse");
         return 0;
     }
     fillBuffer("+OK\r\n", buffer,LEN_OK );
-
+    free(usernames);
+    free(passwords);
     return (LEN_OK);
 }
 

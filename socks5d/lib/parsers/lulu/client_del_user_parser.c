@@ -13,14 +13,14 @@ ClientDelUserParserState traverseWordDel(ClientDelUserParser *p, byte c, ClientD
             p->Index = 0;
             return nextState;
         }
-        Error("Im in the last letter of the word and there is no pipe");
+        Debug("Im in the last letter of the word and there is no pipe");
         return DelInvalidState;
     }
     if (c == p->Word[p->Index]) {
         p->Index++;
         return p->State;
     }
-    LogError( "wrong character for word, was waiting for %c and got %c", p->Word[p->Index], c);
+    LogDebug( "wrong character for word, was waiting for %c and got %c", p->Word[p->Index], c);
     return DelInvalidState;
 
 }
@@ -67,7 +67,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
             break;
         case DelUserName:
             if(c == '|'){
-                Error( "Too many arguments");
+                Debug( "Too many arguments");
                 p->State = DelInvalidState;
                 break;
             }
@@ -76,7 +76,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
                 break;
             }
             if(p->Index == MAXLONG+1){
-                Error("Username can have max 255 characters");
+                Debug("Username can have max 255 characters");
                 p->State = DelInvalidState;
                 break;
             }
@@ -87,20 +87,20 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
             if(c == '\n'){
                 if(p->Index == 0){
                     p->State = DelInvalidState;
-                    Error("Username has to be at least 1 character long");
+                    Debug("Username has to be at least 1 character long");
                     break;
                 }
                 p->State = DelFinished;
                 break;
             }
             if(c == '|'){
-                Error("Too many arguments");
+                Debug("Too many arguments");
                 p->State = DelInvalidState;
                 break;
             }
             if(c == '\r'){
                 if(p->Index == MAXLONG+1){
-                    Error("Username can have max 255 characters");
+                    Debug("Username can have max 255 characters");
                     p->State = DelInvalidState;
                     break;
                 }
@@ -110,7 +110,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
             }
 
             if(p->Index == MAXLONG){
-                Error( "Username and password can have max 255 characters");
+                Debug( "Username and password can have max 255 characters");
                 p->State = DelInvalidState;
                 break;
             }

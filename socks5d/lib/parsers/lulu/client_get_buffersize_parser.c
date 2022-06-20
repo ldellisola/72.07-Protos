@@ -14,7 +14,7 @@ ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizePars
             p->Index = 0;
             return nextState;
         }
-        Error("The word has finished and character given isnt a terminating character");
+        Debug("The word has finished and character given isnt a terminating character");
         return BufferSizeInvalidState;
 
     }
@@ -23,14 +23,14 @@ ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizePars
         p->Index++;
         return p->State;
     }
-    LogError( "%c is not part of the word \" %s \"", c, p->Word);
+    LogDebug( "%c is not part of the word \" %s \"", c, p->Word);
     return BufferSizeInvalidState;
 }
 
 void ClientGetBufferSizeParserReset(ClientGetBufferSizeParser *p) {
     Debug("Resetting ClientGetBufferSizeParser...");
     if (null == p) {
-        Error("Cannot reset NULL ClientGetBufferSizeParser");
+        Debug("Cannot reset NULL ClientGetBufferSizeParser");
         return;
     }
 
@@ -62,7 +62,7 @@ ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSize
     LogDebug("Feeding %d to ClientGetBufferSizeParser", c);
 
     if (null == p) {
-        Error("Cannot feed GetBufferSizeParser if is NULL");
+        Debug("Cannot feed GetBufferSizeParser if is NULL");
         return BufferSizeInvalidState;
     }
 
@@ -82,7 +82,7 @@ ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSize
                 p->State = BufferSizeFinished;
                 break;
             }
-            Error( "There is a CR but no LF");
+            Debug( "There is a CR but no LF");
             p->State =  BufferSizeInvalidState;
             break;
         case BufferSizeFinished:
@@ -96,12 +96,12 @@ ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSize
 size_t ClientGetBufferSizeParserConsume(ClientGetBufferSizeParser *p, byte *c, size_t length) {
     LogDebug("ClientBufferSizeParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if ClientGetBufferSizeParser is NULL");
+        Debug( "Cannot consume if ClientGetBufferSizeParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "ClientGetBufferSizeParser cannot consume NULL array");
+        Debug( "ClientGetBufferSizeParser cannot consume NULL array");
         return 0;
     }
 
