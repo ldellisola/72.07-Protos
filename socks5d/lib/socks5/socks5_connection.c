@@ -178,6 +178,27 @@ void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector)
     if (null != connection->RemoteAddressString)
         free(connection->RemoteAddressString);
 
+    unsigned state = GetStateFromFsm(&connection->Fsm);
+
+    bool mayDisposeDNS = true;
+    mayDisposeDNS &= CS_DNS_READ == state || CS_REQUEST_READ == state || CS_REQUEST_WRITE == state || CS_ESTABLISH_CONNECTION == state;
+    if (mayDisposeDNS)
+    {
+        RequestData * d = &connection->Data.Request;
+        // free address if not dns
+        if (null == d->RemoteAddress && null != d->CurrentRemoteAddress){
+            Debug("Releasing remote address memory because it was not resolved by DNS");
+            free(d->CurrentRemoteAddress->ai_addr);
+            free(d->CurrentRemoteAddress);
+        }
+        // free dns address
+        if (null != d->RemoteAddress) {
+            Debug("Disposing DNS resolved addresses");
+            freeaddrinfo(d->RemoteAddress);
+        }
+    }
+
+
     DestroyObject(&socks5Pool, connection);
     Debug("Socks5Connection disposed!");
 }
