@@ -15,17 +15,7 @@
 #include "parsers/lulu/client_del_user_parser.h"
 #include "parsers/lulu/client_get_timeout_parser.h"
 #include "utils/buffer.h"
-#define T_PARSER_COUNT 9
-// TODO: HACER UN ENUM JE
-#define T_GOODBYE_PARSER 0
-#define T_SET_BUFFER_SIZE_PARSER 1
-#define T_METRICS_PARSER 2
-#define T_GET_BUFFER_SIZE_PARSER 3
-#define T_TIMEOUT_PARSER 4
-#define T_SET_USER_PARSER 5
-#define T_LIST_USERS_PARSER 6
-#define T_DEL_USER_PARSER 7
-#define T_GET_TIMEOUT_PARSER 8
+
 
 
 typedef struct {

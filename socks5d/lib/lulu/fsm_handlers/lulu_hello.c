@@ -16,6 +16,8 @@ void LuluHelloReadInit(unsigned int state, void *data) {
     ClientHelloData *d = &connection->Data.Auth;
     d->ParserIndex = 0;
     d->ClientHelloSucceeded = false;
+    BufferReset(&connection->ReadBuffer);
+    BufferReset(&connection->WriteBuffer);
     d->ReadBuffer = &connection->ReadBuffer;
     d->WriteBuffer = &connection->WriteBuffer;
     ClientHelloParserReset(&d->HelloParser);
@@ -45,16 +47,7 @@ unsigned LuluHelloReadRun(void *data) {
              return possibleReturn;
          }
     }
-
-    // no reconocio el comando
-    buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
-    size_t bytesWritten = BuildClientNotRecognisedResponse(buffer, bufferSize);
-
-    if (0 == bytesWritten)
-        return LULU_CS_ERROR;
-
-    BufferWriteAdv(d->WriteBuffer, (ssize_t ) bytesWritten);
-    return LULU_CS_HELLO_WRITE;
+    return LULU_CS_ERROR;
 }
 
 int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnection *connection, void *data, size_t bufferSize ){
@@ -142,16 +135,16 @@ unsigned LuluHelloWriteRun(void *data) {
     ClientHelloData *d = &connection->Data.Auth;
 
     if (!BufferCanRead(d->WriteBuffer)) {
-        if (!d->ClientHelloSucceeded && d->ParserIndex == HELLO_PARSER) {
+        if ((!d->ClientHelloSucceeded && d->ParserIndex == HELLO_PARSER) || d->ParserIndex == NOT_RECOGNIZED_PARSER) {
             Debug("User not authorized");
-            return LULU_CS_HELLO_READ;
+            bool success = SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_READ);
+            return success? LULU_CS_HELLO_READ: LULU_CS_ERROR;
         }
         if(d->ParserIndex == GOODBYE_PARSER){
             Debug("Goodbye user");
             return LULU_CS_DONE;
         }
         Debug("User authorized");
-//TODO: esta bien esto del selector?
         bool success = SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_READ);
         return success ? LULU_CS_TRANSACTION_READ : LULU_CS_ERROR;
     }

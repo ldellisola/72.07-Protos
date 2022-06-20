@@ -23,7 +23,6 @@ ClientGetBufferSizeParserState traverseWordGetBufferSize(ClientGetBufferSizePars
         p->Index++;
         return p->State;
     }
-    Info("not get buffersize");
     LogError( "%c is not part of the word \" %s \"", c, p->Word);
     return BufferSizeInvalidState;
 }

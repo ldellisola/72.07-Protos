@@ -13,6 +13,7 @@
 
 #define HELLO_PARSER 0
 #define GOODBYE_PARSER 1
+#define NOT_RECOGNIZED_PARSER 2
 typedef struct {
     uint8_t ParserIndex;
     ClientHelloParser HelloParser;

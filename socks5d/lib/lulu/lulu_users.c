@@ -16,16 +16,12 @@ LuluUser * LogInLuluUser(const char * username, const char * password) {
         Error("username and password cannot be null");
         return null;
     }
-//TODO: COMO ES ESTO?
     LuluUser * current = null;
     for (current = currentLuluUsers; null != current ; current = (LuluUser *) current->Next){
         if (!current->InUse)
             continue;
         bool isAuthorized = 0 == strcmp(current->Username,username);
         isAuthorized &= 0 == strcmp(current->Password,password);
-//        LogInfo(false, "username = %s, pass= %s", username, password);
-//        bool isAuthorized = 0 == strcmp("admin",username);
-//        isAuthorized &= 0 == strcmp("adminPass",password);
         if (isAuthorized)
             return current;
     }

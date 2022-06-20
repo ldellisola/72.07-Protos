@@ -8,6 +8,17 @@
 #include "lulu/lulu.h"
 
 #include "lulu/lulu_connection.h"
+#define T_PARSER_COUNT 9
+// TODO: HACER UN ENUM JE
+#define T_GOODBYE_PARSER 0
+#define T_SET_BUFFER_SIZE_PARSER 1
+#define T_METRICS_PARSER 2
+#define T_GET_BUFFER_SIZE_PARSER 3
+#define T_TIMEOUT_PARSER 4
+#define T_SET_USER_PARSER 5
+#define T_LIST_USERS_PARSER 6
+#define T_DEL_USER_PARSER 7
+#define T_GET_TIMEOUT_PARSER 8
 
 int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRead, LuluConnection *connection, void *data, size_t bufferSize );
 
