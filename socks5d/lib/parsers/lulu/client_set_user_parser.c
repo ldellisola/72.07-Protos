@@ -31,7 +31,7 @@ ClientSetUserParserState traverseWordSetUser(ClientSetUserParser *p, byte c, Cli
 void ClientSetUserParserReset(ClientSetUserParser *p) {
     Debug("Resetting SetUserParser...");
     if (null == p) {
-        Error( "Cannot reset NULL SetUserParser");
+        Debug( "Cannot reset NULL SetUserParser");
         return;
     }
 
@@ -59,7 +59,7 @@ void ClientSetUserParserReset(ClientSetUserParser *p) {
 ClientSetUserParserState ClientSetUserParserFeed(ClientSetUserParser *p, byte c) {
     LogDebug("Feeding %d to ClientSetUserParser", c);
     if (null == p) {
-        Error( "Cannot feed SetUserParser if is NULL");
+        Debug( "Cannot feed SetUserParser if is NULL");
         return UserInvalidState;
     }
 
@@ -175,12 +175,12 @@ bool ClientSetUserParserHasFailed(ClientSetUserParserState state) {
 size_t ClientSetUserParserConsume(ClientSetUserParser *p, byte *c, size_t length) {
     LogDebug("SetUserParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if SetUserParser is NULL");
+        Debug( "Cannot consume if SetUserParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "SetUserParser cannot consume NULL array");
+        Debug( "SetUserParser cannot consume NULL array");
         return 0;
     }
 

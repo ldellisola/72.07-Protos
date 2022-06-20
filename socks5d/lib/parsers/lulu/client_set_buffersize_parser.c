@@ -29,7 +29,7 @@ ClientSetBufferSizeParserState traverseWordSetBufferSize(ClientSetBufferSizePars
 void ClientSetBufferSizeParserReset(ClientSetBufferSizeParser *p) {
     Debug("Resetting ClientSetBufferSizeParser...");
     if (null == p) {
-        Error( "Cannot reset NULL ClientSetBufferSizeParser");
+        Debug( "Cannot reset NULL ClientSetBufferSizeParser");
         return;
     }
 
@@ -63,7 +63,7 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
 //    Error( "char = %c", c);
 
     if (null == p) {
-        Error( "Cannot feed SetBufferSizeParser if is NULL");
+        Debug( "Cannot feed SetBufferSizeParser if is NULL");
         return SetBufferSizeInvalidState;
     }
 
@@ -115,12 +115,12 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
 size_t ClientSetBufferSizeParserConsume(ClientSetBufferSizeParser *p, byte *c, size_t length) {
     LogDebug("ClientSetBufferSizeParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if ClientSetBufferSizeParser is NULL");
+        Debug( "Cannot consume if ClientSetBufferSizeParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "ClientSetBufferSizeParser cannot consume NULL array");
+        Debug( "ClientSetBufferSizeParser cannot consume NULL array");
         return 0;
     }
 

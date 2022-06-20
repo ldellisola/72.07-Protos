@@ -29,7 +29,7 @@ ClientMetricsParserState traverseWordMetrics(ClientMetricsParser *p, byte c, Cli
 void ClientMetricsParserReset(ClientMetricsParser *p) {
     Debug("Resetting ClientMetricsParser...");
     if (null == p) {
-        Error( "Cannot reset NULL ClientMetricsParser");
+        Debug( "Cannot reset NULL ClientMetricsParser");
         return;
     }
 
@@ -59,7 +59,7 @@ ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c)
 //    Error( "char = %c", c);
 
     if (null == p) {
-        Error( "Cannot feed MetricsParser if is NULL");
+        Debug( "Cannot feed MetricsParser if is NULL");
         return MetricsInvalidState;
     }
 
@@ -93,12 +93,12 @@ ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c)
 size_t ClientMetricsParserConsume(ClientMetricsParser *p, byte *c, size_t length) {
     LogDebug("ClientMetricsParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if ClientMetricsParser is NULL");
+        Debug( "Cannot consume if ClientMetricsParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "ClientMetricsParser cannot consume NULL array");
+        Debug( "ClientMetricsParser cannot consume NULL array");
         return 0;
     }
 

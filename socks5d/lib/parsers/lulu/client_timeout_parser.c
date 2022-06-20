@@ -29,7 +29,7 @@ ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, Cli
 void ClientTimeoutParserReset(ClientTimeoutParser *p) {
     Debug("Resetting ClientTimeoutParser...");
     if (null == p) {
-        Error( "Cannot reset NULL ClientTimeoutParser");
+        Debug( "Cannot reset NULL ClientTimeoutParser");
         return;
     }
 
@@ -57,10 +57,10 @@ void ClientTimeoutParserReset(ClientTimeoutParser *p) {
 
 ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c) {
     LogDebug("Feeding %d to ClientTimeoutParser", c);
-//    Error( "char = %c", c);
+//    LogError( "char = %c", c);
 
     if (null == p) {
-        Error( "Cannot feed TimeoutParser if is NULL");
+        Debug( "Cannot feed TimeoutParser if is NULL");
         return TimeoutInvalidState;
     }
 
@@ -76,7 +76,14 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
         case TimeoutValue:
 //            Error( "TimeoutValue");
             if(isdigit(c)){
-                p->Value *=10 + ((char)c- '0');
+                int digit = (uint8_t) ((char)c- '0');
+//                LogError( "digit = %d, value = %d", digit, p->Value);
+                p->Value = (p->Value * 10) + digit;
+//                LogError( "value = %d", p->Value);
+                if(p->Value > 10000000000){
+                    LogDebug("Timeout too big", p->Value, digit);
+                    p->State = TimeoutInvalidState;
+                }
                 break;
             }
             if(c == '\r'){
@@ -101,12 +108,12 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
 size_t ClientTimeoutParserConsume(ClientTimeoutParser *p, byte *c, size_t length) {
     LogDebug("ClientTimeoutParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if ClientTimeoutParser is NULL");
+        Debug( "Cannot consume if ClientTimeoutParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "ClientTimeoutParser cannot consume NULL array");
+        Debug( "ClientTimeoutParser cannot consume NULL array");
         return 0;
     }
 

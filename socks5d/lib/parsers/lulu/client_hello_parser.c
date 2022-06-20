@@ -13,14 +13,14 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
             p->Index = 0;
             return nextState;
         }
-        Error("Im in the last letter of the word and there is no pipe");
+        Debug("Im in the last letter of the word and there is no pipe");
         return ClientHelloInvalidState;
     }
     if (c == p->Word[p->Index]) {
         p->Index++;
         return p->State;
     }
-    LogError("wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
+    LogDebug("wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
     return ClientHelloInvalidState;
 
 }
@@ -28,7 +28,7 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
 void ClientHelloParserReset(ClientHelloParser *p) {
     Debug("Resetting HelloParser...");
     if (null == p) {
-        Error( "Cannot reset NULL HelloParser");
+        Debug( "Cannot reset NULL HelloParser");
         return;
     }
 
@@ -50,7 +50,7 @@ void ClientHelloParserReset(ClientHelloParser *p) {
 ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
     LogDebug("Feeding %d to ClientHelloParser", c);
     if (null == p) {
-        Error("Cannot feed HelloParser if is NULL");
+        Debug("Cannot feed HelloParser if is NULL");
         return ClientHelloInvalidState;
     }
 
@@ -170,12 +170,12 @@ bool ClientHelloParserHasFailed(ClientHelloParserState state) {
 size_t ClientHelloParserConsume(ClientHelloParser *p, byte *c, size_t length) {
     LogDebug("AuthParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if HelloParser is NULL");
+        Debug( "Cannot consume if HelloParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "HelloParser cannot consume NULL array");
+        Debug( "HelloParser cannot consume NULL array");
         return 0;
     }
 

@@ -28,7 +28,7 @@ ClientDelUserParserState traverseWordDel(ClientDelUserParser *p, byte c, ClientD
 void ClientDelUserParserReset(ClientDelUserParser *p) {
     Debug("Resetting DelParser...");
     if (null == p) {
-        Error("Cannot reset NULL DelParser");
+        Debug("Cannot reset NULL DelParser");
         return;
     }
 
@@ -54,7 +54,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
     LogDebug("Feeding %d to ClientDelUserParser", c);
 //    Error( "char= %c", c);
     if (null == p) {
-        Error("Cannot feed DelUserParser if is NULL");
+        Debug("Cannot feed DelUserParser if is NULL");
         return DelInvalidState;
     }
 
@@ -135,12 +135,12 @@ bool ClientDelUserParserHasFailed(ClientDelUserParserState state) {
 size_t ClientDelUserParserConsume(ClientDelUserParser *p, byte *c, size_t length) {
     LogDebug("DelUserParser consuming %d bytes", length);
     if (null == p) {
-        Error("Cannot consume if DelUserParser is NULL");
+        Debug("Cannot consume if DelUserParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error("DelUserParser cannot consume NULL array");
+        Debug("DelUserParser cannot consume NULL array");
         return 0;
     }
 

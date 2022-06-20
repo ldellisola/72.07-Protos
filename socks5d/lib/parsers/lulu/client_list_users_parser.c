@@ -58,7 +58,7 @@ ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, b
 //    Error( "char = %c", c);
 
     if (null == p) {
-        Error( "Cannot feed ListUsersParser if is NULL");
+        Debug( "Cannot feed ListUsersParser if is NULL");
         return ListInvalidState;
     }
 
@@ -92,12 +92,12 @@ ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, b
 size_t ClientListUsersParserConsume(ClientListUsersParser *p, byte *c, size_t length) {
     LogDebug("ClientBufferSizeParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if ClientListUsersParser is NULL");
+        Debug( "Cannot consume if ClientListUsersParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "ClientListUsersParser cannot consume NULL array");
+        Debug( "ClientListUsersParser cannot consume NULL array");
         return 0;
     }
 

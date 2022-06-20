@@ -59,7 +59,7 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
 //    Error( "char = %c", c);
 
     if (null == p) {
-        LogError(false, "Cannot feed GetTimeoutParser if is NULL");
+        LogDebug(false, "Cannot feed GetTimeoutParser if is NULL");
         return GetTimeoutInvalidState;
     }
 
@@ -97,12 +97,12 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
 size_t ClientGetTimeoutParserConsume(ClientGetTimeoutParser *p, byte *c, size_t length) {
     LogDebug("ClientTimeoutParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if ClientGetTimeoutParser is NULL");
+        Debug( "Cannot consume if ClientGetTimeoutParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "ClientGetTimeoutParser cannot consume NULL array");
+        Debug( "ClientGetTimeoutParser cannot consume NULL array");
         return 0;
     }
 
