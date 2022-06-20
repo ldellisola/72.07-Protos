@@ -7,6 +7,7 @@
 #include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 #include "lulu/lulu_server.h"
+#include "socks5/socks5_timeout.h"
 
 
 static void sigterm_handler(const int signal) {
@@ -41,7 +42,7 @@ int main(int argc, char **argv) {
     };
 
     int socks5PoolSize = 50;
-    int luluPoolSize = 50;
+//    int luluPoolSize = 50;
 
     bool startServer = true;
     startServer &= InitTcpServer(&options, socks5PoolSize * 2);
@@ -55,11 +56,11 @@ int main(int argc, char **argv) {
             arguments.EnablePasswordScanners,
             arguments.BufferSize
     );
-    startServer &= RegisterLuluServer(
-            arguments.LuluPort,
-            arguments.LuluAddress,
-            luluPoolSize
-    );
+//    startServer &= RegisterLuluServer(
+//            arguments.LuluPort,
+//            arguments.LuluAddress,
+//            luluPoolSize
+//    );
 
 
     if (startServer) {

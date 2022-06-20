@@ -4,7 +4,6 @@
 
 #include "socks5/fsm_handlers/socks5_connected.h"
 #include "socks5/socks5_connection.h"
-#include "socks5/socks5_password_dissector.h"
 #include "socks5/socks5_buffer.h"
 
 

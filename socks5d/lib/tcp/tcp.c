@@ -321,6 +321,10 @@ TcpConnection *ConnectToIPv6TcpServer(struct sockaddr * address, const FdHandler
     return null;
 }
 
+fd_selector GetSelector() {
+    return selector;
+}
+
 
 int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *address, socklen_t addressSize,
                 int concurrentConnections) {

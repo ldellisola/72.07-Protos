@@ -84,5 +84,7 @@ TcpConnection *ConnectToIPv4TcpServer(struct sockaddr *address, const FdHandler 
 
 TcpConnection *ConnectToIPv6TcpServer(struct sockaddr *address, const FdHandler *handler, void *data);
 
+fd_selector GetSelector();
+
 
 #endif //SERVER_TCP_H

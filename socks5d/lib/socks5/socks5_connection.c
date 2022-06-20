@@ -126,8 +126,6 @@ static ObjectPoolHandlers poolHandlers = {
 };
 
 static ObjectPool socks5Pool;
-static time_t socksMaxTimeout = 100;
-
 
 
 Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
@@ -146,11 +144,8 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     connection->Fsm.StatesSize = CS_ERROR;
     InitFsm(&connection->Fsm, socks5ConnectionFsm);
 
-    // TODO: Confirmar con lu
     BufferInit(&connection->WriteBuffer,10, calloc(10, sizeof(byte)));
     BufferInit(&connection->ReadBuffer,10, calloc(10, sizeof(byte)));
-//    InitSocks5Buffer(&connection->WriteBuffer);
-//    InitSocks5Buffer(&connection->ReadBuffer);
 
     RegisterConnectionInSocks5Metrics();
 
@@ -194,65 +189,16 @@ void CreateSocks5ConnectionPool(int initialSize) {
     InitObjectPool(&socks5Pool, &poolHandlers, initialSize, sizeof(Socks5Connection));
 }
 
+
 void CleanSocks5ConnectionPool() {
     Debug("Cleaning SOCKS5 connection socks5Pool");
+    ExecuteOnExistingElements(&socks5Pool, (void (*)(void *, void *)) DisposeSocks5Connection, GetSelector());
     CleanObjectPool(&socks5Pool);
 }
 
-void CheckForTimeoutInSingleConnection(void * obj, void * data){
-    Socks5Connection * connection = obj;
-    fd_selector fdSelector = data;
-
-    if (socksMaxTimeout <= 0)
-        return;
-
-    time_t currentTime = time(null);
-    if ((time_t) -1 == currentTime)
-    {
-        ErrorWithReason("Cannot get current time");
-        return;
-    }
-
-    if (currentTime - connection->LastConnectionOn >= socksMaxTimeout) {
-        if (null == connection->RemoteAddressString) {
-            LogInfo("Connection with client file descriptor %d and remote file descriptor %d timed out after %ld seconds",
-                    connection->ClientTcpConnection->FileDescriptor,
-                    connection->RemoteTcpConnection->FileDescriptor,
-                    currentTime - connection->LastConnectionOn
-            );
-        }
-        else{
-            LogInfo("Connection to %s:%d timed out after %d seconds",
-                    connection->RemoteAddressString,
-                    connection->RemotePort,
-                    currentTime - connection->LastConnectionOn
-            );
-        }
-        DisposeSocks5Connection(connection, fdSelector);
-    }
-
-
+ObjectPool *GetSocks5ConnectionPool() {
+    return &socks5Pool;
 }
-
-void CheckForTimeoutInSocks5Connections(fd_selector fdSelector) {
-
-    ExecuteOnExistingElements(&socks5Pool, CheckForTimeoutInSingleConnection, fdSelector);
-
-}
-
-void NotifySocks5ConnectionAccess(void *data) {
-    Socks5Connection * connection = data;
-    if (null == connection)
-        return;
-
-    connection->LastConnectionOn = time(null);
-
-}
-
-void SetConnectionTimeout(time_t timeout) {
-    socksMaxTimeout = timeout;
-}
-
 
 
 void Socks5ConnectionRead(SelectorKey *key) {

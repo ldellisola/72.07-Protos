@@ -25,7 +25,7 @@ CliArguments ParseCli(int argc, char **argv) {
             .LuluPort="8080",
             .LuluAddress=null,
             .BufferSize = 1000,
-            .Timeout = 500
+            .Timeout = 50
     };
 
     memset(args.Usernames,0,sizeof(args.Usernames));

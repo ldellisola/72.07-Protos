@@ -20,6 +20,7 @@ set(
         socks5_metrics.c
         socks5_password_dissector.c
         socks5_buffer.c
+        socks5_timeout.c
 )
 
 add_library(socks5 STATIC ${SOURCES})

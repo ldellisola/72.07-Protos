@@ -15,6 +15,7 @@
 #include "socks5/fsm_handlers/socks5_establish_connection.h"
 #include "parsers/pop3/pop3_auth_parser.h"
 #include "socks5_users.h"
+#include "utils/object_pool.h"
 
 typedef struct {
     time_t LastConnectionOn;
@@ -60,22 +61,10 @@ void CreateSocks5ConnectionPool(int initialSize);
 void CleanSocks5ConnectionPool();
 
 /**
- * It will check all current active socks5 connections and see if they are currently timed out
- * @param fdSelector Selector
+ * It returns a pointer to the socks5 connection pool
+ * @return Pointer to the socks5connnection pool.
  */
-void CheckForTimeoutInSocks5Connections(fd_selector fdSelector);
-
-/**
- * It updates the LastConnectionOn field
- * @param data pointer to Socks5Connection
- */
-void NotifySocks5ConnectionAccess(void * data);
-
-/**
- * It sets the time it takes for a connection to timeout
- * @param timeout Time in seconds. If its 0 or negative, then connections will never timeout
- */
-void SetConnectionTimeout(time_t timeout);
+ObjectPool * GetSocks5ConnectionPool();
 
 
 

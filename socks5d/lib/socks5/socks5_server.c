@@ -10,6 +10,7 @@
 #include "socks5/socks5_metrics.h"
 #include "socks5/socks5_password_dissector.h"
 #include "socks5/socks5_buffer.h"
+#include "socks5/socks5_timeout.h"
 
 static int ipv4Socket = FUNCTION_ERROR;
 static int ipv6Socket = FUNCTION_ERROR;
@@ -30,7 +31,7 @@ bool RegisterSocks5Server(const char *port, const char *address, int poolSize, t
 
     CreateSocks5ConnectionPool(poolSize);
     SetSocks5BufferSize(bufferSize);
-    SetConnectionTimeout(timeout);
+    SetSocks5ConnectionTimeout(timeout);
     LoadSocks5Users(usernames, passwords);
     InitSocks5Metrics();
     EnablePasswordDissector(passwordDissector);

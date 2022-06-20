@@ -9,7 +9,7 @@
 #include "utils/utils.h"
 #include "selector/selector.h"
 #include "utils/object_pool.h"
-
+#include "tcp/tcp.h"
 
 
 static void destroy(void * obj){
@@ -133,8 +133,13 @@ bool IsTcpConnectionReady(TcpConnection *connection) {
     return true;
 }
 
+static void DisposeWrapper(void * con, void * data){
+    DisposeTcpConnection(con,data);
+}
+
 void CleanTcpConnectionPool() {
     Debug("Clearing TCP socks5Pool");
+    ExecuteOnExistingElements(&tcpPool, DisposeWrapper , GetSelector());
     CleanObjectPool(&tcpPool);
 }
 

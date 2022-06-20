@@ -63,7 +63,6 @@ unsigned HelloReadRun(void *data) {
     if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
         d->AuthenticationMethod = SelectAuthenticationMethod(d->Parser.Methods, d->Parser.NMethods);
 
-
         buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
         size_t bytesWritten = BuildHelloResponse(buffer, bufferSize, d->AuthenticationMethod);
         if (0 == bytesWritten)
@@ -98,7 +97,6 @@ unsigned HelloWriteRun(void *data) {
 
     size_t size;
     byte *ptr = BufferReadPtr(d->WriteBuffer, &size);
-
     ssize_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
 
     if (FUNCTION_ERROR == bytesWritten){

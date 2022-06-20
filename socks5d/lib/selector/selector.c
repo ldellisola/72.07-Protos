@@ -326,7 +326,8 @@ SelectorStatus SelectorRegister(
         int fd,
         const FdHandler *handler,
         FdInterest interest,
-        void *data) {
+        void *data)
+        {
     SelectorStatus ret = SELECTOR_STATUS_SUCCESS;
     // 0. validación de argumentos
     if (s == NULL || INVALID_FD(fd) || handler == NULL) {
