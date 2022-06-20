@@ -19,7 +19,7 @@ typedef enum {
 void ResetPop3AuthParser(Pop3AuthParser *parser) {
     if (null == parser)
     {
-        Error( "POP3 Parser cannot be null");
+        Warning( "POP3 Parser cannot be null");
         return;
     }
 
@@ -40,7 +40,7 @@ const int commandLen = 4;
 int FeedPop3AuthParser(byte c, Pop3AuthParser *parser) {
 
     if (null == parser){
-        Error("POP3 Parser cannot be null");
+        Warning("POP3 Parser cannot be null");
         return FUNCTION_ERROR;
     }
 
@@ -153,12 +153,12 @@ int FeedPop3AuthParser(byte c, Pop3AuthParser *parser) {
 size_t ConsumePop3AuthParser(byte *data, size_t dataLength, Pop3AuthParser *parser) {
     LogDebug("Pop3AuthParser consuming %d bytes", dataLength);
         if (null == parser) {
-            Error( "Cannot consume if Pop3AuthParser is NULL");
+            Warning( "Cannot consume if Pop3AuthParser is NULL");
             return 0;
         }
 
         if (null == data) {
-            Error( "Pop3AuthParser cannot consume NULL array");
+            Warning( "Pop3AuthParser cannot consume NULL array");
             return 0;
         }
 
@@ -169,7 +169,7 @@ size_t ConsumePop3AuthParser(byte *data, size_t dataLength, Pop3AuthParser *pars
 
 bool HasPasswordPop3AuthParser(Pop3AuthParser *parser) {
     if (null == parser){
-        Error("POP3 Parser cannot be null");
+        Warning("POP3 Parser cannot be null");
         return false;
     }
     return parser->IsPasswordComplete;

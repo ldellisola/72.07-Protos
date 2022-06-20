@@ -19,7 +19,7 @@ static void LoadSingleUser(const char *username, const char *password);
 void LoadSocks5Users(const char *usernames[], const char *passwords[]) {
     if (null == usernames)
     {
-        Error("users cannot be null");
+        Warning("users cannot be null");
         return;
     }
 
@@ -36,7 +36,7 @@ Socks5User * LogInSocks5User(const char * username, const char * password) {
 
     if(null == username || null ==password)
     {
-        Error("username and password cannot be null");
+        Warning("username and password cannot be null");
         return null;
     }
 
@@ -57,7 +57,7 @@ int DeleteSocks5User(const char *username) {
 
     if(null == username)
     {
-        Error("Username cannot be null");
+        Warning("Username cannot be null");
     }
 
     Socks5User * current = null;
@@ -99,7 +99,7 @@ int GetAllLoggedInSocks5Users(char **usernames, int length) {
 void LogOutSocks5User(struct Socks5User *user) {
 
     if(null == user) {
-        Error("User cannot be null");
+        Warning("User cannot be null");
         return;
     }
 

@@ -57,7 +57,7 @@ bool RegisterSocks5Server(const char *port, const char *address, int poolSize, t
                  LogInfo("Running Socks5 server on [%s]:%s",address,port);
             break;
         default:
-            Error("Unknown Address type");
+            Warning("Unknown Address type");
             success = false;
     }
     return success;

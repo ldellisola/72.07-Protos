@@ -34,13 +34,13 @@ bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
     CreateTcpConnectionPool(poolSize);
 
     if (SELECTOR_STATUS_SUCCESS != SelectorInit(null == optionalOptions ? &options : optionalOptions)) {
-        Error( "Cannot initialize Selector");
+        Warning( "Cannot initialize Selector");
         return false;
     }
 
     selector = SelectorNew(1024);
     if (null == selector) {
-        Error( "Cannot create selector");
+        Warning( "Cannot create selector");
         return false;
     }
 
@@ -65,10 +65,10 @@ int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char 
                 LogDebug("IPv4 address %s parsed successfully", address);
                 break;
             case 0:
-                LogErrorWithReason("Address %s cannot be parsed into an IPv4", address);
+                LogWarningWithReason("Address %s cannot be parsed into an IPv4", address);
                 return FUNCTION_ERROR;
             default:
-                ErrorWithReason("Unknown error parsing IPv4");
+                WarningWithReason("Unknown error parsing IPv4");
                 return FUNCTION_ERROR;
         }
 
@@ -94,10 +94,10 @@ int IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char 
                 LogDebug("IPv6 address %s parsed successfully", address);
                 break;
             case 0:
-                LogErrorWithReason("Address %s cannot be parsed into an IPv6", address);
+                LogWarningWithReason("Address %s cannot be parsed into an IPv6", address);
                 return FUNCTION_ERROR;
             default:
-                ErrorWithReason("Unknown error parsing IPv6");
+                WarningWithReason("Unknown error parsing IPv6");
                 return FUNCTION_ERROR;
         }
         addr.sin6_addr = in6Addr;
@@ -112,7 +112,7 @@ bool RunTcpServer() {
     while (isRunning) {
         selectorStatus = SelectorSelect((fd_selector) selector);
         if (selectorStatus != SELECTOR_STATUS_SUCCESS) {
-            Error("Error on selector. Exiting...");
+            Warning("Error on selector. Exiting...");
             return false;
         }
     }
@@ -139,12 +139,12 @@ TcpConnection *AcceptNewTcpConnection(int fd) {
     const int client = accept(fd, (struct sockaddr *) &clientAddr, &clientAddrLen);
 
     if (-1 == client) {
-        LogError("Cannot accept client connection in fd %d", fd);
+        LogWarning("Cannot accept client connection in fd %d", fd);
         return null;
     }
 
     if (-1 == SelectorFdSetNio(client)) {
-        LogError("Cannot set client socket non-blocking in fd %d", client);
+        LogWarning("Cannot set client socket non-blocking in fd %d", client);
         return null;
     }
 
@@ -158,12 +158,12 @@ TcpConnection *AcceptNewTcpConnection(int fd) {
 
 ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t bufferLength) {
     if (socket == null) {
-        Error("Cannot ReadHead from null TCP socket");
+        Warning("Cannot ReadHead from null TCP socket");
         return FUNCTION_ERROR;
     }
 
     if (buffer == null) {
-        Error("TCP ReadHead buffer cannot be null");
+        Warning("TCP ReadHead buffer cannot be null");
         return FUNCTION_ERROR;
     }
 
@@ -171,7 +171,7 @@ ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t buffer
     long bytes = recv(socket->FileDescriptor, buffer, bufferLength, 0);
 
     if (bytes < 0) {
-        LogErrorWithReason("Could not read from TCP socket on file descriptor %d", socket->FileDescriptor);
+        LogWarningWithReason("Could not read from TCP socket on file descriptor %d", socket->FileDescriptor);
         return FUNCTION_ERROR;
     }
 
@@ -181,12 +181,12 @@ ssize_t ReadFromTcpConnection(TcpConnection *socket, byte *buffer, size_t buffer
 
 ssize_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t contentLength) {
     if (socket == null) {
-        Error("Cannot WriteHead to null TCP socket");
+        Warning("Cannot write to null TCP socket");
         return FUNCTION_ERROR;
     }
 
     if (content == null) {
-        Error("TCP WriteHead buffer cannot be null");
+        Warning("TCP write buffer cannot be null");
         return FUNCTION_ERROR;
     }
 
@@ -195,7 +195,7 @@ ssize_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t conten
     long bytes = send(socket->FileDescriptor, content, contentLength, 0);
 
     if (bytes < 0) {
-        LogErrorWithReason("Could not WriteHead to TCP socket on file descriptor %d", socket->FileDescriptor);
+        LogWarningWithReason("Could not write to TCP socket on file descriptor %d", socket->FileDescriptor);
         return FUNCTION_ERROR;
     }
 
@@ -207,12 +207,12 @@ ssize_t WriteToTcpConnection(TcpConnection *socket, byte *content, size_t conten
 TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler *handler, void *data) {
 
     if (null == address) {
-        Error("Address cannot be null");
+        Warning("Address cannot be null");
         return null;
     }
 
     if (AF_INET != address->sa_family){
-        Error("Only IPv4 addresses are supported");
+        Warning("Only IPv4 addresses are supported");
         return null;
     }
 
@@ -332,24 +332,24 @@ int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *ad
                 int concurrentConnections) {
 
     if (port > 65535 || port <= 0) {
-        Error("Invalid port. Cannot be null");
+        Warning("Invalid port. Cannot be null");
         return FUNCTION_ERROR;
     }
 
     if (null == address){
-        Error("Address cannot be null");
+        Warning("Address cannot be null");
         return FUNCTION_ERROR;
     }
 
     if (null == selector) {
-        Error("Selector not created!");
+        Warning("Selector not created!");
         return FUNCTION_ERROR;
     }
 
     int servSock = socket(address->sa_family, SOCK_STREAM, IPPROTO_TCP);
 
     if (servSock < 0) {
-        ErrorWithReason("Cannot open passive socket");
+        WarningWithReason("Cannot open passive socket");
         return FUNCTION_ERROR;
     }
 

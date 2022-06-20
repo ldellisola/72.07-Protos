@@ -11,7 +11,7 @@
 void AuthParserReset(AuthParser *p) {
     Debug("Resetting AuthParser...");
     if (null == p) {
-        Error( "Cannot reset NULL AuthParser");
+        Warning( "Cannot reset NULL AuthParser");
         return;
     }
 
@@ -31,7 +31,7 @@ void AuthParserReset(AuthParser *p) {
 AuthParserState AuthParserFeed(AuthParser *p, byte c) {
     LogDebug("Feeding %d to AuthParser", c);
     if (null == p) {
-        Error( "Cannot feed AuthParser if is NULL");
+        Warning( "Cannot feed AuthParser if is NULL");
         return AuthInvalidState;
     }
 
@@ -91,12 +91,12 @@ bool AuthParserHasFailed(AuthParserState state) {
 size_t AuthParserConsume(AuthParser *p, byte *c, size_t length) {
     LogDebug("AuthParser consuming %d bytes", length);
     if (null == p) {
-        Error("Cannot consume if AuthParser is NULL");
+        Warning("Cannot consume if AuthParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "AuthParser cannot consume NULL array");
+        Warning( "AuthParser cannot consume NULL array");
         return 0;
     }
 

@@ -49,7 +49,7 @@ void InitObjectPool(ObjectPool *pool, ObjectPoolHandlers *handlers, size_t poolS
 
 void * GetObjectFromPool(ObjectPool *pool) {
     if (null == pool || null == pool->Handlers) {
-        Error( "Object socks5Pool was not initialized");
+        Warning( "Object socks5Pool was not initialized");
         return null;
     }
     PooledObject * temp;
@@ -69,8 +69,15 @@ void * GetObjectFromPool(ObjectPool *pool) {
     }
 
     temp->Next = calloc(1, sizeof(PooledObject));
+    if (null == temp->Next)
+        FatalWithReason("Cannot allocate memory");
+
     temp = temp->Next;
     temp->Object = calloc(1,pool->ObjectSize);
+
+    if (null == temp->Object)
+        FatalWithReason("Cannot allocate memory");
+
     temp->Status = PooledObjectInUse;
 
     if (null != pool->Handlers->OnCreate)

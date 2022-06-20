@@ -81,12 +81,12 @@ bool HelloParserHasFinished(HelloParserState state) {
 size_t HelloParserConsume(HelloParser *p, byte *c, size_t length) {
     LogDebug("HelloParser consuming %d bytes", length);
     if (null == p) {
-        Error("Cannot consume if HelloParser is NULL");
+        Warning("Cannot consume if HelloParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error("HelloParser cannot consume NULL array");
+        Warning("HelloParser cannot consume NULL array");
         return 0;
     }
 
@@ -101,7 +101,7 @@ size_t HelloParserConsume(HelloParser *p, byte *c, size_t length) {
 void HelloParserReset(HelloParser *p) {
     Debug("Resetting HelloParser...");
     if (null == p) {
-        Error( "Cannot reset NULL HelloParser");
+        Warning( "Cannot reset NULL HelloParser");
         return;
     }
 

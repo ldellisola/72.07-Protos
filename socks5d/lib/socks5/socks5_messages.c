@@ -10,7 +10,7 @@
 
 size_t BuildHelloResponse(byte *buffer, size_t length, int authenticationMethod) {
     if (length < 2) {
-        Error("Buffer to small for the complete HelloResponse");
+        Warning("Buffer to small for the complete HelloResponse");
         return 0;
     }
 
@@ -21,7 +21,7 @@ size_t BuildHelloResponse(byte *buffer, size_t length, int authenticationMethod)
 
 size_t BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceeded) {
     if (length < 2) {
-        Error("Buffer to small to WriteHead AuthResponse");
+        Warning("Buffer to small to WriteHead AuthResponse");
         return 0;
     }
 
@@ -36,7 +36,7 @@ size_t BuildAuthResponse(byte *buffer, size_t length, bool authenticationSucceed
 size_t BuildRequestResponse(byte *buffer, size_t length, int replyCommand) {
 
     if (length < 10) {
-        Error( "Buffer to small to WriteHead RequestResponse");
+        Warning( "Buffer to small to WriteHead RequestResponse");
         return 0;
     }
 
