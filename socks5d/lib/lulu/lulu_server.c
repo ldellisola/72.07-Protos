@@ -18,9 +18,9 @@ const FdHandler lulu = {
         .handle_close      = NULL, // nada que liberar
 };
 
-bool RegisterLuluServer(const char *port, const char *address, int poolSize) {
+bool RegisterLuluServer(const char *port, const char *address, int poolSize,const char *usernames[], const char *passwords[]) {
     CreateLuluConnectionPool(poolSize);
-
+    LoadLuluUsers(usernames, passwords);
     if (null == address){
         bool success = RegisterLuluServerOnIPv4(port,null);
         success &= RegisterLuluServerOnIPv6(port,null);

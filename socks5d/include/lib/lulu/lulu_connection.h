@@ -19,6 +19,8 @@
 #include "lulu/lulu_users.h"
 #include "fsm/fsm.h"
 #include "lulu/fsm_handlers/lulu_hello.h"
+#include "lulu/fsm_handlers/lulu_transaction.h"
+#include "tcp/tcp.h"
 
 typedef struct {
     time_t LastConnectionOn;
@@ -27,7 +29,11 @@ typedef struct {
 
     struct LuluUser * User;
     const FdHandler *Handler;
-    ClientHelloData Auth;
+    union {
+        ClientHelloData Auth;
+        ClientTransactionData Transaction;
+    } Data;
+
     ClientDelUserParser DelUserParser;
     ClientGetBufferSizeParser GetBufferSizeParser;
     ClientGetTimeoutParser GetTimeoutParser;

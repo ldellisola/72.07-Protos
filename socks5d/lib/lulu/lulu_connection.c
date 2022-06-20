@@ -22,19 +22,19 @@ static StateDefinition luluConnectionFsm[] = {
         {
                 .state = LULU_CS_HELLO_READ,
                 .on_arrival = LuluHelloReadInit,
-//                .on_departure = LuluHelloReadClose,
+                .on_departure = LuluHelloReadClose,
                 .on_read_ready = LuluHelloReadRun
         },
         {
                 .state = LULU_CS_HELLO_WRITE,
-//                .on_write_ready = AuthWriteRun,
-//                .on_departure = AuthWriteClose
+                .on_write_ready = LuluHelloWriteRun,
+                .on_departure = LuluHelloWriteClose
         },
         {
                 .state = LULU_CS_TRANSACTION_READ,
-//                .on_arrival = RequestReadInit,
+                .on_arrival = LuluTransactionReadInit,
 //                .on_departure = RequestReadClose,
-//                .on_read_ready = RequestReadRun
+                .on_read_ready = LuluTransactionReadRun
         },
         {
                 .state = LULU_CS_TRANSACTION_WRITE,

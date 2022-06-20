@@ -17,6 +17,11 @@
 void SetSocks5BufferSize(size_t bufferSize);
 
 /**
+ * It returns the size of the Socks5Buffers.
+ */
+size_t GetSocks5BufferSize();
+
+/**
  * It initializes a Socks5Buffer
  * @param buffer
  */

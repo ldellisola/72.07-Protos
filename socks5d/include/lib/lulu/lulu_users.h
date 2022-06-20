@@ -14,4 +14,5 @@ typedef struct LuluUser{
     bool IsLoggedIn;
 }LuluUser;
 LuluUser * LogInLuluUser(const char * username, const char * password);
+void LoadLuluUsers(const char *usernames[], const char *passwords[]);
 #endif //SOCKS5D_LULU_USERS_H

@@ -9,11 +9,11 @@
 
 int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnection *connection, void *data, size_t bufferSize );
 
-#define ATTACHMENT(key) ( (LuluConnection*)((SelectorKey*)(key))->Data)
-//I am called once
+#define ATTACHMENT_LULU_HELLO(key) ( (LuluConnection*)((SelectorKey*)(key))->Data)
+
 void LuluHelloReadInit(unsigned int state, void *data) {
-    LuluConnection *connection = ATTACHMENT(data);
-    ClientHelloData *d = &connection->Auth;
+    LuluConnection *connection = ATTACHMENT_LULU_HELLO(data);
+    ClientHelloData *d = &connection->Data.Auth;
     d->ParserIndex = 0;
     d->ClientHelloSucceeded = false;
     d->ReadBuffer = &connection->ReadBuffer;
@@ -21,9 +21,10 @@ void LuluHelloReadInit(unsigned int state, void *data) {
     ClientHelloParserReset(&d->HelloParser);
     ClientGoodbyeParserReset(&d->GoodbyeParser);
 }
+
 unsigned LuluHelloReadRun(void *data) {
-    LuluConnection *connection = ATTACHMENT(data);
-    ClientHelloData *d = &connection->Auth;
+    LuluConnection *connection = ATTACHMENT_LULU_HELLO(data);
+    ClientHelloData *d = &connection->Data.Auth;
     size_t bufferSize;
 
     byte *buffer = BufferWritePtr(d->ReadBuffer, &bufferSize);
@@ -45,13 +46,20 @@ unsigned LuluHelloReadRun(void *data) {
          }
     }
 
+    // no reconocio el comando
+    buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
+    size_t bytesWritten = BuildClientNotRecognisedResponse(buffer, bufferSize);
 
-    return LULU_CS_ERROR;
+    if (0 == bytesWritten)
+        return LULU_CS_ERROR;
+
+    BufferWriteAdv(d->WriteBuffer, (ssize_t ) bytesWritten);
+    return LULU_CS_HELLO_WRITE;
 }
 
 int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnection *connection, void *data, size_t bufferSize ){
     switch (d->ParserIndex) {
-        case 0:
+        case HELLO_PARSER:
             ClientHelloParserConsume(&d->HelloParser, buffer, bytesRead);
 
             if (!ClientHelloParserHasFinished(d->HelloParser.State))
@@ -72,11 +80,10 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
                     return LULU_CS_ERROR;
 
                 BufferWriteAdv(d->WriteBuffer, (ssize_t ) bytesWritten);
-
                 return LULU_CS_HELLO_WRITE;
             }
             break;
-        case 1:
+        case GOODBYE_PARSER:
             ClientGoodbyeParserConsume(&d->GoodbyeParser, buffer, bytesRead);
 
             if (!ClientGoodbyeParserHasFinished(d->GoodbyeParser.State))
@@ -104,3 +111,47 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
     return LULU_CS_ERROR;
 }
 
+// TODO: aca tengo que reset los parsers?
+void LuluHelloReadClose(unsigned int state, void *data) {
+
+}
+
+void LuluHelloWriteClose(unsigned int state, void *data) {
+    LuluConnection *connection = ATTACHMENT_LULU_HELLO(data);
+    ClientHelloData *d = &connection->Data.Auth;
+    d->ParserIndex = 0;
+}
+
+unsigned LuluHelloWriteRun(void *data) {
+    LuluConnection *connection = ATTACHMENT_LULU_HELLO(data);
+    ClientHelloData *d = &connection->Data.Auth;
+
+    if (!BufferCanRead(d->WriteBuffer)) {
+        if (!d->ClientHelloSucceeded && d->ParserIndex == HELLO_PARSER) {
+            Debug("User not authorized");
+            return LULU_CS_HELLO_READ;
+        }
+        if(d->ParserIndex == GOODBYE_PARSER){
+            Debug("Goodbye user");
+            return LULU_CS_DONE;
+        }
+        Debug("User authorized");
+//TODO: esta bien esto del selector?
+        bool success = SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_READ);
+        return success ? LULU_CS_TRANSACTION_READ : LULU_CS_ERROR;
+    }
+
+    size_t size;
+    byte *ptr = BufferReadPtr(d->WriteBuffer, &size);
+
+    ssize_t bytesWritten = WriteToTcpConnection(connection->ClientTcpConnection, ptr, size);
+
+    if (FUNCTION_ERROR == bytesWritten){
+        return LULU_CS_ERROR;
+    }
+
+    BufferReadAdv(d->WriteBuffer, bytesWritten);
+
+    return LULU_CS_HELLO_WRITE;
+
+}
