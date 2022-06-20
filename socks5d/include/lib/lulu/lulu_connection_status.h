@@ -18,7 +18,7 @@ typedef enum {
      *   - CS_AUTH_WRITE cuando se leyeron todos los bytes
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
-    LULU_CS_AUTH_READ,
+    LULU_CS_HELLO_READ,
     /**
      * envia la respuesta de `auth' al cliente.
      *
@@ -30,7 +30,7 @@ typedef enum {
      *   - CS_REQUEST_READ cuando se manden todos los bytes
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
-    LULU_CS_AUTH_WRITE,
+    LULU_CS_HELLO_WRITE,
     /**
      * recibe el mensaje del `request' del cliente.
      *
@@ -57,6 +57,6 @@ typedef enum {
     LULU_CS_DONE,
     LULU_CS_ERROR
 
-} CONNECTION_STATE;
+} LULU_CONNECTION_STATE;
 
 #endif //SOCKS5D_LULU_CONNECTION_STATUS_H

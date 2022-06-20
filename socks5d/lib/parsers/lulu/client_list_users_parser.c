@@ -121,3 +121,8 @@ bool ClientListUsersParserHasFinished(ClientListUsersParserState state) {
             return true;
     }
 }
+
+bool ClientListUsersParserHasFailed(ClientListUsersParserState state) {
+    return state == ListInvalidState ? true : false;
+}
+

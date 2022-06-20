@@ -131,3 +131,7 @@ bool ClientTimeoutParserHasFinished(ClientTimeoutParserState state) {
             return true;
     }
 }
+
+bool ClientTimeoutParserHasFailed(ClientTimeoutParserState state) {
+    return state == TimeoutInvalidState ? true : false;
+}

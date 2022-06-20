@@ -127,3 +127,8 @@ bool ClientGetTimeoutParserHasFinished(ClientGetTimeoutParserState state) {
     }
 }
 
+bool ClientGetTimeoutParserHasFailed(ClientGetTimeoutParserState state) {
+    return state == GetTimeoutInvalidState ? true : false;
+}
+
+

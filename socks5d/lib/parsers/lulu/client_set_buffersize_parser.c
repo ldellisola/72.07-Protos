@@ -145,3 +145,6 @@ bool ClientSetBufferSizeParserHasFinished(ClientSetBufferSizeParserState state) 
             return true;
     }
 }
+bool ClientSetBufferSizeParserHasFailed(ClientSetBufferSizeParserState state) {
+    return state == SetBufferSizeInvalidState ? true : false;
+}

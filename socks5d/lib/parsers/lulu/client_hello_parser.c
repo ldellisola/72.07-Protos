@@ -20,13 +20,14 @@ ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloPar
         p->Index++;
         return p->State;
     }
-    LogError(false, "wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
+    LogError("wrong character for HELLO, i was waiting for %c and got %c", p->Word[p->Index], c);
     return ClientHelloInvalidState;
 
 }
 
 void ClientHelloParserReset(ClientHelloParser *p) {
     Debug("Resetting HelloParser...");
+    Info("Resetting HelloParser...");
     if (null == p) {
         Error( "Cannot reset NULL HelloParser");
         return;
@@ -49,7 +50,7 @@ void ClientHelloParserReset(ClientHelloParser *p) {
 
 ClientHelloParserState ClientHelloParserFeed(ClientHelloParser *p, byte c) {
     LogDebug("Feeding %d to ClientHelloParser", c);
-//    Error( "char= %c", c);
+    LogInfo( "char= %c", c);
     if (null == p) {
         Error("Cannot feed HelloParser if is NULL");
         return ClientHelloInvalidState;
