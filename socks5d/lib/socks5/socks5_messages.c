@@ -10,10 +10,7 @@
 
 size_t BuildHelloResponse(byte *buffer, size_t length, int authenticationMethod) {
     if (length < 2) {
-        Warning("Buffer to small for the complete HelloResponse");
-    }
-    if (length == 0){
-        Error("Cannot write to empty buffer");
+        Error("Buffer to small for the complete HelloResponse");
         return 0;
     }
 
