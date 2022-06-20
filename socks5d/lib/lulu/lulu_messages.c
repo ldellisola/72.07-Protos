@@ -140,20 +140,28 @@ size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
 //    TODO:freee
     char **usernames = calloc(200, sizeof(byte));
     int users = GetAllLoggedInSocks5Users(usernames,200 );
-    char str[200*255];
-    str[0] = '+';
+    if(users == 0){
+        free(usernames);
+        fillBuffer("+NO USERS\r\n", buffer,11 );
+        return 11;
+    }
+
+    
     users = (users == -1)? 200:users;
+    //       +     usernames    pipes and \r    \n
+    char str[1 +   users*255  +    users       + 1];
+    str[0] = '+';
     for (int i = 0; i < users; ++i) {
         strcat(str,usernames[i]);
-        strcat(str,(i!=users-1)? "|":"");
+        strcat(str,(i==users-1)? "\r\n":"|");
     }
-    strcat(str,"\r\n");
     if (length < (strlen(str)) ) {
         Error("Buffer to small to WriteHead ClientSetUserSizeResponse");
+        free(usernames);
         return 0;
     }
     fillBuffer(str, buffer,(int) (strlen(str)) );
-
+    free(usernames);
     return (strlen(str));
 }
 
