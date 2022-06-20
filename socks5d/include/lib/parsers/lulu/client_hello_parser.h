@@ -26,7 +26,6 @@ typedef struct {
     ClientHelloParserState PrevState;
     char UName[MAXLONG];
     char Passwd[MAXLONG];
-    //TODO: ponerle 0 al final
     char Hello[6];
     uint16_t Index;
     char* Word;

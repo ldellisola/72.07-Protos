@@ -29,7 +29,7 @@ ClientTimeoutParserState traverseWordTimeout(ClientTimeoutParser *p, byte c, Cli
 void ClientTimeoutParserReset(ClientTimeoutParser *p) {
     Debug("Resetting ClientTimeoutParser...");
     if (null == p) {
-        Error( "Cannot reset NULL ClientTimeoutParser");
+        Debug( "Cannot reset NULL ClientTimeoutParser");
         return;
     }
 
@@ -60,7 +60,7 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
 //    Error( "char = %c", c);
 
     if (null == p) {
-        Error( "Cannot feed TimeoutParser if is NULL");
+        Debug( "Cannot feed TimeoutParser if is NULL");
         return TimeoutInvalidState;
     }
 
@@ -101,12 +101,12 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
 size_t ClientTimeoutParserConsume(ClientTimeoutParser *p, byte *c, size_t length) {
     LogDebug("ClientTimeoutParser consuming %d bytes", length);
     if (null == p) {
-        Error( "Cannot consume if ClientTimeoutParser is NULL");
+        Debug( "Cannot consume if ClientTimeoutParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error( "ClientTimeoutParser cannot consume NULL array");
+        Debug( "ClientTimeoutParser cannot consume NULL array");
         return 0;
     }
 
