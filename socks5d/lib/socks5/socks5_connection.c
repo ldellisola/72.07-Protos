@@ -146,8 +146,11 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     connection->Fsm.StatesSize = CS_ERROR;
     InitFsm(&connection->Fsm, socks5ConnectionFsm);
 
-    InitSocks5Buffer(&connection->WriteBuffer);
-    InitSocks5Buffer(&connection->ReadBuffer);
+    // TODO: Confirmar con lu
+    BufferInit(&connection->WriteBuffer,10, calloc(10, sizeof(byte)));
+    BufferInit(&connection->ReadBuffer,10, calloc(10, sizeof(byte)));
+//    InitSocks5Buffer(&connection->WriteBuffer);
+//    InitSocks5Buffer(&connection->ReadBuffer);
 
     RegisterConnectionInSocks5Metrics();
 

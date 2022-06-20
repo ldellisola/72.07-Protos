@@ -10,6 +10,10 @@
 #include "utils/utils.h"
 #include "parsers/socks5/request_parser.h"
 
+#define SOCKS5_HELLO_RESPONSE_LENGTH (2)
+#define SOCKS5_AUTH_RESPONSE_LENGTH (2)
+#define SOCKS5_REQUEST_RESPONSE_LENGTH (10)
+
 /**
  * It writes the HelloResponse message to a buffer
  * @param buffer buffer to WriteHead to

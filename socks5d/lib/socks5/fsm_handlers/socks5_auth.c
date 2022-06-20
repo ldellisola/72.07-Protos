@@ -39,6 +39,8 @@ unsigned AuthReadRun(void *data) {
     BufferWriteAdv(d->ReadBuffer, bytesRead);
     AuthParserConsume(&d->Parser, buffer, bytesRead);
 
+    BufferReset(d->ReadBuffer);
+
     if (!AuthParserHasFinished(d->Parser.State))
         return CS_AUTH_READ;
 

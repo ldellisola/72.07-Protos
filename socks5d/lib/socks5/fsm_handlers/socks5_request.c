@@ -43,6 +43,8 @@ unsigned RequestReadRun(void *data) {
 
     BufferWriteAdv(d->ReadBuffer, bytesRead);
     RequestParserConsume(&d->Parser, buffer, bytesRead);
+    BufferReset(d->ReadBuffer);
+
 
     if (!RequestParserHasFinished(d->Parser.State))
         return CS_REQUEST_READ;

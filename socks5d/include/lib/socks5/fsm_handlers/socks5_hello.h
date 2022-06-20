@@ -12,6 +12,7 @@ typedef struct {
     HelloParser Parser;
     ArrayBuffer *WriteBuffer, *ReadBuffer;
     byte AuthenticationMethod;
+    size_t bufferIndex;
 } HelloData;
 
 

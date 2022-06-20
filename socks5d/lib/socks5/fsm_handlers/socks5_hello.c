@@ -52,6 +52,8 @@ unsigned HelloReadRun(void *data) {
     BufferWriteAdv(d->ReadBuffer, bytesRead);
     HelloParserConsume(&d->Parser, buffer, bytesRead);
 
+    BufferReset(d->ReadBuffer);
+
     if (!HelloParserHasFinished(d->Parser.State))
         return CS_HELLO_READ;
 
