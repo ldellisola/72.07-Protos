@@ -58,7 +58,7 @@ void EstablishConnectionInit(unsigned int state, void *data) {
 
 
     if (null == remoteConnection) {
-        LogErrorWithReason("Cannot connect to remote address %s",connection->RemoteAddressString);
+        LogWarningWithReason("Cannot connect to remote address %s",connection->RemoteAddressString);
         d->Command = SOCKS5_REPLY_GENERAL_FAILURE;
         SelectorSetInterestKey(key,SELECTOR_OP_READ | SELECTOR_OP_WRITE);
     }

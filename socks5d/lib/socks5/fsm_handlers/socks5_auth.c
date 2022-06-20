@@ -32,7 +32,6 @@ unsigned AuthReadRun(void *data) {
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead <= 0) {
-        Error("Cannot read from Tcp connection");
         return CS_ERROR;
     }
 

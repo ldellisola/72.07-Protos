@@ -21,7 +21,7 @@ void CheckForTimeoutInSingleConnection(void * obj, void * data){
     time_t currentTime = time(null);
     if ((time_t) -1 == currentTime)
     {
-        ErrorWithReason("Cannot get current time");
+        FatalWithReason("Cannot get current time");
         return;
     }
 

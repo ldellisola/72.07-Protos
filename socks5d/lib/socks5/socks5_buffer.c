@@ -9,7 +9,7 @@ static size_t targetBufferSize = 1000;
 
 void SetSocks5BufferSize(size_t bufferSize) {
     if (bufferSize <=0)
-        LogError("Cannot create a buffer of size %ld",bufferSize);
+        LogWarning("Cannot create a buffer of size %ld",bufferSize);
     else
         targetBufferSize = bufferSize;
 }

@@ -17,7 +17,7 @@ RequestParser RequestParserInit() {
 RequestParserState RequestParserFeed(RequestParser *p, byte c) {
     LogDebug("Feeding %d to RequestParser", c);
     if (null == p) {
-        Error( "Cannot feed RequestParser if is NULL");
+        Warning( "Cannot feed RequestParser if is NULL");
         return RequestInvalidState;
     }
 
@@ -92,7 +92,7 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
         case RequestInvalidState:
             break;
         default:
-            Error( "request invalid state");
+            Warning( "request invalid state");
             p->State = RequestInvalidState;
             break;
     }
@@ -102,7 +102,7 @@ RequestParserState RequestParserFeed(RequestParser *p, byte c) {
 void RequestParserReset(RequestParser *p) {
     Debug("Resetting RequestParser...");
     if (null == p) {
-        Error( "Cannot reset NULL RequestParser");
+        Warning( "Cannot reset NULL RequestParser");
         return;
     }
 
@@ -120,12 +120,12 @@ void RequestParserReset(RequestParser *p) {
 size_t RequestParserConsume(RequestParser *p, byte *c, size_t length) {
     LogDebug("RequestParser consuming %d bytes", length);
     if (null == p) {
-        Error("Cannot consume if RequestParser is NULL");
+        Warning("Cannot consume if RequestParser is NULL");
         return 0;
     }
 
     if (null == c) {
-        Error("RequestParser cannot consume NULL array");
+        Warning("RequestParser cannot consume NULL array");
         return 0;
     }
 

@@ -134,7 +134,7 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
     Socks5Connection *connection = GetObjectFromPool(&socks5Pool);
 
     if (null == tcpConnection)
-        Error("Cannot allocate space for Socks5Connection");
+        Fatal("Cannot allocate space for Socks5Connection");
 
     connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &socks5ConnectionHandler;
@@ -157,7 +157,7 @@ Socks5Connection *CreateSocks5Connection(TcpConnection *tcpConnection) {
 void DisposeSocks5Connection(Socks5Connection *connection, fd_selector selector) {
     Debug("Disposing Socks5Connection...");
     if (null == connection) {
-        Error( "Cannot destroy NULL Socks5Connection");
+        Warning( "Cannot destroy NULL Socks5Connection");
         return;
     }
 
