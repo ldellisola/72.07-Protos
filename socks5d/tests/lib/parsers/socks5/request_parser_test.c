@@ -5,7 +5,7 @@
 #include "request_parser_test.h"
 #include "parsers/socks5/request_parser.h"
 
-RequestParser parser;
+static RequestParser parser;
 
 /**************************************************************************
  *                      Init Tests

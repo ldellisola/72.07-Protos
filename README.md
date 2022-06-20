@@ -47,15 +47,99 @@ Donde cada carpeta contiene:
 
 ## Compilación
 
+Para compilar tanto el cliente como el servidor es necesario tener instalado `CMAKE`:
 
+```bash
+$ apt-get install cmake
+```
 
+Para poder compilar el programa hay que seguir los siguientes pasos:
 
+1. Clono al repositorio y entro a la carpeta:
 
+   ```bash
+   $ git clone https://github.com/ldellisola/socks5d.git
+   $ cd socks5d
+   ```
 
+2. Entro a la carpeta del codigo fuente e inicializo el proyecto CMake
 
+   ```bash
+   $ cd socks5d
+   $ cmake .
+   ```
 
+3. Ahora puedo compilar ambos programas:
 
+   - Para compilar el servidor:
 
+     ```bash
+     $ cd src/server
+     $ cmake --build .
+     ```
+
+   - Para compilar el cliente:
+
+     ```bash
+     $ cd src/lulu_client
+     $ cmake --build .
+     ```
+
+## Ejecución  
+
+Para conocer los comandos del servidor, se puede utilizar al archivo man `socks5d.8`. Junto a los comandos pedidos por la cátedra, agregamos dos más:
+
+- `-t`: Indica el timeout en segundos
+- `-b`: Indica el tamaño del buffer
+
+Un ejemplo de ejecución seria:
+
+```bash
+$ ./socks5d -t 50 -b 500 -p 9000
+```
+
+Ademas, con la variable en environment `SOCKS5D_LOG_LEVEL` se puede elegir el nivel de log:
+
+- `DEBUG`: Logs necesarios para desarrollar el programa e identificar problemas
+- `INFO`: Logs orientados al usuario, con información util del servidor
+- `WARN`: Logs que indican posibles errores si estos no son manejados correctamente.
+- `ERROR`: Logs qué indican errores certeros que finalizan una conexión.
+- `FATAL`: Logs qué indican errores certeros finalizan la ejecución del programa.
+
+## Tests
+
+### Tests Unitarios
+
+Si se quieren ejecutar los tests, se deberá instalar la librería `check`:
+
+```bash
+$ apt-get install check
+```
+
+Aunque la ultima version de check funciona sin problemas, nosotros desarrollamos nuestros tests con la version `10.0.0`. 
+
+Debido a las limitaciones de pampero, no se puede instalar esta librería, por lo que por default los tests están desactivados. Para poder activarlos se necesita descomentar las siguientes lineas en el archivo `socks5d/CMakeLists.txt`:
+
+```cmake
+# enable_testing()
+# add_subdirectory(tests)
+```
+
+### Tests de Stress
+
+Los tests de stress se realizan con otro programa diseñado por nosotros.  [Acá](scripts/StressTest/README.md) se puede encontrar más información sobre este programa.
+
+### Tests de Velocidad de Descarga
+
+Para probar los efectos de nuestro servidor socks5 sobre la velocidad de descarga, decidimos utilizar al comando `curl` para descargar una [ISO de Ubuntu 22.04](https://ubuntu.zero.com.ar/ubuntu-releases/jammy/ubuntu-22.04-desktop-amd64.iso):
+
+```bash
+$ time curl https://ubuntu.zero.com.ar/ubuntu-releases/jammy/ubuntu-22.04-desktop-amd64.iso \
+ -x socks5h://localhost:1080 \
+ --output ubuntu.iso
+```
+
+Así también sobre un archivo en un servidor http local, para evitar cualquier interferencia externa sobre nuestro test.
 
 
 

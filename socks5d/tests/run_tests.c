@@ -23,7 +23,6 @@
 
 
 int main(void) {
-
     Suite *suites[] = {
             RegisterHelloParserTestSuit(),
             RegisterAuthParserTestSuit(),

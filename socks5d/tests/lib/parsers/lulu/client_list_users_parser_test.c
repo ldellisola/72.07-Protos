@@ -5,7 +5,7 @@
 #include "client_list_users_parser_test.h"
 #include "parsers/lulu/client_list_users_parser.h"
 
-ClientListUsersParser parser;
+static ClientListUsersParser parser;
 
 /**************************************************************************
  *                      ClientListUsersParserReset Tests

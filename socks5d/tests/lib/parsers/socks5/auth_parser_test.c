@@ -5,7 +5,7 @@
 #include "auth_parser_test.h"
 #include "parsers/socks5/auth_parser.h"
 
-AuthParser parser;
+static AuthParser parser;
 
 /**************************************************************************
  *                      AuthParserInit Tests

@@ -4,7 +4,7 @@
 
 #include "client_hello_parser_test.h"
 #include "parsers/lulu/client_hello_parser.h"
-ClientHelloParser parser;
+static ClientHelloParser parser;
 
 /**************************************************************************
  *                      ClientHelloParserReset Tests

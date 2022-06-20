@@ -4,7 +4,7 @@
 
 #include "client_goodbye_parser_test.h"
 #include "parsers/lulu/client_goodbye_parser.h"
-ClientGoodbyeParser parser;
+static ClientGoodbyeParser parser;
 
 /**************************************************************************
  *                      ClientGoodbyeParserReset Tests

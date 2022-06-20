@@ -4,7 +4,7 @@
 
 #include "client_get_buffersize_parser_test.h"
 #include "parsers/lulu/client_get_buffersize_parser.h"
-ClientGetBufferSizeParser parser;
+static ClientGetBufferSizeParser parser;
 
 /**************************************************************************
  *                      ClientGetBufferSizeParserReset Tests

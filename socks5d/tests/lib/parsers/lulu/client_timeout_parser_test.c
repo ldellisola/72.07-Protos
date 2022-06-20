@@ -4,7 +4,7 @@
 
 #include "client_timeout_parser_test.h"
 #include "parsers/lulu/client_timeout_parser.h"
-ClientTimeoutParser parser;
+static ClientTimeoutParser parser;
 
 /**************************************************************************
  *                      ClientHelloParserReset Tests

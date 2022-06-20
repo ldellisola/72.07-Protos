@@ -4,7 +4,7 @@
 
 #include "client_metrics_parser_test.h"
 #include "parsers/lulu/client_metrics_parser.h"
-ClientMetricsParser parser;
+static ClientMetricsParser parser;
 
 /**************************************************************************
  *                      ClientMetricsParserReset Tests

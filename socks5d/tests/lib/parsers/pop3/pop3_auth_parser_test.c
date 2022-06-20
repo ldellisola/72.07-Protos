@@ -13,7 +13,7 @@ typedef enum {
     UNKNOWN_COMMAND,
 }States;
 
-Pop3AuthParser parser;
+static Pop3AuthParser parser;
 
 START_TEST(ResetParser_Succeeds){
     // Arrange

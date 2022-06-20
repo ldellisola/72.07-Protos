@@ -19,7 +19,7 @@ set(LIBS_TO_TEST parsers_test socks5_test tcp_test lulu_client_test server_test)
 
 # Since Check uses Threads to paralelize the tests, it'Selector mandatory
 # add pthread as a dependency, alongside the Check libraries.
-add_executable(run_tests run_tests.c lib/utils/object_pool_tests.c lib/utils/object_pool_tests.h)
+add_executable(run_tests run_tests.c)
 target_link_libraries(run_tests ${LIBS_TO_TEST} ${CHECK_LIBRARIES} pthread rt m subunit)
 
 # Create testing target and redirect its output to `Testing` folder

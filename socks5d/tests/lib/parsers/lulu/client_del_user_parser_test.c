@@ -4,7 +4,7 @@
 
 #include "client_del_user_parser_test.h"
 #include "parsers/lulu/client_del_user_parser.h"
-ClientDelUserParser parser;
+static ClientDelUserParser parser;
 
 /**************************************************************************
  *                      ClientDelUserParserReset Tests
