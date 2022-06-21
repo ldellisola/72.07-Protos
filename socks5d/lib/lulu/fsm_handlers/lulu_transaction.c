@@ -39,6 +39,7 @@ void LuluTransactionReadInit(unsigned int state, void *data) {
     ClientSetUserParserReset(&d->SetUserParser);
     ClientTimeoutParserReset(&d->TimeoutParser);
     ClientGoodbyeParserReset(&d->GoodbyeParser);
+
 }
 void LuluTransactionWriteInit(unsigned int state, void *data) {
 
@@ -62,7 +63,6 @@ unsigned LuluTransactionReadRun(void *data) {
     BufferWriteAdv(d->ReadBuffer, bytesRead);
 
     int possibleReturn = NO_RETURN;
-
     while (d->ParserIndex <= T_PARSER_COUNT ){
         possibleReturn = RunTransactionParser(d, buffer, bytesRead, connection, data, bufferSize);
         if(possibleReturn != NO_RETURN){
@@ -293,6 +293,9 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
             break;
         case T_PARSER_COUNT:
             BufferReset(d->ReadBuffer);
+            if(buffer[bytesRead-2] != '\r' || buffer[bytesRead-1] != '\n')
+                return LULU_CS_TRANSACTION_READ;
+
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientNotRecognisedResponse(buffer, bufferSize);
@@ -306,7 +309,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
             }
             return LULU_CS_ERROR;
         default:
-            Error("hay un num muy grande");
+            Debug("hay un num muy grande");
             break;
     }
     return LULU_CS_ERROR;

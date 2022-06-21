@@ -120,6 +120,8 @@ typedef struct {
     int Fd;
     /** dato provisto por el usuario */
     void *Data;
+    /** Maneja si se implementa timeout */
+    bool HasTimeout;
 } SelectorKey;
 
 /**
@@ -156,7 +158,8 @@ SelectorStatus SelectorRegister(
         int fd,
         const FdHandler *handler,
         FdInterest interest,
-        void *data);
+        void *data,
+        bool hasTimeout);
 
 /**
  * desregistra un file descriptor del selector

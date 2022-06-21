@@ -237,7 +237,8 @@ TcpConnection *ConnectToIPv4TcpServer(struct sockaddr * address, const FdHandler
             sock,
             handler,
             SELECTOR_OP_WRITE | SELECTOR_OP_READ,
-            data
+            data,
+            true
     );
 
     if (status != SELECTOR_STATUS_SUCCESS) {
@@ -303,7 +304,8 @@ TcpConnection *ConnectToIPv6TcpServer(struct sockaddr * address, const FdHandler
                 sock,
                 handler,
                 SELECTOR_OP_WRITE | SELECTOR_OP_READ,
-                data
+                data,
+                true
         );
 
         if (status != SELECTOR_STATUS_SUCCESS) {
@@ -381,7 +383,7 @@ int ListenOnTcp(unsigned int port, const FdHandler *handler, struct sockaddr *ad
         return FUNCTION_ERROR;
     }
 
-    SelectorStatus status = SelectorRegister((fd_selector) selector, servSock, handler, SELECTOR_OP_READ, null);
+    SelectorStatus status = SelectorRegister((fd_selector) selector, servSock, handler, SELECTOR_OP_READ, null, true);
 
     if (status != SELECTOR_STATUS_SUCCESS) {
         Error("Cannot register TCP socket on selector");
