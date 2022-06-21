@@ -34,13 +34,13 @@ bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
     CreateTcpConnectionPool(poolSize);
 
     if (SELECTOR_STATUS_SUCCESS != SelectorInit(null == optionalOptions ? &options : optionalOptions)) {
-        Warning( "Cannot initialize Selector");
+        Fatal("Cannot initialize Selector");
         return false;
     }
 
     selector = SelectorNew(1024);
     if (null == selector) {
-        Warning( "Cannot create selector");
+        Fatal( "Cannot create selector");
         return false;
     }
 
@@ -124,9 +124,10 @@ void StopTcpServer() {
 }
 
 void DisposeTcpServer() {
+    CleanTcpConnectionPool();
     SelectorClose();
     SelectorDestroy(selector);
-    CleanTcpConnectionPool();
+
 
 }
 
