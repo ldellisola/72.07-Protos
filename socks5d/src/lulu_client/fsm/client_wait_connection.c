@@ -5,6 +5,7 @@
 #include <errno.h>
 #include "lulu_client/fsm/client_wait_connection.h"
 #include "lulu_client/client_data.h"
+#include "utils/logger.h"
 
 #define ATTACHMENT(key) ( (ClientData *)((SelectorKey*)(key))->Data)
 
@@ -24,6 +25,7 @@ unsigned LuluClientConnect(void *data) {
         case EALREADY:
             return CS_WAITING_CONNECTION;
         default:
+            Error("Cannot connecto the the server!");
             return CS_ERROR;
     }
 }

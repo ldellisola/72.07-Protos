@@ -92,7 +92,7 @@ unsigned LuluClientTransactionRead(void *data) {
             state = CS_GOODBYE_WRITE_REMOTE;
             break;
         default:
-            printf("Invalid character");
+            printf("Invalid character\n");
             return CS_TRANSACTION;
     }
 
