@@ -172,7 +172,7 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
 
 //  I check that username doesnt exist
     char **loggedUsernames = calloc(200, sizeof(byte));
-    int users = GetAllLoggedInSocks5Users(loggedUsernames,200 );
+    int users = GetAllSocks5Users(loggedUsernames,200 );
 
     users = (users == -1)? 200:users;
 
@@ -188,8 +188,6 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     }
     free(loggedUsernames);
 //    TODO: free?/listo
-
-//    TODO: IS -->THIS<-- OK?
     LoadSingleUser(username,password );
     if (length < LEN_OK) {
         Warning("Buffer to small to WriteHead ClientSetUserSizeResponse");

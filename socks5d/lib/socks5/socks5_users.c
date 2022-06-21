@@ -99,6 +99,19 @@ int GetAllLoggedInSocks5Users(char **usernames, int length) {
     return i;
 }
 
+int GetAllSocks5Users(char **usernames, int length) {
+    int i = 0;
+    for (Socks5User * current = currentUsers; null != current ; current = current->Next){
+        if (current->InUse) {
+            usernames[i++] = current->Username;
+            if (i == length)
+                return -1;
+        }
+    }
+
+    return i;
+}
+
 void LogOutSocks5User(struct Socks5User *user) {
 
     if(null == user) {
