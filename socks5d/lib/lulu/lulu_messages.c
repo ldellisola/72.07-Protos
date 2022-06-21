@@ -148,6 +148,7 @@ size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
     //       +     usernames    pipes and \r    \n
     char str[1 +   users*255  +    users       + 1];
     str[0] = '+';
+    str[1] = '\0';
     for (int i = 0; i < users; ++i) {
         strcat(str,usernames[i]);
         strcat(str,(i==users-1)? "\r\n":"|");
@@ -187,13 +188,6 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     }
     free(loggedUsernames);
 //    TODO: free?/listo
-//  I create user
-//    const char** usernames = calloc(2, sizeof(byte));
-//    const char** passwords= calloc(2, sizeof(byte));
-//    usernames[0] = username;// TODO <-- THIS
-//    usernames[1] = null;
-//    passwords[0] = password; // TODO <-- THIS
-//    passwords[1] = null;
 
 //    TODO: IS -->THIS<-- OK?
     LoadSingleUser(username,password );
@@ -212,7 +206,7 @@ size_t BuildClientDelUserResponse(byte *buffer, size_t length, char* username) {
     switch (status) {
         case OK:
             if (length < LEN_OK) {
-                Error("Buffer to small to WriteHead ClientDelUserSizeResponse");
+                Warning("Buffer to small to WriteHead ClientDelUserSizeResponse");
                 return 0;
             }
             fillBuffer("+OK\r\n", buffer,LEN_OK );
@@ -220,7 +214,7 @@ size_t BuildClientDelUserResponse(byte *buffer, size_t length, char* username) {
             return (LEN_OK);
         case LOGGED_IN:
             if (length < LEN_USER_LOGGED_IN) {
-                Error("Buffer to small to WriteHead ClientDelUserSizeResponse");
+                Warning("Buffer to small to WriteHead ClientDelUserSizeResponse");
                 return 0;
             }
             fillBuffer("-USER LOGGED IN\r\n", buffer,LEN_USER_LOGGED_IN );
@@ -228,12 +222,12 @@ size_t BuildClientDelUserResponse(byte *buffer, size_t length, char* username) {
             return (LEN_USER_LOGGED_IN);
         case DOESNT_EXIST:
             if (length < LEN_USER_DOESNT_EXIST) {
-                Error("Buffer to small to WriteHead ClientDelUserSizeResponse");
+                Warning("Buffer to small to WriteHead ClientDelUserSizeResponse");
                 return 0;
             }
             fillBuffer("-USER DOESNT EXIST\r\n", buffer,LEN_USER_DOESNT_EXIST );
 
-            return (DOESNT_EXIST);
+            return (LEN_USER_DOESNT_EXIST);
         default:
             break;
 

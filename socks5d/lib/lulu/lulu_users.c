@@ -13,7 +13,7 @@ LuluUser * LogInLuluUser(const char * username, const char * password) {
 
     if(null == username || null ==password)
     {
-        Error("username and password cannot be null");
+        Warning("username and password cannot be null");
         return null;
     }
     LuluUser * current = null;

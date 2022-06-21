@@ -46,8 +46,11 @@ Socks5User * LogInSocks5User(const char * username, const char * password) {
             continue;
         bool isAuthorized = 0 == strcmp(current->Username,username);
         isAuthorized &= 0 == strcmp(current->Password,password);
-        if (isAuthorized)
+        if (isAuthorized){
+            current->IsLoggedIn = true;
             return current;
+        }
+
     }
 
     return null;
