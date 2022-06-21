@@ -76,7 +76,7 @@ typedef enum {
      *
      * Transiciones:
      *   - CS_DONE      Si respondo con un comando invalido
-     *   - CS_COPY      Si salio bien
+     *   - CS_CONNECTED Si salio bien
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
     CS_REQUEST_WRITE,
@@ -88,7 +88,7 @@ typedef enum {
      *
      * Transiciones:
      *   - CS_ESTABLISH_CONNECTION  mientras queden bytes por leer
-     *   - CS_REQUEST_ESTABLISH_CONNECTION cuando se leyeron todos los bytes
+     *   - CS_REQUEST_WRITE cuando se leyeron todos los bytes
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */
     CS_ESTABLISH_CONNECTION,
@@ -98,7 +98,8 @@ typedef enum {
      * Intereses:
      *      - SELECTOR_OP_READ sobre el fd del cliente y del servidor remoto
      * Transiciones:
-     *   - CS_CONNECTED  mientras transfiera
+     *   - CS_REMOTE_READ  mientras transfiera
+     *   - CS_CLIENT_READ  mientras transfiera
      *   - CS_DONE       Si termina
      *   - CS_ERROR      ante cualquier error (IO/parseo)
      */

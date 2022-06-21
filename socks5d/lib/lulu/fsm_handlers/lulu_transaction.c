@@ -258,6 +258,7 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
             BufferReset(d->ReadBuffer);
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
+
                 size_t bytesWritten = BuildClientListUsersResponse(buffer, bufferSize );
 
                 if (0 == bytesWritten)
