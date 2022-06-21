@@ -38,6 +38,7 @@ unsigned LuluHelloReadRun(void *data) {
     BufferWriteAdv(d->ReadBuffer, bytesRead);
 
     int possibleReturn = NO_RETURN;
+//    d->ParserIndex = d->NotRecognised? PARSER_COUNT:d->ParserIndex;
     while (d->ParserIndex <= PARSER_COUNT && possibleReturn == NO_RETURN){
          possibleReturn = RunParser(d, buffer, bytesRead, connection, data, bufferSize);
     }
@@ -95,10 +96,10 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
             }
             break;
         default:
-            if(buffer[0] == '\r' && buffer[1] == '\n')
-                return LULU_CS_HELLO_READ;
-//            LogError("finished, bytes =%ld", bytesRead);
             BufferReset(d->ReadBuffer);
+            if(buffer[bytesRead-2] != '\r' || buffer[bytesRead-1] != '\n')
+                return LULU_CS_HELLO_READ;
+
             if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientNotRecognisedResponse(buffer, bufferSize);
