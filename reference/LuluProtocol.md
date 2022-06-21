@@ -24,7 +24,7 @@ GOODBYE
     Argumentos: ninguno
             
     Restricciones: ninguna
-
+    
     Descripción:
         Para simplificar el parseo, todos los servidores LULU utilizan un formato. La respuesta positiva consiste en un “+”, seguido por una palabra clave GOODBYE, terminado con el par CRLF. La sesión LULU será terminada cerrando la conexión TCP.
             
@@ -52,7 +52,7 @@ HELLO|username|password
     Respuestas posibles:
         +OK
         -AUTHENTICATION ERROR
-
+    
     Ejemplo:
         C:	HELLO|user1|pass
         S:	+OK
@@ -68,15 +68,15 @@ SET|TIMEOUT|valor
 
     Argumentos: 
         .valor: Valor en segundos de TIMEOUT el cual ocupa 10 bytes. Este valor representa el tiempo en el que se cerrará la sesión después de x tiempo de inactividad. Solo se permiten números enteros positivos mayores a 600 (10 minutos’).
-
+    
     Restricciones:
         Solo puede ser dado en el estado de TRANSACCIÓN
             
     Descripción: 
-
+    
     Respuestas posibles:
         +OK
-
+    
     Ejemplo:
         C:	SET|TIMEOUT|10
         S:	+OK 
@@ -95,12 +95,13 @@ GET|TIMEOUT
             
     Respuestas posibles:
         +seconds
-
+    
     Ejemplo:
         C:	GET|TIMEOUT
         S:	+600
 
-        
+
+​        
 SET|BUFFERSIZE|valor
 
     Argumentos: 
@@ -115,14 +116,14 @@ SET|BUFFERSIZE|valor
     Respuestas posibles:
         +OK
         -INVALID BUFFER SIZE
-
+    
     Ejemplo:
         C:	SET|BUFFERSIZE|100
         S:	+OK
         …
         C:	SET|BUFFERSIZE|0
         S:	-INVALID BUFFER SIZE
-        
+
 
 GET|BUFFERSIZE
 
@@ -136,12 +137,13 @@ GET|BUFFERSIZE
             
     Respuestas posibles:
         +buffersize
-
+    
     Ejemplo:
         C:	GET|BUFFERSIZE
         S:	+100
 
-        
+
+​        
 GET|METRICS
 
     Argumentos: ninguno
@@ -154,7 +156,7 @@ GET|METRICS
             
     Respuestas posibles:
         +conexiones_historicas|conexiones_concurrentes|bytes_transferidos
-
+    
     Ejemplo:
         C:	GET|METRICS
         S:	+45|2|200
@@ -174,7 +176,7 @@ SET|USER|username|password
     Respuestas posibles:
         +OK
         -USER EXISTS
-
+    
     Ejemplo:
         C:	SET|USER|user1|pass
         S:	+OK
@@ -195,7 +197,7 @@ LIST|USERS
             
     Respuestas posibles:
         +user1|user2|...|userN
-
+    
     Ejemplo:
         C:	LIST|USERS
         S:	+user1|user2|...|lucia|lucas
@@ -216,7 +218,7 @@ DEL|USER|username
         +OK
         -USER DOESNT EXIST
         -USER LOGGED IN
-
+    
     Ejemplo:
         C:	DEL|USER|user1
         S:	+OK
