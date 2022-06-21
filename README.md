@@ -89,7 +89,7 @@ Para poder compilar el programa hay que seguir los siguientes pasos:
 
 ## Ejecución  
 
-Para conocer los comandos del servidor, se puede utilizar al archivo man `socks5d.8`. Junto a los comandos pedidos por la cátedra, agregamos dos más:
+Para conocer los comandos del servidor se puede utilizar al archivo man `socks5d.8`. Junto a los comandos pedidos por la cátedra, agregamos dos más:
 
 - `-t`: Indica el timeout en segundos
 - `-b`: Indica el tamaño del buffer
@@ -107,6 +107,18 @@ Ademas, con la variable en environment `SOCKS5D_LOG_LEVEL` se puede elegir el ni
 - `WARN`: Logs que indican posibles errores si estos no son manejados correctamente.
 - `ERROR`: Logs qué indican errores certeros que finalizan una conexión.
 - `FATAL`: Logs qué indican errores certeros finalizan la ejecución del programa.
+
+Para conocer los comandos del cliente se puede utilizar al archivo man `client.8`. Los comandos disponibles son:
+
+- `-u  usuario:contraseña`: Declara un usuario del server LULU con su contraseña.
+- `-h`: Imprime la ayuda y termina.
+- `-L  dirección-de-management`: Establece la dirección donde servirá el servicio de management. Por defecto escucha únicamente en loopback.
+- `-P puerto-conf `: Puerto TCP donde escuchará por conexiones entrante de protocolo de configuración. Por defecto el valor es 8080.
+- `-v`:  Imprime información sobre la versión y termina.
+
+```bash
+$ ./client -u lucas:dell
+```
 
 ## Tests
 
