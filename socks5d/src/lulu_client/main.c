@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     clientData.Password = args.Password;
 
 
-    if (SELECTOR_STATUS_SUCCESS != SelectorRegister(selector,0,GetClientHandlers(),SELECTOR_OP_NOOP,&clientData))
+    if (SELECTOR_STATUS_SUCCESS != SelectorRegister(selector,0,GetClientHandlers(),SELECTOR_OP_NOOP,&clientData,false))
         Fatal("Cannot register stdin as input");
 
     int remoteAddressFamily = GetAddressFamily(args.Address);
