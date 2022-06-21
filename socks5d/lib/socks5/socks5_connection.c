@@ -3,8 +3,6 @@
 //
 #include "socks5/socks5_connection.h"
 #include <string.h>
-#include <assert.h>
-#include <time.h>
 #include "socks5/fsm_handlers/socks5_hello.h"
 #include "utils/logger.h"
 #include "parsers/socks5/auth_parser.h"

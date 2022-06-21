@@ -4,5 +4,5 @@
 
 #ifndef SOCKS5D_LULU_H
 #define SOCKS5D_LULU_H
-#define NO_RETURN -1
+#define NO_RETURN (-1)
 #endif //SOCKS5D_LULU_H

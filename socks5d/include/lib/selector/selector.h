@@ -184,10 +184,10 @@ SelectorStatus SelectorSelect(fd_selector s);
  *
  * retorna -1 ante error, y deja detalles en errno.
  */
-int SelectorFdSetNio(const int fd);
+int SelectorFdSetNio(int fd);
 
 /** notifica que un trabajo bloqueante terminó */
-SelectorStatus SelectorNotifyBlock(fd_selector s, const int fd);
+SelectorStatus SelectorNotifyBlock(fd_selector s, int fd);
 
 
 #endif //SOCKS5D_SELECTOR_H

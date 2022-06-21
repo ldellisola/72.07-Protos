@@ -8,7 +8,7 @@
 #include "utils/utils.h"
 #include "utils/logger.h"
 #include "utils/object_pool.h"
-#include <assert.h>
+
 static void LuluConnectionRead(SelectorKey *key);
 static void LuluConnectionWrite(SelectorKey *key);
 static void DestroyLuluConnection(void *data);

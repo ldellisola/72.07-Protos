@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include "fsm/fsm.h"
 
-#define N(x) (sizeof(x)/sizeof((x)[0]))
 
 void InitFsm(FiniteStateMachine *fsm, StateDefinition *stateDefinition) {
     fsm->States = stateDefinition;

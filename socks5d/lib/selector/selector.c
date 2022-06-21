@@ -12,12 +12,9 @@
 #include <pthread.h>
 
 #include <stdint.h> // SIZE_MAX
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
-#include <sys/socket.h>
 #include <sys/select.h>
-#include <sys/signal.h>
 #include <signal.h>
 #include "selector/selector.h"
 
@@ -303,7 +300,7 @@ void SelectorDestroy(fd_selector s) {
         if (s->Fds != NULL) {
             for (size_t i = 0; i < s->FdSize; i++) {
                 if (ITEM_USED(s->Fds + i)) {
-                    SelectorUnregisterFd(s, i);
+                    SelectorUnregisterFd(s, (int) i);
                 }
             }
             pthread_mutex_destroy(&s->ResolutionMutex);

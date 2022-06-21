@@ -5,7 +5,6 @@
 #include <strings.h>
 #include "selector/selector.h"
 #include "socks5/socks5_connection.h"
-#include "utils/logger.h"
 #include "socks5/socks5_connection_status.h"
 #include "socks5/socks5_messages.h"
 

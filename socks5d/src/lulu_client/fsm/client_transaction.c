@@ -41,9 +41,9 @@ unsigned LuluClientTransactionRead(void *data) {
         return CS_TRANSACTION;
     }
 
-    int stdInMode = SELECTOR_OP_NOOP;
-    int remoteMode = SELECTOR_OP_NOOP;
-    unsigned state = CS_ERROR;
+    int stdInMode;
+    int remoteMode;
+    unsigned state;
 
     switch (ptr[0]) {
         case '1':

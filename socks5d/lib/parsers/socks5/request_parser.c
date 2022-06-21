@@ -4,16 +4,6 @@
 #include "utils/logger.h"
 #include "parsers/socks5/request_parser.h"
 
-RequestParser RequestParserInit() {
-    Debug("Creating RequestParser...");
-    RequestParser parser;
-
-    RequestParserReset(&parser);
-
-    Debug("RequestParser created!");
-    return parser;
-}
-
 RequestParserState RequestParserFeed(RequestParser *p, byte c) {
     LogDebug("Feeding %d to RequestParser", c);
     if (null == p) {

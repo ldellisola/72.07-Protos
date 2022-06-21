@@ -10,12 +10,11 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 
 add_subdirectory(lib)
-add_subdirectory(src)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-set(LIBS_TO_TEST parsers_test socks5_test tcp_test lulu_client_test server_test)
+set(LIBS_TO_TEST parsers_test socks5_test)
 
 # Since Check uses Threads to paralelize the tests, it'Selector mandatory
 # add pthread as a dependency, alongside the Check libraries.

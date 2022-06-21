@@ -15,7 +15,7 @@ START_TEST(Init_Succeeds)
     {
         // Arrange
         // Act
-        parser = RequestParserInit();
+        RequestParserReset(&parser);
         // Assert
         ck_assert_int_eq(parser.State, RequestVersion);
         ck_assert_int_eq(parser.AddressLength, 0);
@@ -460,7 +460,7 @@ END_TEST
 
 
 void SetupRequestParser(void) {
-    parser = RequestParserInit();
+    RequestParserReset(&parser);
 }
 
 void TeardownRequestParser(void) {

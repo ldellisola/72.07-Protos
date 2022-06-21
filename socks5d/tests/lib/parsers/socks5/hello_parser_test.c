@@ -153,7 +153,7 @@ START_TEST(parser_initializes_correcty)
     {
         // Arrange
         // Act
-        parser = HelloParserInit();
+        HelloParserReset(&parser);
         // Assert
         ck_assert_int_eq(parser.State, HelloVersion);
         ck_assert_int_eq(parser.NMethods, 0);
@@ -165,7 +165,7 @@ END_TEST
 
 
 void SetupHelloParser(void) {
-    parser = HelloParserInit();
+    HelloParserReset(&parser);
 }
 
 void TeardownHelloParser(void) {

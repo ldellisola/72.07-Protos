@@ -8,7 +8,7 @@ set(
         cli.c
 )
 
-add_executable(server ${SOURCES})
+add_executable(socks5d ${SOURCES})
 add_library(server_lib ${SOURCES})
 
-target_link_libraries(server PUBLIC socks5 tcp utils selector lulu)
+target_link_libraries(socks5d PUBLIC socks5 tcp utils selector lulu)
