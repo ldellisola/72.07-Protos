@@ -14,7 +14,6 @@
 void PrintHelp();
 
 void PrintVersion();
-bool isValidIpAddress(char *ipAddress);
 
 CliArguments ParseCli(int argc, char ** argv){
     CliArguments  arguments = {
@@ -53,11 +52,8 @@ CliArguments ParseCli(int argc, char ** argv){
                 }
                 break;
             case 'L':
-                if(isValidIpAddress(optarg)){
-                    arguments.Address = optarg;
-                }else{
-                    Fatal("Invalid Address");
-                }
+                arguments.Address = optarg;
+                
 
                 break;
             case 'P':
@@ -97,11 +93,3 @@ void PrintHelp() {
     printf("\t-v     Imprime información sobre la versión y termina.\n\n");
 }
 
-bool isValidIpAddress(char *ipAddress)
-{
-    struct sockaddr_in sa;
-    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
-    if(result == 0)
-        result = inet_pton(AF_INET6, ipAddress, &(sa.sin_addr));
-    return result != 0;
-}

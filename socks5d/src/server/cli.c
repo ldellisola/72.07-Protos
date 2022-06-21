@@ -15,7 +15,6 @@
 
 void PrintVersion();
 void PrintHelp();
-bool isValidIpAddress(char *ipAddress);
 
 void LoadUser(CliArguments * args,int userNum, char * user);
 
@@ -40,19 +39,13 @@ CliArguments ParseCli(int argc, char **argv) {
     while ((ch = getopt(argc,argv,"hl:L:Np:P:u:vb:t:")) != -1){
         switch (ch) {
             case 'l':
-                if (!isValidIpAddress(optarg))
-                    Fatal("Invalid socks Address");
-                else
-                    args.SocksAddress = optarg;
-                break;
+
+                args.SocksAddress = optarg;
             case 'N':
                 args.EnablePasswordScanners = false;
                 break;
             case 'L':
-                if (!isValidIpAddress(optarg))
-                    Fatal("Invalid Lulu Adress");
-                else
-                    args.LuluAddress = optarg;
+                args.LuluAddress = optarg;
                 break;
             case 'p':
                 p = strtol(optarg, null, 10);
@@ -136,12 +129,4 @@ void PrintHelp() {
     printf("\t-v     Imprime información sobre la versión versión y termina.\n\n");
 }
 
-bool isValidIpAddress(char *ipAddress)
-{
-    struct sockaddr_in sa;
-    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
-    if(result == 0)
-        result = inet_pton(AF_INET6, ipAddress, &(sa.sin_addr));
-    return result != 0;
-}
 
