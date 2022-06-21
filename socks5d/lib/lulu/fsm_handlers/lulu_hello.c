@@ -28,19 +28,16 @@ unsigned LuluHelloReadRun(void *data) {
     LuluConnection *connection = ATTACHMENT_LULU_HELLO(data);
     ClientHelloData *d = &connection->Data.Auth;
     size_t bufferSize;
-
     byte *buffer = BufferWritePtr(d->ReadBuffer, &bufferSize);
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
-
     if (bytesRead <= 0) {
-        Error("Cannot read from Tcp connection");
+        Warning("Cannot read from Tcp connection");
         return LULU_CS_ERROR;
     }
 
     BufferWriteAdv(d->ReadBuffer, bytesRead);
 
     int possibleReturn = NO_RETURN;
-
     while (d->ParserIndex <= PARSER_COUNT && possibleReturn == NO_RETURN){
          possibleReturn = RunParser(d, buffer, bytesRead, connection, data, bufferSize);
     }
@@ -98,8 +95,11 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
             }
             break;
         default:
+            if(buffer[0] == '\r' && buffer[1] == '\n')
+                return LULU_CS_HELLO_READ;
+//            LogError("finished, bytes =%ld", bytesRead);
             BufferReset(d->ReadBuffer);
-            if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE)) {
+            if (SELECTOR_STATUS_SUCCESS == SelectorSetInterestKey(data, SELECTOR_OP_WRITE) ) {
                 buffer = BufferWritePtr(d->WriteBuffer, &bufferSize);
                 size_t bytesWritten = BuildClientNotRecognisedResponse(buffer, bufferSize);
 
@@ -115,7 +115,10 @@ int RunParser(ClientHelloData *d, byte *buffer, ssize_t bytesRead, LuluConnectio
 }
 
 void LuluHelloReadClose(unsigned int state, void *data) {
-
+    LuluConnection *connection = ATTACHMENT_LULU_HELLO(data);
+    ClientHelloData *d = &connection->Data.Auth;
+    ClientHelloParserReset(&d->HelloParser);
+    ClientGoodbyeParserReset(&d->GoodbyeParser);
 }
 
 void LuluHelloWriteClose(unsigned int state, void *data) {

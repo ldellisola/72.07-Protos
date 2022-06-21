@@ -4,7 +4,7 @@ En este repositorio se encuentra el TPE de la materia Protocolos de Comunicació
 
 Los autores son:
 
-- **Torrusio, Lucia**
+- **Torrusio, Lucia** 59489
 - **Dell’Isola, Lucas** 58025
 
 Este trabajo practico consiste en la implementación de un servidor Socks5 junto al diseño e implementación de un protocolo propio para poder manejar a dicho servidor.

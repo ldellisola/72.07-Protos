@@ -449,7 +449,7 @@ static void handle_iteration(fd_selector s) {
             key.Data = item->Data;
             key.HasTimeout = item->HasTimeout;
 
-            if (NULL != conf.OnConnectionCall && NULL != key.Data)
+            if (NULL != conf.OnConnectionCall && NULL != key.Data && key.HasTimeout)
                 conf.OnConnectionCall(key.Data);
 
             if (FD_ISSET(item->Fd, &s->SlaveRead)) {
