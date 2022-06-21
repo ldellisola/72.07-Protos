@@ -90,6 +90,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
                     Debug("Username has to be at least 1 character long");
                     break;
                 }
+                p->Word[p->Index] = '\0';
                 p->State = DelFinished;
                 break;
             }

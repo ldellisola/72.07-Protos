@@ -62,7 +62,8 @@ int DeleteSocks5User(const char *username) {
     {
         Warning("Username cannot be null");
     }
-
+    if(currentUsers->Username == NULL)
+        return DOESNT_EXIST;
     Socks5User * current = null;
     for (current = currentUsers; null != current ; current = current->Next){
         bool isUser = 0 == strcmp(current->Username,username);
