@@ -6,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#include <arpa/inet.h>
 #include "lulu_client/cli.h"
 #include "utils/utils.h"
 #include "utils/logger.h"
@@ -13,6 +14,7 @@
 void PrintHelp();
 
 void PrintVersion();
+bool isValidIpAddress(char *ipAddress);
 
 CliArguments ParseCli(int argc, char ** argv){
     CliArguments  arguments = {
@@ -46,7 +48,12 @@ CliArguments ParseCli(int argc, char ** argv){
                 }
                 break;
             case 'L':
-                arguments.Address = optarg;
+                if(isValidIpAddress(optarg)){
+                    arguments.Address = optarg;
+                }else{
+
+                }
+
                 break;
             case 'P':
                 arguments.Port = (int) strtol(optarg,null,10);
@@ -83,4 +90,13 @@ void PrintHelp() {
     printf("\t-P puerto-conf\n\t\tPuerto SCTP  donde escuchará por conexiones entrante del protocolo\n\t\tde configuración. Por defecto el valor es 8080.\n\n");
     printf("\t-u user:pass\n\t\tDeclara un usuario del server LULU con su contraseña.\n\n");
     printf("\t-v     Imprime información sobre la versión versión y termina.\n\n");
+}
+
+bool isValidIpAddress(char *ipAddress)
+{
+    struct sockaddr_in sa;
+    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
+    if(result == 0)
+        result = inet_pton(AF_INET6, ipAddress, &(sa.sin_addr));
+    return result != 0;
 }

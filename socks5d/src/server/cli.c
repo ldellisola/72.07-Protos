@@ -40,7 +40,7 @@ CliArguments ParseCli(int argc, char **argv) {
     while ((ch = getopt(argc,argv,"hl:L:Np:P:u:vb:t:")) != -1){
         switch (ch) {
             case 'l':
-                if (isValidIpAddress(optarg))
+                if (!isValidIpAddress(optarg))
                     Fatal("Invalid socks Address");
                 else
                     args.SocksAddress = optarg;
@@ -49,7 +49,7 @@ CliArguments ParseCli(int argc, char **argv) {
                 args.EnablePasswordScanners = false;
                 break;
             case 'L':
-                if (isValidIpAddress(optarg))
+                if (!isValidIpAddress(optarg))
                     Fatal("Invalid Lulu Adress");
                 else
                     args.LuluAddress = optarg;
