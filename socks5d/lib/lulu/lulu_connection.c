@@ -7,10 +7,11 @@
 #include "lulu/lulu_connection_status.h"
 #include "utils/utils.h"
 #include "utils/logger.h"
+#include "utils/object_pool.h"
 #include <assert.h>
 static void LuluConnectionRead(SelectorKey *key);
 static void LuluConnectionWrite(SelectorKey *key);
-
+static void DestroyLuluConnection(void *data);
 
 const FdHandler luluConnectionHandler = {
         .handle_read   = LuluConnectionRead,
@@ -48,19 +49,19 @@ static StateDefinition luluConnectionFsm[] = {
                 .state = LULU_CS_ERROR,
         },
 };
-typedef enum {
-    PooledLuluConnectionEmpty,
-    PooledLuluConnectionInUse
-} PooledLuluConnectionStatus;
+//typedef enum {
+//    PooledLuluConnectionEmpty,
+//    PooledLuluConnectionInUse
+//} PooledLuluConnectionStatus;
+//
+//typedef struct PooledLuluConnection_{
+//    struct PooledLuluConnection_ * Next;
+//    LuluConnection Connection;
+//    PooledLuluConnectionStatus Status;
+//}PooledLuluConnection;
 
-typedef struct PooledLuluConnection_{
-    struct PooledLuluConnection_ * Next;
-    LuluConnection Connection;
-    PooledLuluConnectionStatus Status;
-}PooledLuluConnection;
-
-
-PooledLuluConnection * luluPool;
+static ObjectPool luluPool;
+//PooledLuluConnection * luluPool;
 //void CleanLuluPool( PooledLuluConnection * pool);
 LuluConnection *CreateLuluConnection(TcpConnection *tcpConnection) {
     Debug("Creating LuluConnection.");
@@ -87,45 +88,56 @@ LuluConnection *CreateLuluConnection(TcpConnection *tcpConnection) {
 }
 
 LuluConnection *GetLuluConnection() {
-    if (null == luluPool) {
-        Warning("LULU pool was not initialized");
-        return null;
-    }
 
-    PooledLuluConnection * temp;
-    for ( temp = luluPool; temp != null ; temp = temp->Next) {
-        if (PooledLuluConnectionEmpty == temp->Status) {
-            temp->Status = PooledLuluConnectionInUse;
-            return &temp->Connection;
-        }
+    return GetObjectFromPool(&luluPool);
 
-        if (null == temp->Next)
-            break;
-    }
-
-    temp->Next = calloc(1, sizeof(PooledLuluConnection));
-    temp = temp->Next;
-    temp->Status = PooledLuluConnectionInUse;
-
-    return &temp->Connection;
+//    if (null == luluPool) {
+//        Warning("LULU pool was not initialized");
+//        return null;
+//    }
+//
+//    PooledLuluConnection * temp;
+//    for ( temp = luluPool; temp != null ; temp = temp->Next) {
+//        if (PooledLuluConnectionEmpty == temp->Status) {
+//            temp->Status = PooledLuluConnectionInUse;
+//            return &temp->Connection;
+//        }
+//
+//        if (null == temp->Next)
+//            break;
+//    }
+//
+//    temp->Next = calloc(1, sizeof(PooledLuluConnection));
+//    temp = temp->Next;
+//    temp->Status = PooledLuluConnectionInUse;
+//
+//    return &temp->Connection;
 }
+
+static  ObjectPoolHandlers luluPoolHandlers = {
+    .OnDispose = DestroyLuluConnection
+};
 
 void CreateLuluConnectionPool(int initialSize) {
     Debug("Initializing LULU Pool");
-    if (initialSize < 1) {
-        LogDebug("Invalid initial pool size %d, using default value 1", initialSize);
-        initialSize = 1;
-    }
 
-    luluPool = calloc(1, sizeof(PooledLuluConnection));
-    luluPool->Status = PooledLuluConnectionEmpty;
-    PooledLuluConnection *current = luluPool;
+    InitObjectPool(&luluPool,&luluPoolHandlers,initialSize, sizeof(LuluConnection));
 
-    while (--initialSize > 0) {
-        current->Next = calloc(1, sizeof(PooledLuluConnection));
-        current = current->Next;
-        current->Status = PooledLuluConnectionEmpty;
-    }
+
+//    if (initialSize < 1) {
+//        LogDebug("Invalid initial pool size %d, using default value 1", initialSize);
+//        initialSize = 1;
+//    }
+//
+//    luluPool = calloc(1, sizeof(PooledLuluConnection));
+//    luluPool->Status = PooledLuluConnectionEmpty;
+//    PooledLuluConnection *current = luluPool;
+//
+//    while (--initialSize > 0) {
+//        current->Next = calloc(1, sizeof(PooledLuluConnection));
+//        current = current->Next;
+//        current->Status = PooledLuluConnectionEmpty;
+//    }
 }
 //void CleanLuluConnectionPool() {
 //    Debug("Cleaning LULU connection luluPool");
@@ -152,27 +164,27 @@ void DisposeLuluConnection(LuluConnection *connection, fd_selector selector) {
     if (null != connection->User)
         LogOutLuluUser(connection->User);
 
-    DestroyLuluConnection(connection);
+    DestroyObject(&luluPool,connection);
     Debug("Socks5Connection disposed!");
 }
-void DestroyLuluConnection(LuluConnection *connection) {
-    if (null == luluPool) {
-        Warning("TCP pool was not initialized");
+void DestroyLuluConnection(void *data) {
+    if (null == data) {
+        Warning("Invalid data");
         return;
     }
-
-    memset(connection,0, sizeof(LuluConnection));
-
-    PooledLuluConnection * temp;
-    for (temp = luluPool; temp != null && &temp->Connection != connection ; temp = temp->Next);
-
-    if (null == temp)
-    {
-        Warning("Error while destroying connection!");
-        return;
-    }
-    assert(&temp->Connection == connection);
-    temp->Status = PooledLuluConnectionEmpty;
+//
+    memset(data,0, sizeof(LuluConnection));
+//
+//    PooledLuluConnection * temp;
+//    for (temp = luluPool; temp != null && &temp->Connection != connection ; temp = temp->Next);
+//
+//    if (null == temp)
+//    {
+//        Warning("Error while destroying connection!");
+//        return;
+//    }
+//    assert(&temp->Connection == connection);
+//    temp->Status = PooledLuluConnectionEmpty;
 
 }
 
@@ -197,9 +209,10 @@ void LuluConnectionWrite(SelectorKey *key) {
     }
 }
 
-//void CleanLuluPool( PooledLuluConnection * pool){
+void CleanLuluPool(){
+    CleanObjectPool(&luluPool);
 //    Debug("Cleaning object luluPool");
-//    if (null == pool || null ==  pool->Handlers) {
+//    if (null == pool || null ==  pool->) {
 //        Error("Object socks5Pool was not initialized");
 //        return;
 //    }
@@ -213,4 +226,4 @@ void LuluConnectionWrite(SelectorKey *key) {
 //        free(obj->Object);
 //        free(obj);
 //    }
-//}
+}

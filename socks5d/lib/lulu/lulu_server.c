@@ -34,7 +34,6 @@ bool RegisterLuluServer(const char *port, const char *address, int poolSize,cons
             return RegisterLuluServerOnIPv6(port,address);
         default:
             Error("Unknown Address type");
-//            todo: esta bien?
             return false;
     }
 }
@@ -106,6 +105,6 @@ void DisposeLuluServer() {
         close(ipv4SocketLulu);
 
     DisposeAllLuluUsers();
-//    CleanLuluConnectionPool();
+    CleanLuluPool();
 }
 
