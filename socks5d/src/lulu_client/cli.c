@@ -30,11 +30,9 @@ CliArguments ParseCli(int argc, char ** argv){
             case 'v':
                 PrintVersion();
                 exit(0);
-                break;
             case 'h':
                 PrintHelp();
                 exit(0);
-                break;
             case 'u':
                 p = strchr(optarg, ':');
                 if(null == p) {

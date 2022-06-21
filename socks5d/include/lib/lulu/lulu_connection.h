@@ -51,6 +51,8 @@ LuluConnection *CreateLuluConnection(TcpConnection *tcpConnection);
 LuluConnection *GetLuluConnection();
 void CreateLuluConnectionPool(int initialSize);
 void DisposeLuluConnection(LuluConnection *connection, fd_selector selector);
-void DestroyLuluConnection(LuluConnection *connection);
+
+
+void CleanLuluPool();
 
 #endif //SOCKS5D_LULU_CONNECTION_H

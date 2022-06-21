@@ -2,6 +2,7 @@
 // Created by tluci on 11/6/2022.
 //
 
+#include <errno.h>
 #include "lulu/lulu_server.h"
 
 #include "utils/utils.h"
@@ -34,14 +35,17 @@ bool RegisterLuluServer(const char *port, const char *address, int poolSize,cons
             return RegisterLuluServerOnIPv6(port,address);
         default:
             Error("Unknown Address type");
-//            todo: esta bien?
             return false;
     }
 }
 
 bool RegisterLuluServerOnIPv4(const char * port, const char *address) {
     Debug("Starting LULU server on IPv4...");
-    int portNum = atoi(port);
+    int portNum = (int) strtol(port,null,10);
+
+    if (0 == portNum && (EINVAL==errno || ERANGE == errno))
+        LogFatalWithReason("Invalid port number: %s",port);
+
     ipv4SocketLulu = IPv4ListenOnTcpPort(portNum, &lulu, address, 50);
 
     if ( -1 == ipv4SocketLulu)
@@ -54,7 +58,11 @@ bool RegisterLuluServerOnIPv4(const char * port, const char *address) {
 
 bool RegisterLuluServerOnIPv6(const char * port, const char *address) {
     Debug("Starting LULU server on IPv6...");
-    int portNum = atoi(port);
+    int portNum = (int) strtol(port,null,10);
+
+    if (0 == portNum && (EINVAL==errno || ERANGE == errno))
+        LogFatalWithReason("Invalid port number: %s",port);
+
     ipv6SocketLulu = IPv6ListenOnTcpPort(portNum, &lulu, address, 50);
     if (-1 == ipv6SocketLulu)
         return false;
@@ -106,6 +114,6 @@ void DisposeLuluServer() {
         close(ipv4SocketLulu);
 
     DisposeAllLuluUsers();
-//    CleanLuluConnectionPool();
+    CleanLuluPool();
 }
 

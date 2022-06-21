@@ -39,11 +39,7 @@ typedef struct {
     uint8_t Methods[255];
 } HelloParser;
 
-/**
- * It initializes a HelloParser instance
- * @return A new HelloParser instance
- */
-HelloParser HelloParserInit();
+
 
 /**
  * It safely disposes a parser instance

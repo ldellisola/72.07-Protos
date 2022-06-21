@@ -4,7 +4,6 @@
 #include "server/cli.h"
 #include "tcp/tcp.h"
 #include "socks5/socks5_server.h"
-#include "socks5/socks5_connection.h"
 #include "utils/logger.h"
 #include "lulu/lulu_server.h"
 #include "socks5/socks5_timeout.h"

@@ -48,7 +48,7 @@ bool InitTcpServer(const SelectorOptions *optionalOptions, int poolSize) {
 }
 
 
-int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections) {
+int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, int concurrentConnections) {
     Debug("Staring TCP server on IPv4...");
 
     struct sockaddr_in addr;
@@ -78,7 +78,7 @@ int IPv4ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char 
     return ListenOnTcp(port, handler, (struct sockaddr *) &addr, sizeof(addr), concurrentConnections);
 }
 
-int IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, unsigned concurrentConnections) {
+int IPv6ListenOnTcpPort(unsigned int port, const FdHandler *handler, const char *address, int concurrentConnections) {
     Debug("Staring TCP server on IPv6...");
 
     struct sockaddr_in6 addr;

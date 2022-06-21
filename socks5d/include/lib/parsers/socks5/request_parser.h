@@ -91,12 +91,6 @@ typedef struct {
 } RequestParser;
 
 /**
- * It initializes a new RequestParser instance
- * @return a RequestParser instance
- */
-RequestParser RequestParserInit();
-
-/**
  * It restores a RequestParser instance
  * @param p The parser instance
  */

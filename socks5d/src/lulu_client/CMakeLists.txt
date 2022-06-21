@@ -15,7 +15,7 @@ set(
         fsm/client_metrics.c
         fsm/client_goodbye.c)
 
-add_executable(lulu_client ${SOURCES} fsm/client_users.c)
+add_executable(client ${SOURCES} fsm/client_users.c)
 add_library(lulu_client_lib ${SOURCES})
 
-target_link_libraries(lulu_client PUBLIC parsers tcp utils fsm)
+target_link_libraries(client PUBLIC parsers tcp utils fsm)

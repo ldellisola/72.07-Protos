@@ -1,20 +1,10 @@
 
 
-#include <monetary.h>
 #include <memory.h>
 #include "parsers/socks5/hello_parser.h"
 #include "utils/logger.h"
 #include "utils/utils.h"
 
-HelloParser HelloParserInit() {
-    Debug("Creating HelloParser...");
-    HelloParser parser = {
-            .State = HelloVersion,
-    };
-    memset(parser.Methods, 0, 255);
-
-    return parser;
-}
 
 HelloParserState HelloParserFeed(HelloParser *p, byte c) {
     LogDebug("Feeding %d to HelloParser", c);

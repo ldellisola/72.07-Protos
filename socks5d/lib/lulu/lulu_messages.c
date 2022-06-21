@@ -3,7 +3,6 @@
 //
 
 #include "lulu/lulu_messages.h"
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
 #include "utils/logger.h"
@@ -41,7 +40,7 @@ size_t BuildClientGoodbyeResponse(byte *buffer, size_t length) {
 }
 size_t BuildClientSetTimeoutResponse(byte *buffer, size_t length, size_t timeout) {
 
-    SetSocks5ConnectionTimeout(timeout);
+    SetSocks5ConnectionTimeout((time_t) timeout);
     if (length < LEN_OK) {
         Warning("Buffer to small to WriteHead ClientSetTimeoutResponse");
         return 0;
@@ -74,8 +73,7 @@ size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,size_t buffe
     }
 }
 size_t BuildClientGetTimeoutResponse(byte *buffer, size_t length) {
-    long timeout = 0;
-    timeout = GetSocks5ConnectionTimeout();
+    long timeout = GetSocks5ConnectionTimeout();
     char num[15] = {0};
     sprintf(num, "+%ld\r\n", timeout);
     size_t nDigits = strlen(num);

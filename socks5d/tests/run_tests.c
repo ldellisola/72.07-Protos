@@ -7,7 +7,6 @@
 #include "parsers/socks5/hello_parser_test.h"
 #include "parsers/socks5/auth_parser_test.h"
 #include "parsers/socks5/request_parser_test.h"
-#include "src/server/cli_test.h"
 #include "lib/socks5/socks5_messages_test.h"
 #include "parsers/lulu/client_hello_parser_test.h"
 #include "parsers/lulu/client_goodbye_parser_test.h"
@@ -27,7 +26,6 @@ int main(void) {
             RegisterHelloParserTestSuit(),
             RegisterAuthParserTestSuit(),
             RegisterRequestParserTestSuit(),
-            RegisterCliTestSuit(),
             RegisterSocks5MessagesTestSuit(),
             RegisterClientHelloParserTestSuit(),
             RegisterClientGoodbyeParserTestSuit(),
