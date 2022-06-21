@@ -73,11 +73,9 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
             p->State = traverseWordSetBufferSize(p, c, SetBufferSize, p->BufferSize);
             break;
         case SetBufferSize:
-//            LogError(false, "BufferSize");
             p->State = traverseWordSetBufferSize(p, c, BufferSizeValue, null);
             break;
         case BufferSizeValue:
-//            Error( "BufferSizeValue");
             if(isdigit(c)){
                 int digit = (uint8_t) ((char)c- '0');
                 p->Value = (p->Value * 10) + digit;
@@ -85,7 +83,6 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
                     LogDebug("BufferSize too big", p->Value, digit);
                     p->State = SetBufferSizeInvalidState;
                 }
-//                Error( "is digit, value = %d, digit = %d", p->Value, digit);
                 break;
             }
             if(c == '\r'){
@@ -96,7 +93,6 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
             p->State =SetBufferSizeInvalidState;
             break;
         case SetBufferSizeCRLF:
-//            LogError(false, "BufferSizeCRLF");
             if( c == '\n'){
                 p->State = SetBufferSizeFinished;
                 break;
@@ -105,9 +101,7 @@ ClientSetBufferSizeParserState ClientSetBufferSizeParserFeed(ClientSetBufferSize
             p->State = SetBufferSizeInvalidState;
             break;
         case SetBufferSizeFinished:
-//            LogError(false, "BufferSizeFinished");
         case SetBufferSizeInvalidState:
-//            LogError(false, "BufferSizeInvalidState");
             break;
     }
     return p->State;

@@ -55,7 +55,6 @@ void ClientListUsersParserReset(ClientListUsersParser *p) {
 
 ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, byte c) {
     LogDebug("Feeding %d to ClientListUsersParser", c);
-//    Error( "char = %c", c);
 
     if (null == p) {
         Debug( "Cannot feed ListUsersParser if is NULL");
@@ -64,16 +63,13 @@ ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, b
 
     switch (p->State) {
         case List:
-//            Error( "BufferSizeGet");
             p->State = traverseWordListUsers(p, c, ListUsers, p->Users);
             break;
         case ListUsers:
-//            Error( "BufferSize");
             p->State = traverseWordListUsers(p, c, ListCRLF, null);
             break;
 
         case ListCRLF:
-//            Error( "BufferSizeCRLF");
             if( c == '\n'){
                 p->State = ListFinished;
                 break;
@@ -82,9 +78,7 @@ ClientListUsersParserState ClientListUsersParserFeed(ClientListUsersParser *p, b
             p->State =  ListInvalidState;
             break;
         case ListFinished:
-//            Error( "BufferSizeFinished");
         case ListInvalidState:
-//            Error( "BufferSizeInvalidState");
             break;
     }
     return p->State;

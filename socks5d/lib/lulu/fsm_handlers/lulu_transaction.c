@@ -56,7 +56,7 @@ unsigned LuluTransactionReadRun(void *data) {
     ssize_t bytesRead = ReadFromTcpConnection(connection->ClientTcpConnection, buffer, bufferSize);
 
     if (bytesRead <= 0) {
-        Error("Cannot read from Tcp connection");
+        Warning("Cannot read from Tcp connection");
         return LULU_CS_ERROR;
     }
 

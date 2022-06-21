@@ -32,7 +32,7 @@ LuluUser * LogInLuluUser(const char * username, const char * password) {
 void LoadLuluUsers(const char *usernames[], const char *passwords[]) {
     if (null == usernames)
     {
-        Error("users cannot be null");
+        Warning("users cannot be null");
         return;
     }
 
@@ -83,7 +83,7 @@ void LoadSingleLuluUser(const char *username, const char *password) {
 void LogOutLuluUser(struct LuluUser *user) {
 
     if(null == user) {
-        Error("User cannot be null");
+        Warning("User cannot be null");
         return;
     }
 

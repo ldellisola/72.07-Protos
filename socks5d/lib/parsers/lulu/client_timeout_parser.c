@@ -57,7 +57,6 @@ void ClientTimeoutParserReset(ClientTimeoutParser *p) {
 
 ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c) {
     LogDebug("Feeding %d to ClientTimeoutParser", c);
-//    LogError( "char = %c", c);
 
     if (null == p) {
         Debug( "Cannot feed TimeoutParser if is NULL");
@@ -66,20 +65,15 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
 
     switch (p->State) {
         case TimeoutSet:
-//            Error( "TimeoutSet");
             p->State = traverseWordTimeout(p, c, Timeout, p->Timeout);
             break;
         case Timeout:
-//            Error( "Timeout");
             p->State = traverseWordTimeout(p, c, TimeoutValue, null);
             break;
         case TimeoutValue:
-//            Error( "TimeoutValue");
             if(isdigit(c)){
                 int digit = (uint8_t) ((char)c- '0');
-//                LogError( "digit = %d, value = %d", digit, p->Value);
                 p->Value = (p->Value * 10) + digit;
-//                LogError( "value = %d", p->Value);
                 if(p->Value > 10000000000){
                     LogDebug("Timeout too big", p->Value, digit);
                     p->State = TimeoutInvalidState;
@@ -94,13 +88,10 @@ ClientTimeoutParserState ClientTimeoutParserFeed(ClientTimeoutParser *p, byte c)
             p->State =TimeoutInvalidState;
             break;
         case TimeoutCRLF:
-//            Error( "TimeoutCRLF");
             p->State = c == '\n'? TimeoutFinished: TimeoutInvalidState;
             break;
         case TimeoutFinished:
-//            Error( "TimeoutFinished");
         case TimeoutInvalidState:
-//            Error( "TimeoutInvalidState");
             break;
     }
     return p->State;

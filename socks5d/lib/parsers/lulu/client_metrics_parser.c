@@ -56,7 +56,6 @@ void ClientMetricsParserReset(ClientMetricsParser *p) {
 
 ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c) {
     LogDebug("Feeding %d to ClientMetricsParser", c);
-//    Error( "char = %c", c);
 
     if (null == p) {
         Debug( "Cannot feed MetricsParser if is NULL");
@@ -65,16 +64,13 @@ ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c)
 
     switch (p->State) {
         case MetricsGet:
-//            Error( "MetricsGet");
             p->State = traverseWordMetrics(p, c, Metrics, p->Metrics);
             break;
         case Metrics:
-//            Error( "Metrics");
             p->State = traverseWordMetrics(p, c, MetricsCRLF, null);
             break;
 
         case MetricsCRLF:
-//            Error( "MetricsCRLF");
             if( c == '\n'){
                 p->State = MetricsFinished;
                 break;
@@ -83,9 +79,7 @@ ClientMetricsParserState ClientMetricsParserFeed(ClientMetricsParser *p, byte c)
             p->State =  MetricsInvalidState;
             break;
         case MetricsFinished:
-//            Error( "MetricsFinished");
         case MetricsInvalidState:
-//            Error( "MetricsInvalidState");
             break;
     }
     return p->State;
