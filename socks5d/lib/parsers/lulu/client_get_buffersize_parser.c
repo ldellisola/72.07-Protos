@@ -68,16 +68,13 @@ ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSize
 
     switch (p->State) {
         case BufferSizeGet:
-//            Error( "BufferSizeGet");
             p->State = traverseWordGetBufferSize(p, c, BufferSize, p->BufferSize);
             break;
         case BufferSize:
-//            Error( "BufferSize");
             p->State = traverseWordGetBufferSize(p, c, BufferSizeCRLF, null);
             break;
 
         case BufferSizeCRLF:
-//            Error( "BufferSizeCRLF");
             if( c == '\n'){
                 p->State = BufferSizeFinished;
                 break;
@@ -86,9 +83,7 @@ ClientGetBufferSizeParserState ClientGetBufferSizeParserFeed(ClientGetBufferSize
             p->State =  BufferSizeInvalidState;
             break;
         case BufferSizeFinished:
-//            Error( "BufferSizeFinished");
         case BufferSizeInvalidState:
-//            Error( "BufferSizeInvalidState");
             break;
     }
     return p->State;

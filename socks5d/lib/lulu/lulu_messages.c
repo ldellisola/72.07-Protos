@@ -14,14 +14,14 @@ size_t BuildClientHelloResponse(byte *buffer, size_t length, bool authentication
 
     if(authenticationSucceeded){
         if (length < LEN_OK) {
-            Error("Buffer to small to WriteHead ClientHelloResponse");
+            Warning("Buffer to small to WriteHead ClientHelloResponse");
             return 0;
         }
         fillBuffer("+OK\r\n", buffer,LEN_OK );
         return LEN_OK;
     }else{
         if (length < LEN_AUTHENTICATION_ERROR) {
-            Error("Buffer to small to WriteHead ClientHelloResponse");
+            Warning("Buffer to small to WriteHead ClientHelloResponse");
             return 0;
         }
         fillBuffer("-AUTHENTICATION ERROR\r\n", buffer, LEN_AUTHENTICATION_ERROR);
@@ -32,7 +32,7 @@ size_t BuildClientHelloResponse(byte *buffer, size_t length, bool authentication
 size_t BuildClientGoodbyeResponse(byte *buffer, size_t length) {
 
     if (length < LEN_GOODBYE) {
-        Error("Buffer to small to WriteHead ClientHelloResponse");
+        Warning("Buffer to small to WriteHead ClientHelloResponse");
         return 0;
     }
     fillBuffer("+GOODBYE\r\n", buffer,LEN_GOODBYE );
@@ -43,7 +43,7 @@ size_t BuildClientSetTimeoutResponse(byte *buffer, size_t length, size_t timeout
 
     SetSocks5ConnectionTimeout(timeout);
     if (length < LEN_OK) {
-        Error("Buffer to small to WriteHead ClientSetTimeoutResponse");
+        Warning("Buffer to small to WriteHead ClientSetTimeoutResponse");
         return 0;
     }
     fillBuffer("+OK\r\n", buffer,LEN_OK );
@@ -59,14 +59,14 @@ size_t BuildClientSetBufferSizeResponse(byte *buffer, size_t length,size_t buffe
     if(validBufferSize){
         SetSocks5BufferSize(bufferSize);
         if (length < LEN_OK) {
-            Error("Buffer to small to WriteHead ClientSetBufferSizeResponse");
+            Warning("Buffer to small to WriteHead ClientSetBufferSizeResponse");
             return 0;
         }
         fillBuffer("+OK\r\n", buffer,LEN_OK );
         return LEN_OK;
     }else{
         if (length < LEN_INVALID_BUFFER_SIZE) {
-            Error("Buffer to small to WriteHead ClientSetBufferSizeResponse");
+            Warning("Buffer to small to WriteHead ClientSetBufferSizeResponse");
             return 0;
         }
         fillBuffer("-INVALID BUFFER SIZE\r\n", buffer,LEN_INVALID_BUFFER_SIZE );
@@ -82,7 +82,7 @@ size_t BuildClientGetTimeoutResponse(byte *buffer, size_t length) {
 
 
     if (length < (nDigits)) {
-        Error("Buffer to small to WriteHead ClientGetTimeoutResponse");
+        Warning("Buffer to small to WriteHead ClientGetTimeoutResponse");
         return 0;
     }
 
@@ -99,7 +99,7 @@ size_t BuildClientGetBufferSizeResponse(byte *buffer, size_t length) {
     size_t nDigits= strlen(num);
 
     if (length < (nDigits + 3)) {
-        Error("Buffer to small to WriteHead ClientGetBufferSizeResponse");
+        Warning("Buffer to small to WriteHead ClientGetBufferSizeResponse");
         return 0;
     }
     char str[nDigits+3];
@@ -122,7 +122,7 @@ size_t BuildClientGetMetricsResponse(byte *buffer, size_t length) {
     nDigits+= strlen(num);
     nDigits+=5;
     if (length < (nDigits)) {
-        Error("Buffer to small to WriteHead ClientGetBufferSizeResponse");
+        Warning("Buffer to small to WriteHead ClientGetBufferSizeResponse");
         return 0;
     }
     char str[nDigits];
@@ -148,12 +148,13 @@ size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
     //       +     usernames    pipes and \r    \n
     char str[1 +   users*255  +    users       + 1];
     str[0] = '+';
+    str[1] = '\0';
     for (int i = 0; i < users; ++i) {
         strcat(str,usernames[i]);
         strcat(str,(i==users-1)? "\r\n":"|");
     }
     if (length < (strlen(str)) ) {
-        Error("Buffer to small to WriteHead ClientSetUserSizeResponse");
+        Warning("Buffer to small to WriteHead ClientSetUserSizeResponse");
         free(usernames);
         return 0;
     }
@@ -171,7 +172,7 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
 
 //  I check that username doesnt exist
     char **loggedUsernames = calloc(200, sizeof(byte));
-    int users = GetAllLoggedInSocks5Users(loggedUsernames,200 );
+    int users = GetAllSocks5Users(loggedUsernames,200 );
 
     users = (users == -1)? 200:users;
 
@@ -187,15 +188,6 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     }
     free(loggedUsernames);
 //    TODO: free?/listo
-//  I create user
-//    const char** usernames = calloc(2, sizeof(byte));
-//    const char** passwords= calloc(2, sizeof(byte));
-//    usernames[0] = username;// TODO <-- THIS
-//    usernames[1] = null;
-//    passwords[0] = password; // TODO <-- THIS
-//    passwords[1] = null;
-
-//    TODO: IS -->THIS<-- OK?
     LoadSingleUser(username,password );
     if (length < LEN_OK) {
         Warning("Buffer to small to WriteHead ClientSetUserSizeResponse");
@@ -212,7 +204,7 @@ size_t BuildClientDelUserResponse(byte *buffer, size_t length, char* username) {
     switch (status) {
         case OK:
             if (length < LEN_OK) {
-                Error("Buffer to small to WriteHead ClientDelUserSizeResponse");
+                Warning("Buffer to small to WriteHead ClientDelUserSizeResponse");
                 return 0;
             }
             fillBuffer("+OK\r\n", buffer,LEN_OK );
@@ -220,7 +212,7 @@ size_t BuildClientDelUserResponse(byte *buffer, size_t length, char* username) {
             return (LEN_OK);
         case LOGGED_IN:
             if (length < LEN_USER_LOGGED_IN) {
-                Error("Buffer to small to WriteHead ClientDelUserSizeResponse");
+                Warning("Buffer to small to WriteHead ClientDelUserSizeResponse");
                 return 0;
             }
             fillBuffer("-USER LOGGED IN\r\n", buffer,LEN_USER_LOGGED_IN );
@@ -228,12 +220,12 @@ size_t BuildClientDelUserResponse(byte *buffer, size_t length, char* username) {
             return (LEN_USER_LOGGED_IN);
         case DOESNT_EXIST:
             if (length < LEN_USER_DOESNT_EXIST) {
-                Error("Buffer to small to WriteHead ClientDelUserSizeResponse");
+                Warning("Buffer to small to WriteHead ClientDelUserSizeResponse");
                 return 0;
             }
             fillBuffer("-USER DOESNT EXIST\r\n", buffer,LEN_USER_DOESNT_EXIST );
 
-            return (DOESNT_EXIST);
+            return (LEN_USER_DOESNT_EXIST);
         default:
             break;
 
@@ -244,7 +236,7 @@ size_t BuildClientDelUserResponse(byte *buffer, size_t length, char* username) {
 size_t BuildClientNotRecognisedResponse(byte *buffer, size_t length) {
 
     if (length < LEN_NOT_RECOGNISED) {
-        Error("Buffer to small to WriteHead ClientNotRecognisedResponse");
+        Warning("Buffer to small to WriteHead ClientNotRecognisedResponse");
         return 0;
     }
     fillBuffer("-NOT RECOGNISED\r\n", buffer,LEN_NOT_RECOGNISED );

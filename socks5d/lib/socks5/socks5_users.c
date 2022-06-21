@@ -46,8 +46,11 @@ Socks5User * LogInSocks5User(const char * username, const char * password) {
             continue;
         bool isAuthorized = 0 == strcmp(current->Username,username);
         isAuthorized &= 0 == strcmp(current->Password,password);
-        if (isAuthorized)
+        if (isAuthorized){
+            current->IsLoggedIn = true;
             return current;
+        }
+
     }
 
     return null;
@@ -59,7 +62,8 @@ int DeleteSocks5User(const char *username) {
     {
         Warning("Username cannot be null");
     }
-
+    if(currentUsers->Username == NULL)
+        return DOESNT_EXIST;
     Socks5User * current = null;
     for (current = currentUsers; null != current ; current = current->Next){
         bool isUser = 0 == strcmp(current->Username,username);
@@ -87,6 +91,19 @@ int GetAllLoggedInSocks5Users(char **usernames, int length) {
     int i = 0;
     for (Socks5User * current = currentUsers; null != current ; current = current->Next){
         if (current->InUse && current->IsLoggedIn) {
+            usernames[i++] = current->Username;
+            if (i == length)
+                return -1;
+        }
+    }
+
+    return i;
+}
+
+int GetAllSocks5Users(char **usernames, int length) {
+    int i = 0;
+    for (Socks5User * current = currentUsers; null != current ; current = current->Next){
+        if (current->InUse) {
             usernames[i++] = current->Username;
             if (i == length)
                 return -1;

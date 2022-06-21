@@ -25,7 +25,7 @@ unsigned LuluClientConnect(void *data) {
         case EALREADY:
             return CS_WAITING_CONNECTION;
         default:
-            Error("Cannot connecto the the server!");
+            Error("Cannot connect to the the server!");
             return CS_ERROR;
     }
 }

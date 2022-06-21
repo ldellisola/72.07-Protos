@@ -6,7 +6,6 @@
 #include "utils/logger.h"
 
 ClientDelUserParserState traverseWordDel(ClientDelUserParser *p, byte c, ClientDelUserParserState nextState, char *nextWord) {
-//    Error( "char c = %c", c);
     if(strlen(p->Word) == p->Index){
         if(c == '|'){
             p->Word = nextWord;
@@ -52,7 +51,6 @@ void ClientDelUserParserReset(ClientDelUserParser *p) {
 
 ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c) {
     LogDebug("Feeding %d to ClientDelUserParser", c);
-//    Error( "char= %c", c);
     if (null == p) {
         Debug("Cannot feed DelUserParser if is NULL");
         return DelInvalidState;
@@ -90,6 +88,7 @@ ClientDelUserParserState ClientDelUserParserFeed(ClientDelUserParser *p, byte c)
                     Debug("Username has to be at least 1 character long");
                     break;
                 }
+                p->Word[p->Index] = '\0';
                 p->State = DelFinished;
                 break;
             }

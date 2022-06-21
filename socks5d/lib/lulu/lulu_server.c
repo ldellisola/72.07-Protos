@@ -33,7 +33,8 @@ bool RegisterLuluServer(const char *port, const char *address, int poolSize,cons
         case AF_INET6:
             return RegisterLuluServerOnIPv6(port,address);
         default:
-            LogError(false,"Unknown Address type");
+            Error("Unknown Address type");
+//            todo: esta bien?
             return false;
     }
 }
@@ -67,14 +68,16 @@ void LuluPassiveAccept(SelectorKey *key) {
     TcpConnection *client = AcceptNewTcpConnection(key->Fd);
 
     if (null == client) {
-        LogError(false, "Cannot accept client connection");
+        Error("Cannot accept client connection");
+//        todo:esta bien?
         return;
     }
 
     LuluConnection *connection = CreateLuluConnection(client);
 
     if (null == connection) {
-        LogError(false, "Cannot create connection");
+        Error("Cannot create connection");
+//        todo:esta bien?
         return;
     }
 
@@ -89,7 +92,8 @@ void LuluPassiveAccept(SelectorKey *key) {
 
     if (SELECTOR_STATUS_SUCCESS != status) {
         DisposeLuluConnection(connection, NULL);
-        LogError(false, "Cannot register new LULU connection to the selector");
+        Fatal("Cannot register new LULU connection to the selector");
+//        todo: esta bien?
     }
 }
 

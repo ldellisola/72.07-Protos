@@ -61,7 +61,13 @@ int DeleteSocks5User(const char * username);
  */
 int GetAllLoggedInSocks5Users(char ** usernames, int length);
 
-
+/**
+ * It retrieves all users.
+ * @param usernames Pointer to a list of strings to store the usernames
+ * @param length max size of usernames we can store in the previous array
+ * @return The number of usernames retrieved. -1 means that there MAY be more logged users
+ */
+int GetAllSocks5Users(char **usernames, int length);
 /**
  * It safely disposes the memory allocated by the users module
  */

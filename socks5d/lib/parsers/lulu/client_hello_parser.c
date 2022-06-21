@@ -6,7 +6,6 @@
 #include "utils/logger.h"
 
 ClientHelloParserState traverseWord(ClientHelloParser *p, byte c, ClientHelloParserState nextState, char *nextWord) {
-//    Error( "char c = %c", c);
     if(strlen(p->Word) == p->Index){
         if(c == '|'){
             p->Word = nextWord;

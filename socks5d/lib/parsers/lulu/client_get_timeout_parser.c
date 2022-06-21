@@ -29,7 +29,7 @@ ClientGetTimeoutParserState traverseWordGetTimeout(ClientGetTimeoutParser *p, by
 void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
     Debug("Resetting ClientGetTimeoutParser...");
     if (null == p) {
-        Error("Cannot reset NULL ClientGetTimeoutParser");
+        Debug("Cannot reset NULL ClientGetTimeoutParser");
         return;
     }
 
@@ -56,7 +56,6 @@ void ClientGetTimeoutParserReset(ClientGetTimeoutParser *p) {
 
 ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p, byte c) {
     LogDebug("Feeding %d to ClientGetTimeoutParser", c);
-//    Error( "char = %c", c);
 
     if (null == p) {
         LogDebug(false, "Cannot feed GetTimeoutParser if is NULL");
@@ -65,16 +64,13 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
 
     switch (p->State) {
         case GetTimeoutGet:
-//            LogError(false, "TimeoutGet");
             p->State = traverseWordGetTimeout(p, c, GetTimeout, p->Timeout);
             break;
         case GetTimeout:
-//            LogError(false, "Timeout");
             p->State = traverseWordGetTimeout(p, c, GetTimeoutCRLF, null);
             break;
 
         case GetTimeoutCRLF:
-//            LogError(false, "TimeoutCRLF");
             if( c == '\n'){
                 p->State = GetTimeoutFinished;
                 break;
@@ -83,9 +79,7 @@ ClientGetTimeoutParserState ClientGetTimeoutParserFeed(ClientGetTimeoutParser *p
             p->State =  GetTimeoutInvalidState;
             break;
         case GetTimeoutFinished:
-//            LogError(false, "TimeoutFinished");
         case GetTimeoutInvalidState:
-//            LogError(false, "TimeoutInvalidState");
             break;
     }
     return p->State;

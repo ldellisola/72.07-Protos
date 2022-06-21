@@ -9,7 +9,7 @@
 void ClientGoodbyeParserReset(ClientGoodbyeParser *p) {
     Debug("Resetting HelloParser...");
     if (null == p) {
-        Error( "Cannot reset NULL HelloParser");
+        Debug( "Cannot reset NULL HelloParser");
         return;
     }
 
@@ -28,7 +28,7 @@ void ClientGoodbyeParserReset(ClientGoodbyeParser *p) {
 }
 
 ClientGoodbyeParserState traverseWordGoodbye(ClientGoodbyeParser *p, byte c, ClientGoodbyeParserState nextState) {
-//    Error( "char c = %c", c);
+
 
     if (p->Index == strlen(p->Goodbye)-1) {
         if (c == '\r') {
@@ -82,7 +82,6 @@ size_t ClientGoodbyeParserConsume(ClientGoodbyeParser *p, byte *c, size_t length
     }
 
     for (size_t i = 0; i < length; ++i) {
-//        Error( "char c = %c", c[i]);
         ClientGoodbyeParserState state = ClientGoodbyeParserFeed(p, c[i]);
         if (ClientGoodbyeParserHasFinished(state))
             return i + 1;

@@ -63,12 +63,12 @@ typedef struct PooledLuluConnection_{
 PooledLuluConnection * luluPool;
 //void CleanLuluPool( PooledLuluConnection * pool);
 LuluConnection *CreateLuluConnection(TcpConnection *tcpConnection) {
-    Info("Creating LuluConnection.");
+    Debug("Creating LuluConnection.");
 
     LuluConnection *connection = GetLuluConnection();
 
     if (null == tcpConnection)
-        LogError(false, "Cannot allocate space for LuluConnection");
+        Fatal("Cannot allocate space for LuluConnection");
 
     connection->ClientTcpConnection = tcpConnection;
     connection->Handler = &luluConnectionHandler;
@@ -82,13 +82,13 @@ LuluConnection *CreateLuluConnection(TcpConnection *tcpConnection) {
     BufferInit(&connection->WriteBuffer, 1000, writeBuffer);
     BufferInit(&connection->ReadBuffer, 1000, readBuffer);
 
-    Info("LuluConnection Created!");
+    Debug("LuluConnection Created!");
     return connection;
 }
 
 LuluConnection *GetLuluConnection() {
     if (null == luluPool) {
-        LogError(false, "LULU pool was not initialized");
+        Warning("LULU pool was not initialized");
         return null;
     }
 
@@ -113,7 +113,7 @@ LuluConnection *GetLuluConnection() {
 void CreateLuluConnectionPool(int initialSize) {
     Debug("Initializing LULU Pool");
     if (initialSize < 1) {
-        LogInfo("Invalid initial pool size %d, using default value 1", initialSize);
+        LogDebug("Invalid initial pool size %d, using default value 1", initialSize);
         initialSize = 1;
     }
 
@@ -134,9 +134,9 @@ void CreateLuluConnectionPool(int initialSize) {
 //}
 
 void DisposeLuluConnection(LuluConnection *connection, fd_selector selector) {
-    Info("Disposing LuluConnection...");
+    Debug("Disposing LuluConnection...");
     if (null == connection) {
-        LogError(false, "Cannot destroy NULL Socks5Connection");
+        Warning("Cannot destroy NULL Socks5Connection");
         return;
     }
 
@@ -153,11 +153,11 @@ void DisposeLuluConnection(LuluConnection *connection, fd_selector selector) {
         LogOutLuluUser(connection->User);
 
     DestroyLuluConnection(connection);
-    Info("Socks5Connection disposed!");
+    Debug("Socks5Connection disposed!");
 }
 void DestroyLuluConnection(LuluConnection *connection) {
     if (null == luluPool) {
-        LogError(false, "TCP pool was not initialized");
+        Warning("TCP pool was not initialized");
         return;
     }
 
@@ -168,7 +168,7 @@ void DestroyLuluConnection(LuluConnection *connection) {
 
     if (null == temp)
     {
-        LogError(false,"Error while destroying connection!");
+        Warning("Error while destroying connection!");
         return;
     }
     assert(&temp->Connection == connection);
