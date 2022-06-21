@@ -27,6 +27,12 @@ typedef struct Socks5User{
 void LoadSocks5Users(const char *usernames[], const char *passwords[]);
 
 /**
+ * It loads to memory a user
+ * @param username username to add.
+ * @param password passwords to add
+ */
+void LoadSingleUser(const char *username, const char *password);
+/**
  * It checks if a user is authorized to use the server
  * @param username username of the user
  * @param password password of the user

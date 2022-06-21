@@ -188,22 +188,22 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     free(loggedUsernames);
 //    TODO: free?/listo
 //  I create user
-    const char** usernames = calloc(2, sizeof(byte));
-    const char** passwords= calloc(2, sizeof(byte));
-    usernames[0] = username;// TODO <-- THIS
-    usernames[1] = null;
-    passwords[0] = password; // TODO <-- THIS
-    passwords[1] = null;
+//    const char** usernames = calloc(2, sizeof(byte));
+//    const char** passwords= calloc(2, sizeof(byte));
+//    usernames[0] = username;// TODO <-- THIS
+//    usernames[1] = null;
+//    passwords[0] = password; // TODO <-- THIS
+//    passwords[1] = null;
 
 //    TODO: IS -->THIS<-- OK?
-    LoadSocks5Users(usernames,passwords );
+    LoadSingleUser(username,password );
     if (length < LEN_OK) {
         Warning("Buffer to small to WriteHead ClientSetUserSizeResponse");
         return 0;
     }
     fillBuffer("+OK\r\n", buffer,LEN_OK );
-    free(usernames);
-    free(passwords);
+//    free(usernames);
+//    free(passwords);
     return (LEN_OK);
 }
 
