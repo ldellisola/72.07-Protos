@@ -24,7 +24,7 @@ CliArguments ParseCli(int argc, char **argv) {
             .EnablePasswordScanners=true,
             .LuluPort="8080",
             .LuluAddress=null,
-            .BufferSize = 1000,
+            .BufferSize = 512,
             .Timeout = 50
     };
 
