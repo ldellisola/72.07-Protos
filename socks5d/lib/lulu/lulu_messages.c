@@ -164,7 +164,10 @@ size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
 
 size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, char* password) {
 
-//    todo: free?/listo
+    if(username == null || password == null)
+        return 0;
+
+//    todo: free?/listo?
 
 //  I check that username doesnt exist
     char **loggedUsernames = calloc(200, sizeof(byte));
@@ -175,7 +178,7 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     for (int i = 0; i < users; ++i) {
         if(strcmp(loggedUsernames[i], username) == 0){
             if (length < LEN_USER_EXISTS) {
-                Error("Buffer to small to WriteHead ClientSetUserSizeResponse");
+                Warning("Buffer to small to WriteHead ClientSetUserSizeResponse");
                 return 0;
             }
             fillBuffer("-USER EXISTS\r\n", buffer,LEN_USER_EXISTS );
@@ -187,13 +190,15 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
 //  I create user
     const char** usernames = calloc(2, sizeof(byte));
     const char** passwords= calloc(2, sizeof(byte));
-    usernames[0] = username;
+    usernames[0] = username;// TODO <-- THIS
     usernames[1] = null;
-    passwords[0] = password;
+    passwords[0] = password; // TODO <-- THIS
     passwords[1] = null;
+
+//    TODO: IS -->THIS<-- OK?
     LoadSocks5Users(usernames,passwords );
     if (length < LEN_OK) {
-        Error("Buffer to small to WriteHead ClientSetUserSizeResponse");
+        Warning("Buffer to small to WriteHead ClientSetUserSizeResponse");
         return 0;
     }
     fillBuffer("+OK\r\n", buffer,LEN_OK );
