@@ -94,7 +94,7 @@ void PrintHelp() {
     printf("\t-L dirección-de-management\n\t\tEstablece la dirección donde servirá el servicio de management.\n\t\tPor defecto escucha únicamente en loopback.\n\n");
     printf("\t-P puerto-conf\n\t\tPuerto SCTP  donde escuchará por conexiones entrante del protocolo\n\t\tde configuración. Por defecto el valor es 8080.\n\n");
     printf("\t-u user:pass\n\t\tDeclara un usuario del server LULU con su contraseña.\n\n");
-    printf("\t-v     Imprime información sobre la versión versión y termina.\n\n");
+    printf("\t-v     Imprime información sobre la versión y termina.\n\n");
 }
 
 bool isValidIpAddress(char *ipAddress)

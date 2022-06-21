@@ -1,0 +1,51 @@
+.\" Macros
+.ds PX \s-1LULU\s+1
+.de EXAMPLE .\" Format de los ejemplos
+.RS 10
+.BR "\\$1"
+.RE
+..
+
+.TH socks5d 0.0.0 "24 de mayo 2022"
+.LO 8
+.SH NAME
+lulu_client \- monitorear y configurar SOCKSv5 server
+
+.SH SYNOPSIS
+.HP 10
+.B lulu_client -u usuario:contraseña [-h] [-L dirección-de-management]
+                [-P puerto-conf] [-v]
+.SH DESCRIPTION
+lulu_client es un cliente de LULU que es utilizado para monitorear y
+configurar el server de SOCKSv5.
+
+.SH OPTIONS
+
+
+.\".IP "\fB\-d\fB"
+
+        \-u usuario:contraseña
+                Declara un usuario del server LULU con sucontraseña.
+
+        \-h
+                Imprime la ayuda y termina.
+
+        \-L dirección-de-management
+                Establece la direcci'on donde servirá el servicio de management.                    
+		Por defecto escucha únicamente en loopback.
+
+        \-P puerto-conf
+                Puerto SCTP donde escuchará por conexiones entrante de protocolo.                   
+		de configuracion. Por defecto el valor es 8080.
+
+        \-v
+                Imprime información sobre la versión y termina.
+
+
+
+.SH SEE ALSO
+socks5d(8)
+
+.SH AUTHOR
+Lucas Dell'Isolla (ldellisola@itba.edu.ar)
+Lucía Torrusio (ltorrusio@itba.edu.ar)
