@@ -36,7 +36,7 @@ CliArguments ParseCli(int argc, char **argv) {
     int numberOfUsers = 0;
     int ch;
     long value;
-    int p;
+    long p;
     while ((ch = getopt(argc,argv,"hl:L:Np:P:u:vb:t:")) != -1){
         switch (ch) {
             case 'l':
@@ -55,14 +55,14 @@ CliArguments ParseCli(int argc, char **argv) {
                     args.LuluAddress = optarg;
                 break;
             case 'p':
-                p = atoi(optarg);
+                p = strtol(optarg, null, 10);
                 if(p >0 && p <= 65535)
                     args.SocksPort = optarg;
                 else
                     Fatal("Invalid socksPort");
                 break;
             case 'P':
-                p = atoi(optarg);
+                p = strtol(optarg, null, 10);
                 if(p >0 && p <= 65535)
                     args.LuluPort = optarg;
                 else

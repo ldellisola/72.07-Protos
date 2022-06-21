@@ -41,23 +41,28 @@ CliArguments ParseCli(int argc, char ** argv){
                 if(null == p) {
                     Fatal("Password not found");
                 } else {
+
                     *p = 0;
                     p++;
-                    arguments.Username = optarg;
-                    arguments.Password = p;
+                    if(strlen(p) > 255 || strlen(optarg)> 255){
+                        Fatal("Password not found");
+                    }else{
+                        arguments.Username = optarg;
+                        arguments.Password = p;
+                    }
                 }
                 break;
             case 'L':
                 if(isValidIpAddress(optarg)){
                     arguments.Address = optarg;
                 }else{
-
+                    Fatal("Invalid Address");
                 }
 
                 break;
             case 'P':
                 arguments.Port = (int) strtol(optarg,null,10);
-                if (0 == arguments.Port && (EINVAL==errno || ERANGE == errno))
+                if ((0 == arguments.Port && (EINVAL==errno || ERANGE == errno)) || (arguments.Port < 0))
                     LogFatalWithReason("Invalid port number: %s",optarg);
 
                 break;
