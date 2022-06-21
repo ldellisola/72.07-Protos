@@ -38,7 +38,6 @@ unsigned LuluHelloReadRun(void *data) {
     BufferWriteAdv(d->ReadBuffer, bytesRead);
 
     int possibleReturn = NO_RETURN;
-//    d->ParserIndex = d->NotRecognised? PARSER_COUNT:d->ParserIndex;
     while (d->ParserIndex <= PARSER_COUNT && possibleReturn == NO_RETURN){
          possibleReturn = RunParser(d, buffer, bytesRead, connection, data, bufferSize);
     }

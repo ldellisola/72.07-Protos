@@ -77,7 +77,6 @@ void LuluPassiveAccept(SelectorKey *key) {
 
     if (null == client) {
         Error("Cannot accept client connection");
-//        todo:esta bien?
         return;
     }
 
@@ -85,7 +84,6 @@ void LuluPassiveAccept(SelectorKey *key) {
 
     if (null == connection) {
         Error("Cannot create connection");
-//        todo:esta bien?
         return;
     }
 
@@ -101,7 +99,6 @@ void LuluPassiveAccept(SelectorKey *key) {
     if (SELECTOR_STATUS_SUCCESS != status) {
         DisposeLuluConnection(connection, NULL);
         Fatal("Cannot register new LULU connection to the selector");
-//        todo: esta bien?
     }
 }
 

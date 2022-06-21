@@ -71,7 +71,7 @@ unsigned ClientWriteRun(void *data) {
     fd_selector selector = ((SelectorKey *) data)->Selector;
 
     if (!BufferCanRead(&connection->WriteBuffer)){
-        // TODO handle error
+
         bool success = true;
         if (connection->RemoteTcpConnection->CanRead){
             success &= SELECTOR_STATUS_SUCCESS == SelectorSetInterest(selector, connection->ClientTcpConnection->FileDescriptor, SELECTOR_OP_READ);

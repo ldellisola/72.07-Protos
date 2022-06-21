@@ -1,4 +1,4 @@
-# HOLA
+# SOCKS5D
 
 En este repositorio se encuentra el TPE de la materia Protocolos de Comunicación realizado por el grupo 11.
 
@@ -15,10 +15,12 @@ Este trabajo practico consiste en la implementación de un servidor Socks5 junto
 .
 ├── README.md
 ├── reference
-│   ├── Lulu Protocol.pdf
+│   ├── Lulu.txt
 │   ├── rfc1928.pdf
 │   ├── rfc1929.pdf
-│   └── Report.pdf
+│   ├── client.8
+│   ├── socks5d.8
+│   └── informe.pdf
 ├── scripts
 │   ├── Dockerfile
 │   └── StressTest

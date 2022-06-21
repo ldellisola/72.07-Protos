@@ -132,7 +132,6 @@ size_t BuildClientGetMetricsResponse(byte *buffer, size_t length) {
 }
 
 size_t BuildClientListUsersResponse(byte *buffer, size_t length) {
-//    TODO:freee / listo
     char **usernames = calloc(200, sizeof(byte));
     int users = GetAllLoggedInSocks5Users(usernames,200 );
     if(users == 0){
@@ -166,8 +165,6 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
     if(username == null || password == null)
         return 0;
 
-//    todo: free?/listo?
-
 //  I check that username doesnt exist
     char **loggedUsernames = calloc(200, sizeof(byte));
     int users = GetAllSocks5Users(loggedUsernames,200 );
@@ -185,15 +182,13 @@ size_t BuildClientSetUserResponse(byte *buffer, size_t length, char* username, c
         }
     }
     free(loggedUsernames);
-//    TODO: free?/listo
     LoadSingleUser(username,password );
     if (length < LEN_OK) {
         Warning("Buffer to small to WriteHead ClientSetUserSizeResponse");
         return 0;
     }
     fillBuffer("+OK\r\n", buffer,LEN_OK );
-//    free(usernames);
-//    free(passwords);
+
     return (LEN_OK);
 }
 

@@ -14,7 +14,6 @@ void ConnectedConnectionInit(unsigned int state, void *data) {
 }
 
 void ConnectedConnectionClose(unsigned int state, void *data) {
-//    Socks5Connection *connection = ATTACHMENT(data);
 
 }
 

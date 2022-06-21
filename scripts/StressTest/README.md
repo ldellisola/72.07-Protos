@@ -53,7 +53,7 @@ Total attempts: 12321
 Total errors: 0
 ```
 
-## Compile
+## Compilation
 
 To compile this program in a linux distribution, it is a requirement to have the .NET6 SDK installed. 
 

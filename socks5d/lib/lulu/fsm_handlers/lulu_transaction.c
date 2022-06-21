@@ -9,7 +9,6 @@
 
 #include "lulu/lulu_connection.h"
 #define T_PARSER_COUNT 9
-// TODO: HACER UN ENUM JE
 #define T_GOODBYE_PARSER 0
 #define T_SET_BUFFER_SIZE_PARSER 1
 #define T_METRICS_PARSER 2
@@ -109,7 +108,6 @@ int RunTransactionParser(ClientTransactionData *d, byte *buffer, ssize_t bytesRe
             break;
         case T_GOODBYE_PARSER:
             ClientGoodbyeParserConsume(&d->GoodbyeParser, buffer, bytesRead);
-//            BufferReset(d->ReadBuffer);
             if (!ClientGoodbyeParserHasFinished(d->GoodbyeParser.State))
                 return LULU_CS_TRANSACTION_READ;
 
