@@ -1,4 +1,4 @@
-# SOCKS5D
+# Socks5d
 
 En este repositorio se encuentra el TPE de la materia Protocolos de Comunicación realizado por el grupo 11.
 
